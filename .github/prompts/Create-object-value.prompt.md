@@ -11,8 +11,9 @@ Remember the schema will be used in a typescript application. So you have to def
 * Understand the schema/idea provided.
 * Define each field.
 * Once you get the fields that compound the schema, use a class to define the object value, all the attributes must be `public readonly` and must be declared in the constructor,
-* The class will be located at `src/core/object_values`.
-* The name of the class and the file must be in camel case. For example; "route day" RouteDay, "user" User, etc.
+* The class will be located at `src/core/object-values`.
+* At the end of the class name you have to add `ObjectValue`. i.e. "Route day" it would be "RouteDayObjectValue".
+* At the end of the file name you have to add `ObjectValue`. i.e. "user" it would be "userObjectValue.ts".
 
 For example, if the user provides you with the following information:
 
@@ -25,7 +26,7 @@ CREATE TABLE public.payment_method (
 You should generate the following object value:
 
 ```typescript
-export class PaymentMethod {
+export class PaymentMethodObjectValue {
   constructor(
     public readonly id_payment_method: string,
     public readonly payment_method_name: string

@@ -12,7 +12,8 @@ Remember the schema will be used in a typescript application. So you have to def
 * Define each field.
 * Once you get the fields that compound the schema, use a class to define the entity, all the attributes must be `public readonly` and must be declared in the constructor,
 * The class will be located at `src/core/entities`.
-* The name of the class and the file must be in camel case. For example; "route day" RouteDay, "user" User, etc.
+* At the end of the class name you have to add `Entity`. i.e. "Route day" it would be "RouteDayEntity".
+* At the end of the file name you have to add `Entity`. i.e. "user" it would be "userEntity.ts".
 
 For example, if the user provides you with the following information:
 
@@ -34,7 +35,7 @@ CREATE TABLE public.users (
 You should generate the following entity:
 
 ```typescript
-export class User {
+export class UserEntity {
   constructor(
     public readonly id_user: string,
     public readonly cellphone: string,
