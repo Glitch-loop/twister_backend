@@ -1,4 +1,4 @@
-import { LocationEntity } from '../entities/locationEntity';
+import { LocationEntity } from '../entities/location.entity';
 
 export abstract class LocationRepository {
   abstract createLocation(location: LocationEntity): Promise<void>;

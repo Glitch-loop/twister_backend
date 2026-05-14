@@ -1,14 +1,14 @@
 // Enums
-import { CLIENT_STATUS_ENUM } from '../enums/clientStatusEnum';
+import { CLIENT_STATUS_ENUM } from '../enums/client-status.enum';
 
 // Object values
-import { NoteObjectValue } from '../object-values/noteObjectValue';
-import { LocationTypeObjectValue } from '../object-values/locationTypeObjectValue';
+import { NoteObjectValue } from '../object-values/note.object-value';
+import { LocationTypeObjectValue } from '../object-values/location-type.object-value';
 
 // Entities
-import { TaxClientInformationEntity } from '../entities/taxClientInformationEntity';
-import { LocationEntity } from '../entities/locationEntity';
-import { FurnitureEntity } from '../entities/furnitureEntity';
+import { TaxClientInformationEntity } from '../entities/tax-client-information.entity';
+import { LocationEntity } from '../entities/location.entity';
+import { FurnitureEntity } from '../entities/furniture.entity';
 
 export class ClientAggregate {
   private _taxClientInformation: TaxClientInformationEntity | null;

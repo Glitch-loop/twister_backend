@@ -1,6 +1,6 @@
-import { NoteObjectValue } from '../object-values/noteObjectValue';
-import { LocationTypeObjectValue } from '../object-values/locationTypeObjectValue';
-import { CLIENT_STATUS_ENUM } from '../enums/clientStatusEnum';
+import { NoteObjectValue } from '../object-values/note.object-value';
+import { LocationTypeObjectValue } from '../object-values/location-type.object-value';
+import { CLIENT_STATUS_ENUM } from '../enums/client-status.enum';
 
 export class LocationEntity {
   constructor(
