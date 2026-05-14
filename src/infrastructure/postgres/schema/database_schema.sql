@@ -365,4 +365,7 @@ INSERT INTO public.payment_method (id_payment_method, payment_method_name) VALUE
   ('52757755-1471-44c3-b6d5-07f7f83a0f6f', 'cash'),
   ('b68e6be3-8919-41dd-9d09-6527884e162e', 'transfer');
 
+INSERT INTO "public"."clients" ("id_client", "legal_name", "postal_code", "fiscal_regime", "name", "cellphone", "email", "created_at", "updated_at") VALUES 
+('041c6093-a97b-4f4c-ab8e-6d1e35689555', 'PÚBLICO EN GENERAL', '48327', '616 – Sin obligaciones fiscales', 'PÚBLICO EN GENERAL', '0000000000', 'Ninguno', NOW(), NOW());
+
 -- Dummy insertions
