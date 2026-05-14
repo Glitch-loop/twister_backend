@@ -13,7 +13,7 @@ Remember the schema will be used in a typescript application. So you have to def
 * Once you get the fields that compound the schema, use a class to define the object value, all the attributes must be `public readonly` and must be declared in the constructor,
 * The class will be located at `src/core/object-values`.
 * At the end of the class name you have to add `ObjectValue`. i.e. "Route day" it would be "RouteDayObjectValue".
-* At the end of the file name you have to add `ObjectValue`. i.e. "user" it would be "userObjectValue.ts".
+* By convention we are using kebab-case for file names and we add `.object-value` at the end of the file name. i.e. "route day" it would be "route-day.object-value.ts". 
 
 For example, if the user provides you with the following information:
 

@@ -20,8 +20,10 @@ If the user doesn't provide any rule or description about what a method makes th
 * All attributes will be injected throught the constructor, at least the user specifically says that not. If user provide rules then apply them in the constructor otherwise, only assign the paramters to their respective attributes. 
 * Define all the methods the aggregate must contain, take into account if the user describes what the method does, if there is not description then let it empty.
 * At the end of the class name you have to add `Aggregate`. i.e. "Client" it would be "ClientAggregate".
-* At the end of the file name you have to add `Aggregate`. i.e. "location" it would be "locationAggregate.ts".
+* By convention we are using kebab-case for file names and we add `.aggregate` at the end of the file name. i.e. "route day" it would be "route-day.aggregate.ts". 
 * This file will be placed at `src/core/aggregates` folder.
+
+
 
 For example, if the user provides you with the following information:
 
