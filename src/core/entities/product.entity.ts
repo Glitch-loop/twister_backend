@@ -1,4 +1,4 @@
-import { ProductPriceObjectValue } from '../object-values/productPriceObjectValue';
+import { ProductPriceObjectValue } from '@/src/core/object-values/product-price.object-value';
 
 export class ProductEntity {
   constructor(

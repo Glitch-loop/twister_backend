@@ -2,16 +2,16 @@
 import { Injectable } from '@nestjs/common';
 
 // Repositories
-import { LocationRepository } from 'src/core/Interfaces/location.repository';
+import { LocationRepository } from '@/src/core/Interfaces/location.repository';
 
 // Entities
-import { LocationEntity } from 'src/core/entities/location.entity';
+import { LocationEntity } from '@/src/core/entities/location.entity';
 
 // Object values
-import { NoteObjectValue } from 'src/core/object-values/note.object-value';
+import { NoteObjectValue } from '@/src/core/object-values/note.object-value';
 
 // Datasource
-import { SupabaseDataSource } from 'src/infrastructure/datasources/supabase-data-source';
+import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
 
 @Injectable()
 export class LocationSupabaseRepository implements LocationRepository {

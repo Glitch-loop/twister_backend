@@ -11,7 +11,7 @@ Remember the schema will be used in a typescript application. So you have to def
 * Understand the schema/idea provided.
 * Define each field.
 * Once you get the fields that compound the schema, use a class to define the entity, all the attributes must be `public readonly` and must be declared in the constructor,
-* The class will be located at `src/core/entities`.
+* The class will be located at `@/src/core/entities`.
 * At the end of the class name you have to add `Entity`. i.e. "Route day" it would be "RouteDayEntity".
 * By convention we are using kebab-case for file names and we add `.entity` at the end of the file name. i.e. "route day" it would be "route-day.entity.ts". 
 

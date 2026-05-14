@@ -1,6 +1,6 @@
-import type { TaxModel } from '../../models/tax.model';
+import type { TaxModel } from '@/src/application/models/tax.model';
 
-import { isRecord } from '../utils';
+import { isRecord } from '@/src/application/guards/utils';
 
 export const isTaxModel = (value: unknown): value is TaxModel => {
   if (!isRecord(value)) {

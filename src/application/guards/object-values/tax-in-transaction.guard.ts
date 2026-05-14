@@ -1,8 +1,7 @@
-import type { TaxInTransactionModel } from '@/src/application/models/tax-in-transaction.model';
-
+import type { TaxInTransactionObjectValue } from '@/src/core/object-values/tax-in-transaction.object-value';
 import { isRecord } from '@/src/application/guards/utils';
 
-export const isTaxInTransactionModel = (value: unknown): value is TaxInTransactionModel => {
+export const isTaxInTransactionObjectValue = (value: unknown): value is TaxInTransactionObjectValue => {
   if (!isRecord(value)) {
     return false;
   }

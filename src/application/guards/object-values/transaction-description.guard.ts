@@ -1,8 +1,7 @@
-import type { TransactionDescriptionModel } from '@/src/application/models/transaction-description.model';
-
+import type { TransactionDescriptionObjectValue } from '@/src/core/object-values/transaction-description.object-value';
 import { isRecord } from '@/src/application/guards/utils';
 
-export const isTransactionDescriptionModel = (value: unknown): value is TransactionDescriptionModel => {
+export const isTransactionDescriptionObjectValue = (value: unknown): value is TransactionDescriptionObjectValue => {
   if (!isRecord(value)) {
     return false;
   }

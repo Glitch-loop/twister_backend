@@ -1,6 +1,6 @@
-import type { RouteDayLocationModel } from '../../models/route-day-location.model';
+import type { RouteDayLocationModel } from '@/src/application/models/route-day-location.model';
 
-import { isRecord } from '../utils';
+import { isRecord } from '@/src/application/guards/utils';
 
 export const isRouteDayLocationModel = (value: unknown): value is RouteDayLocationModel => {
   if (!isRecord(value)) {

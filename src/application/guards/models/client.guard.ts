@@ -1,6 +1,6 @@
-import type { ClientModel } from '../../models/client.model';
+import type { ClientModel } from '@/src/application/models/client.model';
 
-import { isRecord } from '../utils';
+import { isRecord } from '@/src/application/guards/utils';
 
 export const isClientModel = (value: unknown): value is ClientModel => {
   if (!isRecord(value)) {

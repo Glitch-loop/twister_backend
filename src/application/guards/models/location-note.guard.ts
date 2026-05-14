@@ -1,6 +1,6 @@
-import type { LocationNoteModel } from '../../models/location-note.model';
+import type { LocationNoteModel } from '@/src/application/models/location-note.model';
 
-import { isRecord } from '../utils';
+import { isRecord } from '@/src/application/guards/utils';
 
 export const isLocationNoteModel = (value: unknown): value is LocationNoteModel => {
   if (!isRecord(value)) {

@@ -1,6 +1,6 @@
-import type { AssignedRouteDayModel } from '../../models/assigned-route-day.model';
+import type { AssignedRouteDayModel } from '@/src/application/models/assigned-route-day.model';
 
-import { isRecord } from '../utils';
+import { isRecord } from '@/src/application/guards/utils';
 
 export const isAssignedRouteDayModel = (value: unknown): value is AssignedRouteDayModel => {
   if (!isRecord(value)) {

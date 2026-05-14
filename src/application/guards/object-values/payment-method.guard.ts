@@ -1,8 +1,7 @@
-import type { PaymentMethodModel } from '@/src/application/models/payment.method.model';
-
+import type { PaymentMethodObjectValue } from '@/src/core/object-values/payment-method.object-value';
 import { isRecord } from '@/src/application/guards/utils';
 
-export const isPaymentMethodModel = (value: unknown): value is PaymentMethodModel => {
+export const isPaymentMethodObjectValue = (value: unknown): value is PaymentMethodObjectValue => {
   if (!isRecord(value)) {
     return false;
   }

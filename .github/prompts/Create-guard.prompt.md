@@ -17,20 +17,20 @@ If the user don't provide the schema/idea for generating the entity, ask him to 
 
 # Process:
 * Find the domain object/dto/model that the user refers
-  - entities `src/core/entities`.
-  - object values `src/core/object-values`.
-  - enum `src/core/clientStatusEnum`
-  - models `src/application/models`.
+  - entities `@/src/core/entities`.
+  - object values `@/src/core/object-values`.
+  - enum `@/src/core/clientStatusEnum`
+  - models `@/src/application/models`.
 * Once you located the domain object/dto/model that the user wants to create the guard,
 identify the fields that compound the schema, if there is not a clear schema then ask the user to provide more details about the fields and their types.
 * Once identified the fields, create a guard that validates if the input data mathces the schema.
   - The name of the guard must be `is` + name of the domain object/dto/model. i.e. "UserEntity" it would be "isUserEntity".
-  - To verify if it's a record, use the `isRecord` function that is defined in `src/application/guards/utils.ts`.
+  - To verify if it's a record, use the `isRecord` function that is defined in `@/src/application/guards/utils.ts`.
   - You have to use all the fields that compound the schema to valiate the input data.
 * Depending to what you are doing a guard, you will locate the file at:
-  - If it's an entity `src/application/entities`.
-  - If it's a model `src/application/models`.
-  - If it's an object value `src/core/object-values`.
+  - If it's an entity `@/src/application/entities`.
+  - If it's a model `@/src/application/models`.
+  - If it's an object value `@/src/core/object-values`.
 * By convention we are using kebab-case for file names and we add `.guard` at the end of the file name. i.e. "route day" it would be "route-day.guard.ts". 
 
 For example, if the user provides you with the following information:
@@ -39,7 +39,7 @@ For example, if the user provides you with the following information:
 User asked to generate a guard for transaction model.
 
 # Process
-1. Locate the transaction model at `src/application/models/transaction.model.ts`.
+1. Locate the transaction model at `@/src/application/models/transaction.model.ts`.
 2. Identify the fields that compound the transaction model, in this case: 
 ```typescript
 export interface TransactionModel {
@@ -61,9 +61,9 @@ export interface TransactionModel {
 You should generate the following guard:
 
 ```typescript
-import type { TransactionModel } from '../../models/transaction.model';
+import type { TransactionModel } from '@/src/application/models/transaction.model';
 
-import { isRecord } from '../utils';
+import { isRecord } from '@/src/application/guards/utils';
 
 export const isTransactionModel = (value: unknown): value is TransactionModel => {
   if (!isRecord(value)) {

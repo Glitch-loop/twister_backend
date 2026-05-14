@@ -1,6 +1,6 @@
-import type { DayModel } from '../../models/day.model';
+import type { DayModel } from '@/src/application/models/day.model';
 
-import { isRecord } from '../utils';
+import { isRecord } from '@/src/application/guards/utils';
 
 export const isDayModel = (value: unknown): value is DayModel => {
   if (!isRecord(value)) {

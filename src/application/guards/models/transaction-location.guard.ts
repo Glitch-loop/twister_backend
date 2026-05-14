@@ -1,6 +1,6 @@
-import type { TransactionLocationModel } from '../../models/transaction-location.model';
+import type { TransactionLocationModel } from '@/src/application/models/transaction-location.model';
 
-import { isRecord } from '../utils';
+import { isRecord } from '@/src/application/guards/utils';
 
 export const isTransactionLocationModel = (value: unknown): value is TransactionLocationModel => {
   if (!isRecord(value)) {

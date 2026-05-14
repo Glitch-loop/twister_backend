@@ -1,8 +1,7 @@
-import type { PaymentSchemaModel } from '@/src/application/models/payment-schema.model';
-
+import type { PaymentSchemaObjectValue } from '@/src/core/object-values/payment-schema.object-value';
 import { isRecord } from '@/src/application/guards/utils';
 
-export const isPaymentSchemaModel = (value: unknown): value is PaymentSchemaModel => {
+export const isPaymentSchemaObjectValue = (value: unknown): value is PaymentSchemaObjectValue => {
   if (!isRecord(value)) {
     return false;
   }

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { ClientRepository } from 'src/core/Interfaces/ClientRepository';
-import { SupabaseDataSource } from 'src/infrastructure/datasources/supabase-data-source';
+import { ClientRepository } from '@/src/core/Interfaces/client.repository';
+import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
 
 @Injectable()
 export class ClientSupabase implements ClientRepository {
@@ -10,5 +10,4 @@ export class ClientSupabase implements ClientRepository {
     return this.supabaseDataSource.getClient();
   }
 
-  
 }

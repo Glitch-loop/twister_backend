@@ -1,6 +1,6 @@
-import type { ProductModel } from '../../models/product.model';
+import type { ProductModel } from '@/src/application/models/product.model';
 
-import { isRecord } from '../utils';
+import { isRecord } from '@/src/application/guards/utils';
 
 export const isProductModel = (value: unknown): value is ProductModel => {
   if (!isRecord(value)) {

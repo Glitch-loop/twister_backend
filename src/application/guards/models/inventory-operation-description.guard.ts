@@ -1,6 +1,6 @@
-import type { InventoryOperationDescriptionModel } from '../../models/inventory-operation-description.model';
+import type { InventoryOperationDescriptionModel } from '@/src/application/models/inventory-operation-description.model';
 
-import { isRecord } from '../utils';
+import { isRecord } from '@/src/application/guards/utils';
 
 export const isInventoryOperationDescriptionModel = (value: unknown): value is InventoryOperationDescriptionModel => {
   if (!isRecord(value)) {
