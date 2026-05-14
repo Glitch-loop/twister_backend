@@ -151,6 +151,7 @@ CREATE TABLE public.location_notes (
   id_location_note uuid NOT NULL DEFAULT gen_random_uuid(),
   note text NOT NULL,
   id_location uuid NOT NULL,
+  created_at timestamp with time zone NOT NULL,
   CONSTRAINT location_notes_pkey PRIMARY KEY (id_location_note),
   CONSTRAINT location_notes_id_location_fkey FOREIGN KEY (id_location) REFERENCES public.locations (id_location)
 );

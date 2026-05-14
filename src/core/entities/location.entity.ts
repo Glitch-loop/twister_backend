@@ -1,5 +1,8 @@
+// Object values
 import { NoteObjectValue } from '@/src/core/object-values/note.object-value';
 import { LocationTypeObjectValue } from '@/src/core/object-values/location-type.object-value';
+
+// Enums
 import { CLIENT_STATUS_ENUM } from '@/src/core/enums/client-status.enum';
 
 export class LocationEntity {
