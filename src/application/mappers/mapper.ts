@@ -5,24 +5,32 @@ import { Injectable } from '@nestjs/common';
 // Dtos
 
 // Entities
+import { DayEntity } from '@/src/core/entities/day.entity';
 import { LocationEntity } from '@/src/core/entities/location.entity';
+import { TaxClientInformationEntity } from '@/src/core/entities/tax-client-information.entity';
 
 // Object values
 import { NoteObjectValue } from '@/src/core/object-values/note.object-value';
 
 // Models
+import { DayModel } from '@/src/application/models/day.model';
 import { LocationModel } from '@/src/application/models/location.model';
+import { ClientModel } from '@/src/application/models/client.model';
 import { LocationTypeModel } from '@/src/application/models/location-type.model';
 import { LocationNoteModel } from '@/src/application/models/location-note.model';
 
 // Dtos guards
 
 // Entities guards
+import { isDayEntity } from '@/src/application/entities/day.guard';
 import { isLocationEntity } from '@/src/application/entities/location.guard';
+import { isTaxClientInformationEntity } from '@/src/application/entities/tax-client-information.guard';
 import { isNoteObjectValue } from '@/src/application/guards/object-values/note.guard';
 
 // Models guards
+import { isDayModel } from '@/src/application/guards/models/day.guard';
 import { isLocationModel } from '@/src/application/guards/models/location.guard';
+import { isClientModel } from '@/src/application/guards/models/client.guard';
 import { CLIENT_STATUS_ENUM } from '@/src/core/enums/client-status.enum';
 import { isLocationTypeModel } from '../guards/models/location-type.guard';
 import { isLocationNoteModel } from '../guards/models/location-note.guard';
@@ -35,9 +43,18 @@ export class Mapper {
 
   // ==================== OVERLOADED FUNCTIONS FOR MAPPING ====================
   // toDomainObject overloads
-  toDomainObject(model: LocationModel, locationTypeModel: LocationTypeModel, locationNotesModel: LocationNoteModel[]): LocationEntity {
+  toDomainObject(model: DayModel): DayEntity;
+  toDomainObject(model: ClientModel): TaxClientInformationEntity;
+  toDomainObject(model: LocationModel, locationTypeModel: LocationTypeModel, locationNotesModel: LocationNoteModel[]): LocationEntity;
+  toDomainObject(model: LocationModel | ClientModel | DayModel, locationTypeModel?: LocationTypeModel, locationNotesModel?: LocationNoteModel[]): LocationEntity | TaxClientInformationEntity | DayEntity {
+    if (isDayModel(model)) {
+      return this.dayModelToDomainObject(model);
+    }
+    if (isClientModel(model)) {
+      return this.clientModelToDomainObject(model);
+    }
     if(isLocationModel(model)) {
-      if (isLocationTypeModel(locationTypeModel) && locationNotesModel.every(isLocationNoteModel)) { 
+      if (isLocationTypeModel(locationTypeModel) && Array.isArray(locationNotesModel) && locationNotesModel.every(isLocationNoteModel)) { 
         return this.locationModelToDomainObject(model, locationTypeModel, locationNotesModel);
       }
     }
@@ -46,13 +63,21 @@ export class Mapper {
   }
 
   // toModel overloads
+  toModel(domainObject: DayEntity): DayModel;
+  toModel(domainObject: TaxClientInformationEntity): ClientModel;
   toModel(domainObject: LocationEntity): LocationModel;
   toModel(domainObject: NoteObjectValue, parentDomainObject: LocationEntity): LocationModel;
   toModel(domainObject: LocationTypeObjectValue): LocationTypeModel;
-  toModel(domainObject: LocationEntity | NoteObjectValue | LocationTypeObjectValue, parentDomainObject?: LocationEntity): any
+  toModel(domainObject: DayEntity | TaxClientInformationEntity | LocationEntity | NoteObjectValue | LocationTypeObjectValue, parentDomainObject?: LocationEntity): any
   {
-    if (isLocationEntity(parentDomainObject)) {
-      return this.locationDomainObjectToModel(parentDomainObject);
+    if (isDayEntity(domainObject)) {
+      return this.dayDomainObjectToModel(domainObject);
+    }
+    if (isTaxClientInformationEntity(domainObject)) {
+      return this.taxClientInformationEntityToModel(domainObject);
+    }
+    if (isLocationEntity(domainObject)) {
+      return this.locationDomainObjectToModel(domainObject);
     }
     if(isNoteObjectValue(domainObject) && isLocationEntity(parentDomainObject)) {
       return this.noteDomainObjectToModel(domainObject, parentDomainObject);      
@@ -68,6 +93,28 @@ export class Mapper {
   // ==================== MAPPER METHODS DTO to DOMAIN OBJECT ====================
   
   // ==================== MAPPER METHODS DOMAIN OBJECT to MODEL ====================
+  private dayDomainObjectToModel(domainObject: DayEntity): DayModel {
+    return {
+      id_day: domainObject.id_day,
+      day_name: domainObject.day_name,
+      order_to_show: domainObject.order_to_show,
+    };
+  }
+
+  private taxClientInformationEntityToModel(domainObject: TaxClientInformationEntity): ClientModel {
+    return {
+      id_client: domainObject.id_client,
+      legal_name: domainObject.legal_name,
+      postal_code: domainObject.postal_code,
+      fiscal_regime: domainObject.fiscal_regime,
+      name: domainObject.name,
+      cellphone: domainObject.cellphone,
+      email: domainObject.email,
+      created_at: domainObject.created_at,
+      updated_at: domainObject.updated_at,
+    };
+  }
+
   private locationDomainObjectToModel(domainObject: LocationEntity): LocationModel {
     return {
       id_location: domainObject.id_location,
@@ -106,6 +153,35 @@ export class Mapper {
   }
 
   // ==================== MAPPER METHODS MODEL to DOMAIN OBJECT ====================
+  private dayModelToDomainObject(model: DayModel): DayEntity {
+    return new DayEntity(
+      model.day_name,
+      model.id_day,
+      model.order_to_show,
+    );
+  }
+
+  private clientModelToDomainObject(model: ClientModel): TaxClientInformationEntity {
+    if (typeof model.created_at === 'string' && isNaN(Date.parse(model.created_at))) {
+      throw new Error('Invalid created_at format in ClientModel');
+    }
+    if (typeof model.updated_at === 'string' && isNaN(Date.parse(model.updated_at))) {
+      throw new Error('Invalid updated_at format in ClientModel');
+    }
+
+    return new TaxClientInformationEntity(
+      model.id_client,
+      model.legal_name,
+      model.postal_code,
+      model.fiscal_regime,
+      model.name,
+      model.cellphone,
+      model.email,
+      new Date(model.created_at),
+      new Date(model.updated_at),
+    );
+  }
+
   private locationModelToDomainObject(model: LocationModel, locationTypeModel: LocationTypeModel, locationNotesModel: LocationNoteModel[]): LocationEntity {
     if (typeof model.created_at === 'string' && isNaN(Date.parse(model.created_at))) {
       throw new Error('Invalid created_at format in LocationModel');
