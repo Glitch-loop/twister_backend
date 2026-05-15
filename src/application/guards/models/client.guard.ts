@@ -6,7 +6,7 @@ export const isClientModel = (value: unknown): value is ClientModel => {
   if (!isRecord(value)) {
     return false;
   }
-
+  
   return (
     typeof value.id_client === 'string' &&
     typeof value.legal_name === 'string' &&

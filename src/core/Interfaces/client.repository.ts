@@ -2,8 +2,8 @@ import { TaxClientInformationEntity } from '@/src/core/entities/tax-client-infor
 
 export abstract class ClientRepository {
   abstract createClient(client: TaxClientInformationEntity): Promise<void>;
-  abstract getClientById(id_client: string): Promise<TaxClientInformationEntity | null>;
+  abstract retrieveClientById(id_client: string[]): Promise<TaxClientInformationEntity[]>;
   abstract updateClient(id_client: string, updatedData: Partial<TaxClientInformationEntity>): Promise<void>;
-  abstract deleteClient(id_client: string): Promise<void>;
+  abstract deleteClient(id_client: string[]): Promise<void>;
   abstract listClients(): Promise<TaxClientInformationEntity[]>;
 }

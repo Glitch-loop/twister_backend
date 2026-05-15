@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from '@jest/globals';
 import { Mapper } from '@/src/application/mappers/mapper';
 import { CLIENT_STATUS_ENUM } from '@/src/core/enums/client-status.enum';
 import { DayEntity } from '@/src/core/entities/day.entity';
+import { UserEntity } from '@/src/core/entities/user.entity';
 import { TaxClientInformationEntity } from '@/src/core/entities/tax-client-information.entity';
 import { LocationEntity } from '@/src/core/entities/location.entity';
 import { LocationTypeObjectValue } from '@/src/core/object-values/location-type.object-value';
@@ -132,6 +133,43 @@ describe('Mapper.toDomainObject', () => {
           ),
         ],
         'Near the park',
+      ),
+    );
+  });
+
+  it('maps UserModel to UserEntity', () => {
+    const createdAt = new Date('2026-01-07T00:00:00.000Z');
+    const updatedAt = new Date('2026-01-08T00:00:00.000Z');
+    const userModel = {
+      id_user: 'user-1',
+      cellphone: '8180000000',
+      name: 'Jane User',
+      password: 'hashed-password',
+      status: 1,
+      salary: 1500,
+      created_at: createdAt,
+      updated_at: updatedAt,
+      address: 'Downtown 123',
+      rfc: 'XAXX010101000',
+      imss: 'NSS12345678901',
+    };
+
+    const result = mapper.toDomainObject(userModel);
+
+    expect(result).toBeInstanceOf(UserEntity);
+    expect(result).toEqual(
+      new UserEntity(
+        'user-1',
+        '8180000000',
+        'Jane User',
+        'hashed-password',
+        1,
+        1500,
+        createdAt,
+        updatedAt,
+        'Downtown 123',
+        'XAXX010101000',
+        'NSS12345678901',
       ),
     );
   });

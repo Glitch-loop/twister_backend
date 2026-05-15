@@ -154,7 +154,7 @@ export class ClientAggregate {
           loc.created_at,
           loc.updated_at,
           loc.location_type,
-          // eslint-disable-next-line prettier/prettier
+           
           [...loc.notes, ..._notes.filter((note) => note.id_owner === loc.id_location)],
           loc.address_reference,
         );

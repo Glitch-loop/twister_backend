@@ -14,8 +14,6 @@ export const isUserModel = (value: unknown): value is UserModel => {
     typeof value.password === 'string' &&
     typeof value.status === 'number' &&
     typeof value.salary === 'number' &&
-    value.created_at instanceof Date &&
-    value.updated_at instanceof Date &&
     (value.address === undefined || typeof value.address === 'string') &&
     (value.rfc === undefined || typeof value.rfc === 'string') &&
     (value.imss === undefined || typeof value.imss === 'string')
