@@ -1,4 +1,7 @@
+// Entities
 import type { LocationEntity } from '@/src/clients/core/entities/location.entity';
+
+// Guards
 import { isRecord } from '@/src/shared/guards/utils';
 
 export const isLocationEntity = (value: unknown): value is LocationEntity => {

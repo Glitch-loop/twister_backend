@@ -1,4 +1,7 @@
+// Entities
 import type { FurnitureEntity } from '@/src/clients/core/entities/furniture.entity';
+
+// Gurads
 import { isRecord } from '@/src/shared/guards/utils';
 
 export const isFurnitureEntity = (value: unknown): value is FurnitureEntity => {

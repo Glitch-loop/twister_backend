@@ -1,10 +1,26 @@
+// Libraries
 import { Module } from '@nestjs/common';
-import { UserSupabaseRepository } from '@/src/users/infrastructure/repositories/supabase/user-supabase.repository';
-import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
-import { CreateUser } from '@/src/users/application/commands/CreateUser';
-import { Mapper as EntityDtoMapper } from '@/src/application/mappers/entity-dto.mapper';
-import { Mapper as EntityModelMapper } from '@/src/application/mappers/entity-model.mapper';
+
+// Interfaces
 import { UserRepository } from '@/src/users/core/interfaces/user.repository';
+
+// Repositories
+import { UserSupabaseRepository } from '@/src/users/infrastructure/repositories/supabase/user-supabase.repository';
+
+// Datasources
+import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
+
+// Commands
+import { CreateUser } from '@/src/users/application/commands/CreateUser';
+
+//Query
+import { ListAllUsers } from '@/src/users/application/queries/ListAllUsers';
+
+// Mappers
+import { Mapper as EntityDtoMapper } from '@/src/users/application/mappers/entity-dto.mapper';
+import { Mapper as EntityModelMapper } from '@/src/users/application/mappers/entity-model.mapper';
+
+
 import { UsersController } from './users.controller';
 
 @Module({ 
@@ -15,6 +31,7 @@ import { UsersController } from './users.controller';
     EntityModelMapper,
     SupabaseDataSource,
     UserSupabaseRepository,
+    ListAllUsers,
     {
       provide: UserRepository,
       useExisting: UserSupabaseRepository,

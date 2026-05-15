@@ -14,7 +14,7 @@ import { UserModel } from '@/src/users/application/models/user.model';
 import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
 
 // Mappers
-import { Mapper } from '@/src/application/mappers/entity-model.mapper';
+import { Mapper } from '@/src/users/application/mappers/entity-model.mapper';
 
 @Injectable()
 export class UserSupabaseRepository implements UserRepository {
@@ -29,9 +29,7 @@ export class UserSupabaseRepository implements UserRepository {
 
   async createUser(user: UserEntity): Promise<void> {
     try {
-      console.log("Create user: ", user)
       const userModel = this.mapper.toModel(user);
-      console.log("Create user: ", userModel)
       const { error } = await this.supabase.from('users').insert(userModel);
       if (error) {
         throw new Error('Failed to create user, ' + error.message);

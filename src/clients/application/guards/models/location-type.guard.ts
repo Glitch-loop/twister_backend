@@ -1,5 +1,7 @@
+// Models
 import type { LocationTypeModel } from '@/src/application/models/location-type.model';
 
+// Guards
 import { isRecord } from '@/src/shared/guards/utils';
 
 export const isLocationTypeModel = (value: unknown): value is LocationTypeModel => {

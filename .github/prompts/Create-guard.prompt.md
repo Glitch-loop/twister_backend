@@ -4,7 +4,8 @@ description: This prompt is used when the user wants to create a new guard in th
 ---
 
 # Input:
-The domain object, dto, or entity to create the guard.
+- The domain object, dto, or entity to create the guard.
+- Module that belongs the guard
 
 ### Be cautious:
 If the user don't provide the schema/idea for generating the entity, ask him to provide the schema or idea. The user might give you an schema, explanation, picture or any other form of information, so be sure to ask for more details if the user don't provide you with enough information to generate the entity.
@@ -17,10 +18,10 @@ If the user don't provide the schema/idea for generating the entity, ask him to 
 
 # Process:
 * Find the domain object/dto/model that the user refers
-  - entities `@/src/core/entities`.
-  - object values `@/src/core/object-values`.
-  - enum `@/src/core/clientStatusEnum`
-  - models `@/src/application/models`.
+  - entities `@/src/<module>/core/entities`.
+  - object values `@/src/<module>/core/object-values`.
+  - enum `@/src/<module>/core/clientStatusEnum`
+  - models `@/src/<module>/application/models`.
 * Once you located the domain object/dto/model that the user wants to create the guard,
 identify the fields that compound the schema, if there is not a clear schema then ask the user to provide more details about the fields and their types.
 * Once identified the fields, create a guard that validates if the input data mathces the schema.
@@ -28,9 +29,9 @@ identify the fields that compound the schema, if there is not a clear schema the
   - To verify if it's a record, use the `isRecord` function that is defined in `@/src/application/guards/utils.ts`.
   - You have to use all the fields that compound the schema to valiate the input data.
 * Depending to what you are doing a guard, you will locate the file at:
-  - If it's an entity `@/src/application/entities`.
-  - If it's a model `@/src/application/models`.
-  - If it's an object value `@/src/core/object-values`.
+  - If it's an entity `@/src/<module>/application/entities`.
+  - If it's a model `@/src/<module>/application/models`.
+  - If it's an object value `@/src/<module>/core/object-values`.
 * By convention we are using kebab-case for file names and we add `.guard` at the end of the file name. i.e. "route day" it would be "route-day.guard.ts". 
 
 For example, if the user provides you with the following information:
@@ -39,7 +40,7 @@ For example, if the user provides you with the following information:
 User asked to generate a guard for transaction model.
 
 # Process
-1. Locate the transaction model at `@/src/application/models/transaction.model.ts`.
+1. Locate the transaction model at `@/src/<module>/application/models/transaction.model.ts`.
 2. Identify the fields that compound the transaction model, in this case: 
 ```typescript
 export interface TransactionModel {
@@ -61,9 +62,9 @@ export interface TransactionModel {
 You should generate the following guard:
 
 ```typescript
-import type { TransactionModel } from '@/src/application/models/transaction.model';
+import type { TransactionModel } from '@/src/<module>/application/models/transaction.model';
 
-import { isRecord } from '@/src/application/guards/utils';
+import { isRecord } from '@/src/shared/guards/utils';
 
 export const isTransactionModel = (value: unknown): value is TransactionModel => {
   if (!isRecord(value)) {
@@ -86,6 +87,6 @@ export const isTransactionModel = (value: unknown): value is TransactionModel =>
 };
 ```
 
-> Notice I have used "isRecord" from utils.ts located at `src/application/guards/utils.ts` to validate if the input value is a record, then I validate each field that compound the transaction model.
+> Notice I have used "isRecord" from utils.ts located at `src/shared/guards/utils.ts` to validate if the input value is a record, then I validate each field that compound the transaction model.
 
-4. Since it's a model the file will be located at `src/application/guards/models` and the name of the file will be `transaction.guard.ts`.
+4. Since it's a model the file will be located at `src/<module>/application/guards/models` and the name of the file will be `transaction.guard.ts`.
