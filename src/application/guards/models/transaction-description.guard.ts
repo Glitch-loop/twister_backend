@@ -1,6 +1,6 @@
 import type { TransactionDescriptionModel } from '@/src/application/models/transaction-description.model';
 
-import { isRecord } from '@/src/application/guards/utils';
+import { isRecord } from '@/src/shared/guards/utils';
 
 export const isTransactionDescriptionModel = (value: unknown): value is TransactionDescriptionModel => {
   if (!isRecord(value)) {

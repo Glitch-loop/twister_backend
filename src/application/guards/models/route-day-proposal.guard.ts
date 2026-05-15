@@ -1,6 +1,6 @@
 import type { RouteDayProposalModel } from '@/src/application/models/route-day-proposal.model';
 
-import { isRecord } from '@/src/application/guards/utils';
+import { isRecord } from '@/src/shared/guards/utils';
 
 export const isRouteDayProposalModel = (value: unknown): value is RouteDayProposalModel => {
   if (!isRecord(value)) {

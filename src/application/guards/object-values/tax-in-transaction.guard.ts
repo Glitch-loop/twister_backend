@@ -1,5 +1,5 @@
 import type { TaxInTransactionObjectValue } from '@/src/core/object-values/tax-in-transaction.object-value';
-import { isRecord } from '@/src/application/guards/utils';
+import { isRecord } from '@/src/shared/guards/utils';
 
 export const isTaxInTransactionObjectValue = (value: unknown): value is TaxInTransactionObjectValue => {
   if (!isRecord(value)) {

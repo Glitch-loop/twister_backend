@@ -1,5 +1,5 @@
 import type { TransactionEntity } from '@/src/core/entities/transaction.entity';
-import { isRecord } from '@/src/application/guards/utils';
+import { isRecord } from '@/src/shared/guards/utils';
 
 export const isTransactionEntity = (value: unknown): value is TransactionEntity => {
   if (!isRecord(value)) return false;

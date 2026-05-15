@@ -1,6 +1,6 @@
 import type { MeasurementUnitModel } from '@/src/application/models/measurement-unit.model';
 
-import { isRecord } from '@/src/application/guards/utils';
+import { isRecord } from '@/src/shared/guards/utils';
 
 export const isMeasurementUnitModel = (value: unknown): value is MeasurementUnitModel => {
   if (!isRecord(value)) {

@@ -1,5 +1,5 @@
 import type { RouteDayEntity } from '@/src/core/entities/route-day.entity';
-import { isRecord } from '@/src/application/guards/utils';
+import { isRecord } from '@/src/shared/guards/utils';
 
 export const isRouteDayEntity = (value: unknown): value is RouteDayEntity => {
   if (!isRecord(value)) return false;

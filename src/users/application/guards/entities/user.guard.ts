@@ -1,5 +1,8 @@
+// Entities
 import type { UserEntity } from '@/src/users/core/entities/user.entity';
-import { isRecord } from '@/src/application/guards/utils';
+
+// Guards
+import { isRecord } from '@/src/shared/guards/utils';
 
 export const isUserEntity = (value: unknown): value is UserEntity => {
   if (!isRecord(value)) return false;

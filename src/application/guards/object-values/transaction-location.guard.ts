@@ -1,5 +1,5 @@
 import type { TransactionLocationObjectValue } from '@/src/core/object-values/transaction-location.object-value';
-import { isRecord } from '@/src/application/guards/utils';
+import { isRecord } from '@/src/shared/guards/utils';
 
 export const isTransactionLocationObjectValue = (value: unknown): value is TransactionLocationObjectValue => {
   if (!isRecord(value)) {

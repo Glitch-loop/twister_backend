@@ -1,5 +1,5 @@
 import type { OrganizationStrategyEntity } from '@/src/core/entities/organization-strategy.entity';
-import { isRecord } from '@/src/application/guards/utils';
+import { isRecord } from '@/src/shared/guards/utils';
 
 export const isOrganizationStrategyEntity = (value: unknown): value is OrganizationStrategyEntity => {
   if (!isRecord(value)) return false;

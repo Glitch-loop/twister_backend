@@ -1,6 +1,6 @@
 import type { LocationTypeModel } from '@/src/application/models/location-type.model';
 
-import { isRecord } from '@/src/application/guards/utils';
+import { isRecord } from '@/src/shared/guards/utils';
 
 export const isLocationTypeModel = (value: unknown): value is LocationTypeModel => {
   if (!isRecord(value)) {

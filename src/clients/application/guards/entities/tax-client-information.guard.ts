@@ -1,5 +1,5 @@
 import type { TaxClientInformationEntity } from '@/src/clients/core/entities/tax-client-information.entity';
-import { isRecord } from '@/src/application/guards/utils';
+import { isRecord } from '@/src/shared/guards/utils';
 
 export const isTaxClientInformationEntity = (value: unknown): value is TaxClientInformationEntity => {
   if (!isRecord(value)) return false;

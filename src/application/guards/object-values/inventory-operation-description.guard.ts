@@ -1,5 +1,5 @@
 import type { InventoryOperationDescriptionObjectValue } from '@/src/core/object-values/inventory-operation-description.object-value';
-import { isRecord } from '@/src/application/guards/utils';
+import { isRecord } from '@/src/shared/guards/utils';
 
 export const isInventoryOperationDescriptionObjectValue = (value: unknown): value is InventoryOperationDescriptionObjectValue => {
   if (!isRecord(value)) {

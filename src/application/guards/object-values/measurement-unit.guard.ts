@@ -1,5 +1,5 @@
 import type { MeasurementUnitObjectValue } from '@/src/core/object-values/measurement-unit.object-value';
-import { isRecord } from '@/src/application/guards/utils';
+import { isRecord } from '@/src/shared/guards/utils';
 
 export const isMeasurementUnitObjectValue = (value: unknown): value is MeasurementUnitObjectValue => {
   if (!isRecord(value)) {

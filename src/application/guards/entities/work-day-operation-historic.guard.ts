@@ -1,5 +1,5 @@
 import type { WorkDayOperationHistoricEntity } from '@/src/core/entities/work-day-operation-historic.entity';
-import { isRecord } from '@/src/application/guards/utils';
+import { isRecord } from '@/src/shared/guards/utils';
 
 export const isWorkDayOperationHistoricEntity = (value: unknown): value is WorkDayOperationHistoricEntity => {
   if (!isRecord(value)) return false;

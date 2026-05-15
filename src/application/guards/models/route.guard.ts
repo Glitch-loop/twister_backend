@@ -1,6 +1,6 @@
 import type { RouteModel } from '@/src/application/models/route.model';
 
-import { isRecord } from '@/src/application/guards/utils';
+import { isRecord } from '@/src/shared/guards/utils';
 
 export const isRouteModel = (value: unknown): value is RouteModel => {
   if (!isRecord(value)) {

@@ -1,6 +1,6 @@
 import type { RouteTransactionOperationTypeModel } from '@/src/application/models/route-transaction-operation-type.model';
 
-import { isRecord } from '@/src/application/guards/utils';
+import { isRecord } from '@/src/shared/guards/utils';
 
 export const isRouteTransactionOperationTypeModel = (value: unknown): value is RouteTransactionOperationTypeModel => {
   if (!isRecord(value)) {
