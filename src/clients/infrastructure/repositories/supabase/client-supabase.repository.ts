@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { ClientRepository } from '@/src/core/Interfaces/client.repository';
+import { ClientRepository } from '@/src/clients/core/interfaces/client.repository';
 import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
 import { Mapper } from '@/src/application/mappers/entity-model.mapper';
-import { TaxClientInformationEntity } from '@/src/core/entities/tax-client-information.entity';
+import { TaxClientInformationEntity } from '@/src/clients/core/entities/tax-client-information.entity';
 import { ClientModel } from '@/src/application/models/client.model';
 
 @Injectable()
@@ -18,6 +18,7 @@ export class ClientSupabase implements ClientRepository {
 
   async createClient(client: TaxClientInformationEntity): Promise<void> {
     try {
+
       const clientModel = this.mapper.toModel(client);
       const { data, error } = await this.supabase.from('clients').insert(clientModel);
       if (error) {

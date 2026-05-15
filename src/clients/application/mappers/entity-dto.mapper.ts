@@ -6,7 +6,7 @@ import { Injectable } from '@nestjs/common';
 import { CLIENT_STATUS_ENUM } from '@/src/clients/core/enums/client-status.enum';
 
 // Dtos
-import { UserDto } from '../../users/application/dtos/user.dto';
+import { UserDto } from '../dtos/user.dto';
 
 // Entities
 import { DayEntity } from '@/src/core/entities/day.entity';
@@ -31,7 +31,7 @@ import { isLocationTypeObjectValue } from '@/src/application/guards/object-value
 
 // Models guards
 import { isUserModel } from '@/src/users/application/guards/models/user.guard';
-import { isUserDto } from '../../users/application/guards/dtos/user.guard';
+import { isUserDto } from '../guards/dtos/user.guard';
 
 @Injectable()
 export class Mapper {

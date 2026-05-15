@@ -3,13 +3,13 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 import { randomUUID } from 'crypto';
-import { LocationSupabaseRepository } from '@/src/infrastructure/repositories/supabase/location-supabase.repository';
+import { LocationSupabaseRepository } from '@/src/clients/infrastructure/repositories/supabase/location-supabase.repository';
 import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
 import { Mapper } from '@/src/application/mappers/entity-model.mapper';
-import { LocationEntity } from '@/src/core/entities/location.entity';
+import { LocationEntity } from '@/src/clients/core/entities/location.entity';
 import { LocationTypeObjectValue } from '@/src/core/object-values/location-type.object-value';
 import { NoteObjectValue } from '@/src/core/object-values/note.object-value';
-import { CLIENT_STATUS_ENUM } from '@/src/core/enums/client-status.enum';
+import { CLIENT_STATUS_ENUM } from '@/src/clients/core/enums/client-status.enum';
 
 // ---------------------------------------------------------------------------
 // Helpers

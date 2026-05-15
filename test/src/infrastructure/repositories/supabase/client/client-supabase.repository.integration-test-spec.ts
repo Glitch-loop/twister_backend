@@ -3,10 +3,10 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 import { randomUUID } from 'crypto';
-import { ClientSupabase } from '@/src/infrastructure/repositories/supabase/client-supabase.repository';
+import { ClientSupabase } from '@/src/clients/infrastructure/repositories/supabase/client-supabase.repository';
 import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
 import { Mapper } from '@/src/application/mappers/entity-model.mapper';
-import { TaxClientInformationEntity } from '@/src/core/entities/tax-client-information.entity';
+import { TaxClientInformationEntity } from '@/src/clients/core/entities/tax-client-information.entity';
 
 // ---------------------------------------------------------------------------
 // Helpers

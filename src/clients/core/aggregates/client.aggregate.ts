@@ -6,9 +6,9 @@ import { NoteObjectValue } from '@/src/core/object-values/note.object-value';
 import { LocationTypeObjectValue } from '@/src/core/object-values/location-type.object-value';
 
 // Entities
-import { TaxClientInformationEntity } from '@/src/core/entities/tax-client-information.entity';
-import { LocationEntity } from '@/src/core/entities/location.entity';
-import { FurnitureEntity } from '@/src/core/entities/furniture.entity';
+import { TaxClientInformationEntity } from '@/src/clients/core/entities/tax-client-information.entity';
+import { LocationEntity } from '@/src/clients/core/entities/location.entity';
+import { FurnitureEntity } from '@/src/clients/core/entities/furniture.entity';
 
 export class ClientAggregate {
   private _taxClientInformation: TaxClientInformationEntity | null;

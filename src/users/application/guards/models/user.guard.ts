@@ -1,7 +1,8 @@
-import type { UserDto } from '@/src/application/dtos/user.dto';
+import type { UserModel } from '@/src/users/application/models/user.model';
+
 import { isRecord } from '@/src/application/guards/utils';
 
-export const isUserDto = (value: unknown): value is UserDto => {
+export const isUserModel = (value: unknown): value is UserModel => {
   if (!isRecord(value)) {
     return false;
   }

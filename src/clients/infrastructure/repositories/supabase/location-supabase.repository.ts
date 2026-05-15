@@ -2,10 +2,10 @@
 import { Injectable } from '@nestjs/common';
 
 // Repositories
-import { LocationRepository } from '@/src/core/Interfaces/location.repository';
+import { LocationRepository } from '@/src/clients/core/interfaces/location.repository';
 
 // Entities
-import { LocationEntity } from '@/src/core/entities/location.entity';
+import { LocationEntity } from '@/src/clients/core/entities/location.entity';
 
 // Object values
 import { NoteObjectValue } from '@/src/core/object-values/note.object-value';

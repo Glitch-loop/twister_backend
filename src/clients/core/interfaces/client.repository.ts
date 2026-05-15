@@ -1,4 +1,4 @@
-import { TaxClientInformationEntity } from '@/src/core/entities/tax-client-information.entity';
+import { TaxClientInformationEntity } from '@/src/clients/core/entities/tax-client-information.entity';
 
 export abstract class ClientRepository {
   abstract createClient(client: TaxClientInformationEntity): Promise<void>;

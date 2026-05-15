@@ -31,7 +31,7 @@ import { isLocationTypeObjectValue } from '@/src/application/guards/object-value
 
 // Models guards
 import { isUserModel } from '@/src/users/application/guards/models/user.guard';
-import { isUserDto } from '../../users/application/guards/dtos/user.guard';
+import { isUserDto } from '../guards/dtos/user.guard';
 
 @Injectable()
 export class Mapper {

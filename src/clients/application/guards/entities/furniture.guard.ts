@@ -1,4 +1,4 @@
-import type { FurnitureEntity } from '@/src/core/entities/furniture.entity';
+import type { FurnitureEntity } from '@/src/clients/core/entities/furniture.entity';
 import { isRecord } from '@/src/application/guards/utils';
 
 export const isFurnitureEntity = (value: unknown): value is FurnitureEntity => {

@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { UserRepository } from '@/src/core/Interfaces/user.repository';
+import { UserRepository } from '@/src/users/core/interfaces/user.repository';
 import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
 import { Mapper } from '@/src/application/mappers/entity-model.mapper';
-import { UserEntity } from '@/src/core/entities/user.entity';
-import { UserModel } from '@/src/application/models/user.model';
+import { UserEntity } from '@/src/users/core/entities/user.entity';
+import { UserModel } from '@/src/users/application/models/user.model';
 
 @Injectable()
 export class UserSupabaseRepository implements UserRepository {

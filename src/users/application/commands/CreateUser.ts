@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { UserRepository } from '@/src/core/Interfaces/user.repository';
+import { UserRepository } from '@/src/users/core/interfaces/user.repository';
 import { Mapper } from '@/src/application/mappers/entity-dto.mapper';
 import { UserDto } from '../dtos/user.dto';
-import { UserEntity } from '@/src/core/entities/user.entity';
+import { UserEntity } from '@/src/users/core/entities/user.entity';
 
 @Injectable()
 export class CreateUser {
