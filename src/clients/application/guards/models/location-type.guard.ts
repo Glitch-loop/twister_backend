@@ -1,5 +1,5 @@
 // Models
-import type { LocationTypeModel } from '@/src/application/models/location-type.model';
+import type { LocationTypeModel } from '@/src/clients/application/models/location-type.model';
 
 // Guards
 import { isRecord } from '@/src/shared/guards/utils';

@@ -19,10 +19,10 @@ import { LocationTypeObjectValue } from '@/src/core/object-values/location-type.
 
 // Models
 import { DayModel } from '@/src/application/models/day.model';
-import { LocationModel } from '@/src/application/models/location.model';
-import { ClientModel } from '@/src/application/models/client.model';
-import { LocationTypeModel } from '@/src/application/models/location-type.model';
-import { LocationNoteModel } from '@/src/application/models/location-note.model';
+import { LocationModel } from '@/src/clients/application/models/location.model';
+import { ClientModel } from '@/src/clients/application/models/client.model';
+import { LocationTypeModel } from '@/src/clients/application/models/location-type.model';
+import { LocationNoteModel } from '@/src/clients/application/models/location-note.model';
 import { UserModel } from '@/src/users/application/models/user.model';
 
 // Dtos guards
@@ -40,7 +40,7 @@ import { isLocationModel } from '@/src/clients/application/guards/models/locatio
 import { isClientModel } from '@/src/clients/application/guards/models/client.guard';
 import { isLocationTypeModel } from '@/src/clients/application/guards/models/location-type.guard';
 import { isLocationNoteModel } from '@/src/clients/application/guards/models/location-note.guard';
-import { isLocationTypeObjectValue } from '@/src/application/guards/object-values/location-type.guard';
+import { isLocationTypeObjectValue } from '@/src/clients/application/guards/object-values/location-type.guard';
 import { isUserModel } from '@/src/users/application/guards/models/user.guard';
 
 @Injectable()

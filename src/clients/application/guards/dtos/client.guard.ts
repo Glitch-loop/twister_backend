@@ -1,14 +1,11 @@
-// Models
-import type { ClientModel } from '@/src/clients/application/models/client.model';
+import { ClientDto } from '@/src/clients/application/dtos/client.dto';
+import { isRecord } from "@/src/shared/guards/utils";
 
-// Guards
-import { isRecord } from '@/src/shared/guards/utils';
-
-export const isClientModel = (value: unknown): value is ClientModel => {
+export const isClientDto = (value: unknown): value is ClientDto => {
   if (!isRecord(value)) {
     return false;
   }
-  
+
   return (
     typeof value.id_client === 'string' &&
     typeof value.legal_name === 'string' &&

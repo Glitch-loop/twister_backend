@@ -1,10 +1,7 @@
-// Models
-import type { LocationModel } from '@/src/clients/application/models/location.model';
+import { LocationDto } from '@/src/clients/application/dtos/location.dto';
+import { isRecord } from "@/src/shared/guards/utils";
 
-// Guards
-import { isRecord } from '@/src/shared/guards/utils';
-
-export const isLocationModel = (value: unknown): value is LocationModel => {
+export const isLocationDto = (value: unknown): value is LocationDto => {
   if (!isRecord(value)) {
     return false;
   }

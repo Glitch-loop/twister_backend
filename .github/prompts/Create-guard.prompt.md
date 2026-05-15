@@ -22,11 +22,12 @@ If the user don't provide the schema/idea for generating the entity, ask him to 
   - object values `@/src/<module>/core/object-values`.
   - enum `@/src/<module>/core/clientStatusEnum`
   - models `@/src/<module>/application/models`.
+  - dtos `@/src/<module>/application/dtos`.
 * Once you located the domain object/dto/model that the user wants to create the guard,
 identify the fields that compound the schema, if there is not a clear schema then ask the user to provide more details about the fields and their types.
 * Once identified the fields, create a guard that validates if the input data mathces the schema.
   - The name of the guard must be `is` + name of the domain object/dto/model. i.e. "UserEntity" it would be "isUserEntity".
-  - To verify if it's a record, use the `isRecord` function that is defined in `@/src/application/guards/utils.ts`.
+  - To verify if it's a record, use the `isRecord` function that is defined in `@/src/shared/guards/utils.ts`.
   - You have to use all the fields that compound the schema to valiate the input data.
 * Depending to what you are doing a guard, you will locate the file at:
   - If it's an entity `@/src/<module>/application/entities`.
@@ -41,6 +42,7 @@ User asked to generate a guard for transaction model.
 
 # Process
 1. Locate the transaction model at `@/src/<module>/application/models/transaction.model.ts`.
+> Note: All modules will be located at the root level `@/src/<module>`.
 2. Identify the fields that compound the transaction model, in this case: 
 ```typescript
 export interface TransactionModel {

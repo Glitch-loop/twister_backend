@@ -1,10 +1,7 @@
-// Models
-import type { FurnitureModel } from '@/src/clients/application/models/furniture.model';
+import { FurnitureDto } from '@/src/clients/application/dtos/furniture.dto';
+import { isRecord } from "@/src/shared/guards/utils";
 
-// Guards
-import { isRecord } from '@/src/shared/guards/utils';
-
-export const isFurnitureModel = (value: unknown): value is FurnitureModel => {
+export const isFurnitureDto = (value: unknown): value is FurnitureDto => {
   if (!isRecord(value)) {
     return false;
   }

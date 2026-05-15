@@ -1,5 +1,5 @@
 // Models
-import type { LocationNoteModel } from '@/src/application/models/location-note.model';
+import type { LocationNoteModel } from '@/src/clients/application/models/location-note.model';
 
 // Guards
 import { isRecord } from '@/src/shared/guards/utils';

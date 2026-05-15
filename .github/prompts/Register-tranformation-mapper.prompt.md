@@ -12,6 +12,7 @@ There are 4 types of transformations:
 
 # Input:
 User will provide you with the following information:
+- Module that belongs the mapper.
 - The type of transformation they want to register.
 - The domain object, model or dto that they want to transform from.
 - The domain object, model or dto that they want to transform to.
@@ -20,59 +21,110 @@ User will provide you with the following information:
 
 # Steps to follow:
 * Find the domain object/dto/model that the user refers
-  - entities `@/src/core/entities`.
-  - object values `@/src/core/object-values`.
-  - models `@/src/application/models`.
-* Find guards that validate an object is a specific domain object/dto/model, this will help you to understand the schema of the domain object/dto/model that you are going to transform.
-  - guards for entities `@/src/application/guards/entities`.
-  - guards for object values `@/src/application/guards/object-values`.
-  - guards for models `@/src/application/guards/models`.
+  - entities `@/src/<module>/core/entities`.
+  - object values `@/src/<module>/core/object-values`.
+  - models `@/src/<module>/application/models`.
+  - dtos `@/src/<module>/application/dtos`.
+* Find the guard that validates the object the users wants to transform, this will help you to understand the schema of domain object/dto/model that you are going to transform.
+  - guards for entities `@/src/<module>/application/guards/entities`.
+  - guards for object values `@/src/<module>/application/guards/object-values`.
+  - guards for models `@/src/<module>/application/guards/models`.
 * Once you have identified the object implied and its respective guards, you have to understand the schema of the domain object/dto/model that you are going to transform, this is important because you have to use all the fields that compound the schema to make the transformation.
-* You will set the transformation in the file located at `@/src/application/mappers/mapper.ts`.
-* To register the transformation correctly first you have to split the process in two steps:
-  1. Register the method that actually makes the converstion. This will be located in one of the following sections of the file `mapper.ts` depending on the type of transformation:
-    - From domain object to model: this will be located in the section `// domain object to model transformations`.
-    - From model to domain object: this will be located in the section `// model to domain object transformations`.
-    - From domain object to dto: this will be located in the section `// domain object to dto transformations`.
-    - From dto to domain object: this will be located in the section `// dto to domain object transformations`.
-  2. Register the method signature in the overloads of the `toModel`, `toDomainObject`, `toDto` or `fromDto` methods depending on the type of transformation. For example, if you are registering a transformation from domain object to model, you have to register the method signature in the overloads of the `toModel` method.
-* After registering the transformation, you have to create a test that validates the transformation.
-- If the transformation is from domain object to model, you have to create the test in the file `test/src/application/mappers/mapper.domain-object-to-model.spec.ts`.
-- If the transformation is from model to domain object, you have to create the test in the file `test/src/application/mappers/mapper.model-to-domain-object.spec.ts`.
+* Depending on the type of transformation you are going to register, you have to locate the file where you are going to set the transformation:
+  - If it's a tranformation from domain object to model or vice versa, youll wil locate the file at `@/src/<module>/application/mappers/entity-model.mapper.ts`.
+  - If it's a tranformation from domain object to dto or vice versa, youll wil locate the file at `@/src/<module>/application/mappers/entity-dto.mapper.ts`.
+* To register the transformation correctly, firstly, you have to split the process in two steps:
+  1. Create the method that actually makes the converstion and locate the function in the correct section:
+  - In the case of `@/src/<module>/application/mappers/entity-model.mapper.ts`
+  Sections:
+    ```typescript
+    // ==================== MAPPER METHODS DOMAIN OBJECT to MODEL ====================
+    /*All funcitons that transform from domain objects to model*/
+    // ==================== MAPPER METHODS MODEL to DOMAIN OBJECT ====================
+    /*All funcitons that transform from model to domain objects*/
+    ```
+
+  - In the case of `@/src/<module>/application/mappers/entity-dto.mapper.ts`
+  Sections:
+    ```typescript
+    // ==================== MAPPER METHODS DOMAIN OBJECT to DTO ====================
+    /*All funcitons that transform from domain objects to dto*/
+    // ==================== MAPPER METHODS DTO to DOMAIN OBJECT ====================
+    /*All funcitons that transform from dto to domain objects*/
+    ```
+  
+  2. Register the method in the overloaded functions.
+  - In the case of `@/src/<module>/application/mappers/entity-model.mapper.ts`
+  There are 2 overloaded functions:
+    1. toDomainObject: This function transforms from model to domain object, so if your transformation is from model to domain object you have to register the transformation in this function.
+      Example:
+        ```typescript
+          toDomainObject(model: ClientModel): TaxClientInformationEntity;
+          toDomainObject(model: LocationModel, locationTypeModel: LocationTypeModel, locationNotesModel: LocationNoteModel[]): LocationEntity;
+          toDomainObject(model: LocationModel | ClientModel, locationTypeModel?: LocationTypeModel, locationNotesModel?: LocationNoteModel[]): any { ... }
+        ```
+
+    2. toModel: This function transforms from domain object to model, so if your transformation is from domain object to model you have to register the transformation in this function.
+      Example:
+        ```typescript
+          toModel(domainObject: TaxClientInformationEntity): ClientModel;
+          toModel(domainObject: LocationEntity): LocationModel;
+          toModel(domainObject: NoteObjectValue, parentDomainObject: LocationEntity): LocationModel;
+          toModel(domainObject: LocationTypeObjectValue): LocationTypeModel;
+          toModel(domainObject: TaxClientInformationEntity | LocationEntity | NoteObjectValue | LocationTypeObjectValue, parentDomainObject?: LocationEntity): any { ... }
+        ```
+  
+  - In the case of `@/src/<module>/application/mappers/entity-dto.mapper.ts`
+    1. toDomainObject: This function transforms from dto to domain object, so if your transformation is from dto to domain object you have to register the transformation in this function.
+    ```typescript
+      toDomainObject(dto: LocationDto): LocationEntity;
+      toDomainObject(dto: LocationDto): any { ... }
+    ```
+    2. toModel: This function transforms from domain object to dto, so if your transformation is from domain object to dto you have to register the transformation in this function.
+    ```typescript
+      toDto(domainObject: LocationEntity): LocationDto;
+      toDto(domainObject: LocationEntity): any { ... }
+    ```
 
 # Example:
 Here is an example of how the transformation should be registered in the `mapper.ts` file:
 ```typescript
-/* eslint-disable prettier/prettier */
+ 
 // Libraries
 import { Injectable } from '@nestjs/common';
+
+// Enums
+import { CLIENT_STATUS_ENUM } from '@/src/clients/core/enums/client-status.enum';
 
 // Dtos
 
 // Entities
-import { LocationEntity } from '@/src/core/entities/location.entity';
+import { LocationEntity } from '@/src/clients/core/entities/location.entity';
+import { TaxClientInformationEntity } from '@/src/clients/core/entities/tax-client-information.entity';
 
 // Object values
 import { NoteObjectValue } from '@/src/core/object-values/note.object-value';
+import { LocationTypeObjectValue } from '@/src/core/object-values/location-type.object-value';
 
 // Models
-import { LocationModel } from '@/src/application/models/location.model';
-import { LocationTypeModel } from '@/src/application/models/location-type.model';
-import { LocationNoteModel } from '@/src/application/models/location-note.model';
+import { LocationModel } from '@/src/clients/application/models/location.model';
+import { ClientModel } from '@/src/clients/application/models/client.model';
+import { LocationTypeModel } from '@/src/clients/application/models/location-type.model';
+import { LocationNoteModel } from '@/src/clients/application/models/location-note.model';
 
 // Dtos guards
 
 // Entities guards
-import { isLocationEntity } from '@/src/application/entities/location.guard';
+import { isLocationEntity } from '@/src/clients/application/guards/entities/location.guard';
+import { isTaxClientInformationEntity } from '@/src/clients/application/guards/entities/tax-client-information.guard';
 import { isNoteObjectValue } from '@/src/application/guards/object-values/note.guard';
 
 // Models guards
-import { isLocationModel } from '@/src/application/guards/models/location.guard';
-import { CLIENT_STATUS_ENUM } from '@/src/core/enums/client-status.enum';
-import { isLocationTypeModel } from '../guards/models/location-type.guard';
-import { isLocationNoteModel } from '../guards/models/location-note.guard';
-import { LocationTypeObjectValue } from '@/src/core/object-values/location-type.object-value';
-import { isLocationTypeObjectValue } from '../guards/object-values/location-type.guard';
+import { isLocationModel } from '@/src/clients/application/guards/models/location.guard';
+import { isClientModel } from '@/src/clients/application/guards/models/client.guard';
+import { isLocationTypeModel } from '@/src/clients/application/guards/models/location-type.guard';
+import { isLocationNoteModel } from '@/src/clients/application/guards/models/location-note.guard';
+import { isLocationTypeObjectValue } from '@/src/application/guards/object-values/location-type.guard';
 
 @Injectable()
 export class Mapper {
@@ -80,24 +132,32 @@ export class Mapper {
 
   // ==================== OVERLOADED FUNCTIONS FOR MAPPING ====================
   // toDomainObject overloads
-  toDomainObject(model: LocationModel, locationTypeModel: LocationTypeModel, locationNotesModel: LocationNoteModel[]): LocationEntity {
-    if(isLocationModel(model)) {
-      if (isLocationTypeModel(locationTypeModel) && locationNotesModel.every(isLocationNoteModel)) { 
+  toDomainObject(model: ClientModel): TaxClientInformationEntity;
+  toDomainObject(model: LocationModel, locationTypeModel: LocationTypeModel, locationNotesModel: LocationNoteModel[]): LocationEntity;
+  toDomainObject(model: LocationModel | ClientModel, locationTypeModel?: LocationTypeModel, locationNotesModel?: LocationNoteModel[]): any {
+    if (isClientModel(model)) {
+      return this.clientModelToDomainObject(model);
+    }
+    if (isLocationModel(model)) {
+      if (isLocationTypeModel(locationTypeModel) && Array.isArray(locationNotesModel) && locationNotesModel.every(isLocationNoteModel)) { 
         return this.locationModelToDomainObject(model, locationTypeModel, locationNotesModel);
       }
     }
-
     throw new Error('Invalid input for mapping to domain object');
   }
 
   // toModel overloads
+  toModel(domainObject: TaxClientInformationEntity): ClientModel;
   toModel(domainObject: LocationEntity): LocationModel;
   toModel(domainObject: NoteObjectValue, parentDomainObject: LocationEntity): LocationModel;
   toModel(domainObject: LocationTypeObjectValue): LocationTypeModel;
-  toModel(domainObject: LocationEntity | NoteObjectValue | LocationTypeObjectValue, parentDomainObject?: LocationEntity): any
+  toModel(domainObject: TaxClientInformationEntity | LocationEntity | NoteObjectValue | LocationTypeObjectValue, parentDomainObject?: LocationEntity): any
   {
-    if (isLocationEntity(parentDomainObject)) {
-      return this.locationDomainObjectToModel(parentDomainObject);
+    if (isTaxClientInformationEntity(domainObject)) {
+      return this.taxClientInformationEntityToModel(domainObject);
+    }
+    if (isLocationEntity(domainObject)) {
+      return this.locationDomainObjectToModel(domainObject);
     }
     if(isNoteObjectValue(domainObject) && isLocationEntity(parentDomainObject)) {
       return this.noteDomainObjectToModel(domainObject, parentDomainObject);      
@@ -105,14 +165,26 @@ export class Mapper {
     if(isLocationTypeObjectValue(domainObject)) {
       return this.locationTypeDomainObjectToModel(domainObject);
     }
-  }
 
-
-  // ==================== MAPPER METHODS DOMAIN OBJECT to DTO ====================
+    throw new Error('Invalid input for mapping to model');
   
-  // ==================== MAPPER METHODS DTO to DOMAIN OBJECT ====================
+  }
   
   // ==================== MAPPER METHODS DOMAIN OBJECT to MODEL ====================
+  private taxClientInformationEntityToModel(domainObject: TaxClientInformationEntity): ClientModel {
+    return {
+      id_client: domainObject.id_client,
+      legal_name: domainObject.legal_name,
+      postal_code: domainObject.postal_code,
+      fiscal_regime: domainObject.fiscal_regime,
+      name: domainObject.name,
+      cellphone: domainObject.cellphone,
+      email: domainObject.email,
+      created_at: domainObject.created_at,
+      updated_at: domainObject.updated_at,
+    };
+  }
+
   private locationDomainObjectToModel(domainObject: LocationEntity): LocationModel {
     return {
       id_location: domainObject.id_location,
@@ -150,7 +222,30 @@ export class Mapper {
     } as LocationTypeModel;
   }
 
+
   // ==================== MAPPER METHODS MODEL to DOMAIN OBJECT ====================
+  private clientModelToDomainObject(model: ClientModel): TaxClientInformationEntity {
+    console.log("Mapping client model to domain object: ", model);
+    if (typeof model.created_at === 'string' && isNaN(Date.parse(model.created_at))) {
+      throw new Error('Invalid created_at format in ClientModel');
+    }
+    if (typeof model.updated_at === 'string' && isNaN(Date.parse(model.updated_at))) {
+      throw new Error('Invalid updated_at format in ClientModel');
+    }
+
+    return new TaxClientInformationEntity(
+      model.id_client,
+      model.legal_name,
+      model.postal_code,
+      model.fiscal_regime,
+      model.name,
+      model.cellphone,
+      model.email,
+      new Date(model.created_at),
+      new Date(model.updated_at),
+    );
+  }
+
   private locationModelToDomainObject(model: LocationModel, locationTypeModel: LocationTypeModel, locationNotesModel: LocationNoteModel[]): LocationEntity {
     if (typeof model.created_at === 'string' && isNaN(Date.parse(model.created_at))) {
       throw new Error('Invalid created_at format in LocationModel');
@@ -208,226 +303,13 @@ export class Mapper {
     );
   }
 }
+
 ```
 
 > As you might notice, if the schema is composed, i.e an entity is composed by an object value this is handled as a separate transformation, declaring the function that makes the convertion (Step 1) and then declare it in the overloaded function (step 2) dependeding the case.
 
 > In the same way, notice that it is used guards to validate and redirect the transformation to the correct function.
 
-And once the transformation has been completed, you have to create a test that validates the transformation. If the transformation is from domain object to model, you have to create the test in the file `test/src/application/mappers/mapper.domain-object-to-model.spec.ts`. 
-```Typescript
-import { beforeEach, describe, expect, it } from '@jest/globals';
-
-import { Mapper } from '@/src/application/mappers/mapper';
-import { DayEntity } from '@/src/core/entities/day.entity';
-import { LocationEntity } from '@/src/core/entities/location.entity';
-import { TaxClientInformationEntity } from '@/src/core/entities/tax-client-information.entity';
-import { UserEntity } from '@/src/core/entities/user.entity';
-import { CLIENT_STATUS_ENUM } from '@/src/core/enums/client-status.enum';
-import { LocationTypeObjectValue } from '@/src/core/object-values/location-type.object-value';
-import { NoteObjectValue } from '@/src/core/object-values/note.object-value';
-
-describe('Mapper.toModel', () => {
-  let mapper: Mapper;
-
-  beforeEach(() => {
-    mapper = new Mapper();
-  });
-
-  it('maps DayEntity to DayModel', () => {
-    const dayEntity = new DayEntity('Monday', 'day-1', 1);
-
-    const result = mapper.toModel(dayEntity);
-
-    expect(result).toEqual({
-      id_day: 'day-1',
-      day_name: 'Monday',
-      order_to_show: 1,
-    });
-  });
-
-  it('maps TaxClientInformationEntity to ClientModel', () => {
-    const createdAt = new Date('2026-01-10T00:00:00.000Z');
-    const updatedAt = new Date('2026-01-11T00:00:00.000Z');
-    const taxClientInformationEntity = new TaxClientInformationEntity(
-      'client-1',
-      'Legal Name SA de CV',
-      '64000',
-      '601',
-      'John Doe',
-      '8181818181',
-      'john@example.com',
-      createdAt,
-      updatedAt,
-    );
-
-    const result = mapper.toModel(taxClientInformationEntity);
-
-    expect(result).toEqual({
-      id_client: 'client-1',
-      legal_name: 'Legal Name SA de CV',
-      postal_code: '64000',
-      fiscal_regime: '601',
-      name: 'John Doe',
-      cellphone: '8181818181',
-      email: 'john@example.com',
-      created_at: createdAt,
-      updated_at: updatedAt,
-    });
-  });
-
-  it('maps LocationEntity to LocationModel', () => {
-    const createdAt = new Date('2026-01-01T00:00:00.000Z');
-    const updatedAt = new Date('2026-01-02T00:00:00.000Z');
-    const locationType = new LocationTypeObjectValue(
-      'type-1',
-      'Grocery',
-      new Date('2026-01-03T00:00:00.000Z'),
-    );
-    const notes = [
-      new NoteObjectValue(
-        'note-1',
-        'Bring samples',
-        'location-1',
-        new Date('2026-01-04T00:00:00.000Z'),
-      ),
-    ];
-    const locationEntity = new LocationEntity(
-      'location-1',
-      'Main St',
-      '123',
-      'Downtown',
-      '64000',
-      'Store A',
-      '25.68',
-      '-100.31',
-      CLIENT_STATUS_ENUM.CLIENT,
-      'creator-1',
-      'client-1',
-      createdAt,
-      updatedAt,
-      locationType,
-      notes,
-      null,
-    );
-
-    const result = mapper.toModel(locationEntity);
-
-    expect(result).toEqual({
-      id_location: 'location-1',
-      street: 'Main St',
-      ext_number: '123',
-      colony: 'Downtown',
-      postal_code: '64000',
-      address_reference: undefined,
-      location_name: 'Store A',
-      latitude: '25.68',
-      longitude: '-100.31',
-      status_location: CLIENT_STATUS_ENUM.CLIENT,
-      id_creator: 'creator-1',
-      id_client: 'client-1',
-      created_at: createdAt,
-      updated_at: updatedAt,
-    });
-  });
-
-  it('maps NoteObjectValue to LocationNoteModel', () => {
-    const createdAt = new Date('2026-01-05T00:00:00.000Z');
-    const note = new NoteObjectValue(
-      'note-1',
-      'Call before arrival',
-      'location-1',
-      createdAt,
-    );
-    const locationEntity = new LocationEntity(
-      'location-1',
-      'Main St',
-      '123',
-      'Downtown',
-      '64000',
-      'Store A',
-      '25.68',
-      '-100.31',
-      CLIENT_STATUS_ENUM.CLIENT,
-      'creator-1',
-      'client-1',
-      new Date('2026-01-01T00:00:00.000Z'),
-      new Date('2026-01-02T00:00:00.000Z'),
-      new LocationTypeObjectValue(
-        'type-1',
-        'Grocery',
-        new Date('2026-01-03T00:00:00.000Z'),
-      ),
-      [],
-      null,
-    );
-
-    const result = mapper.toModel(note, locationEntity);
-
-    expect(result).toEqual({
-      id_location_note: 'note-1',
-      note: 'Call before arrival',
-      id_location: 'location-1',
-      created_at: createdAt,
-    });
-  });
-
-  it('maps LocationTypeObjectValue to LocationTypeModel', () => {
-    const createdAt = new Date('2026-01-06T00:00:00.000Z');
-    const locationType = new LocationTypeObjectValue(
-      'type-1',
-      'Pharmacy',
-      createdAt,
-    );
-
-    const result = mapper.toModel(locationType);
-
-    expect(result).toEqual({
-      id_location_type: 'type-1',
-      location_type_name: 'Pharmacy',
-      created_at: createdAt,
-    });
-  });
-
-  it('maps UserEntity to UserModel', () => {
-    const createdAt = new Date('2026-01-07T00:00:00.000Z');
-    const updatedAt = new Date('2026-01-08T00:00:00.000Z');
-    const userEntity = new UserEntity(
-      'user-1',
-      '8180000000',
-      'Jane User',
-      'hashed-password',
-      1,
-      1500,
-      createdAt,
-      updatedAt,
-      'Downtown 123',
-      'XAXX010101000',
-      'NSS12345678901',
-    );
-
-    const result = mapper.toModel(userEntity);
-
-    expect(result).toEqual({
-      id_user: 'user-1',
-      cellphone: '8180000000',
-      name: 'Jane User',
-      password: 'hashed-password',
-      status: 1,
-      salary: 1500,
-      created_at: createdAt,
-      updated_at: updatedAt,
-      address: 'Downtown 123',
-      rfc: 'XAXX010101000',
-      imss: 'NSS12345678901',
-    });
-  });
-});
-
-```
-
-If the transformation is from model to domain object, you have to create the test in the file `test/src/application/mappers/mapper.model-to-domain-object.spec.ts`.
-```Typescript
 import { beforeEach, describe, expect, it } from '@jest/globals';
 
 import { Mapper } from '@/src/application/mappers/mapper';

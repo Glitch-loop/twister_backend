@@ -27,7 +27,7 @@ import { isLocationEntity } from '@/src/clients/application/guards/entities/loca
 import { isTaxClientInformationEntity } from '@/src/clients/application/guards/entities/tax-client-information.guard';
 import { isNoteObjectValue } from '@/src/application/guards/object-values/note.guard';
 import { isUserEntity } from '@/src/users/application/guards/entities/user.guard';
-import { isLocationTypeObjectValue } from '@/src/application/guards/object-values/location-type.guard';
+import { isLocationTypeObjectValue } from '@/src/clients/application/guards/object-values/location-type.guard';
 
 // Models guards
 import { isUserModel } from '@/src/users/application/guards/models/user.guard';

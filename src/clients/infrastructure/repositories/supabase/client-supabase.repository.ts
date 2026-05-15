@@ -3,7 +3,7 @@ import { ClientRepository } from '@/src/clients/core/interfaces/client.repositor
 import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
 import { Mapper } from '@/src/application/mappers/entity-model.mapper';
 import { TaxClientInformationEntity } from '@/src/clients/core/entities/tax-client-information.entity';
-import { ClientModel } from '@/src/application/models/client.model';
+import { ClientModel } from '@/src/clients/application/models/client.model';
 
 @Injectable()
 export class ClientSupabase implements ClientRepository {

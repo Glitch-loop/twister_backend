@@ -16,10 +16,10 @@ import { NoteObjectValue } from '@/src/core/object-values/note.object-value';
 import { LocationTypeObjectValue } from '@/src/core/object-values/location-type.object-value';
 
 // Models
-import { LocationModel } from '@/src/application/models/location.model';
-import { ClientModel } from '@/src/application/models/client.model';
-import { LocationTypeModel } from '@/src/application/models/location-type.model';
-import { LocationNoteModel } from '@/src/application/models/location-note.model';
+import { LocationModel } from '@/src/clients/application/models/location.model';
+import { ClientModel } from '@/src/clients/application/models/client.model';
+import { LocationTypeModel } from '@/src/clients/application/models/location-type.model';
+import { LocationNoteModel } from '@/src/clients/application/models/location-note.model';
 
 // Dtos guards
 
@@ -33,7 +33,7 @@ import { isLocationModel } from '@/src/clients/application/guards/models/locatio
 import { isClientModel } from '@/src/clients/application/guards/models/client.guard';
 import { isLocationTypeModel } from '@/src/clients/application/guards/models/location-type.guard';
 import { isLocationNoteModel } from '@/src/clients/application/guards/models/location-note.guard';
-import { isLocationTypeObjectValue } from '@/src/application/guards/object-values/location-type.guard';
+import { isLocationTypeObjectValue } from '@/src/clients/application/guards/object-values/location-type.guard';
 
 @Injectable()
 export class Mapper {
@@ -43,7 +43,7 @@ export class Mapper {
   // toDomainObject overloads
   toDomainObject(model: ClientModel): TaxClientInformationEntity;
   toDomainObject(model: LocationModel, locationTypeModel: LocationTypeModel, locationNotesModel: LocationNoteModel[]): LocationEntity;
-  toDomainObject(model: LocationModel | ClientModel, locationTypeModel?: LocationTypeModel, locationNotesModel?: LocationNoteModel[]): LocationEntity | TaxClientInformationEntity {
+  toDomainObject(model: LocationModel | ClientModel, locationTypeModel?: LocationTypeModel, locationNotesModel?: LocationNoteModel[]): any {
     if (isClientModel(model)) {
       return this.clientModelToDomainObject(model);
     }
