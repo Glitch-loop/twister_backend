@@ -28,11 +28,11 @@ import { UserModel } from '@/src/application/models/user.model';
 // Dtos guards
 
 // Entities guards
-import { isDayEntity } from '@/src/application/entities/day.guard';
-import { isLocationEntity } from '@/src/application/entities/location.guard';
-import { isTaxClientInformationEntity } from '@/src/application/entities/tax-client-information.guard';
+import { isDayEntity } from '@/src/application/guards/entities/day.guard';
+import { isLocationEntity } from '@/src/application/guards/entities/location.guard';
+import { isTaxClientInformationEntity } from '@/src/application/guards/entities/tax-client-information.guard';
 import { isNoteObjectValue } from '@/src/application/guards/object-values/note.guard';
-import { isUserEntity } from '@/src/application/entities/user.guard';
+import { isUserEntity } from '@/src/application/guards/entities/user.guard';
 
 // Models guards
 import { isDayModel } from '@/src/application/guards/models/day.guard';
@@ -102,11 +102,6 @@ export class Mapper {
     throw new Error('Invalid input for mapping to model');
   
   }
-
-
-  // ==================== MAPPER METHODS DOMAIN OBJECT to DTO ====================
-  
-  // ==================== MAPPER METHODS DTO to DOMAIN OBJECT ====================
   
   // ==================== MAPPER METHODS DOMAIN OBJECT to MODEL ====================
   private dayDomainObjectToModel(domainObject: DayEntity): DayModel {

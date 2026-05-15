@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UserRepository } from '@/src/core/Interfaces/user.repository';
 import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
-import { Mapper } from '@/src/application/mappers/mapper';
+import { Mapper } from '@/src/application/mappers/entity-model.mapper';
 import { UserEntity } from '@/src/core/entities/user.entity';
 import { UserModel } from '@/src/application/models/user.model';
 
@@ -18,10 +18,12 @@ export class UserSupabaseRepository implements UserRepository {
 
   async createUser(user: UserEntity): Promise<void> {
     try {
+      console.log("Create user: ", user)
       const userModel = this.mapper.toModel(user);
+      console.log("Create user: ", userModel)
       const { error } = await this.supabase.from('users').insert(userModel);
       if (error) {
-        throw new Error('Failed to create user');
+        throw new Error('Failed to create user, ' + error.message);
       }
     } catch (error) {
       throw new Error(

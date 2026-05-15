@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from '@jest/globals';
 
-import { Mapper } from '@/src/application/mappers/mapper';
+import { Mapper } from '@/src/application/mappers/entity-model.mapper';
 import { CLIENT_STATUS_ENUM } from '@/src/core/enums/client-status.enum';
 import { DayEntity } from '@/src/core/entities/day.entity';
 import { UserEntity } from '@/src/core/entities/user.entity';

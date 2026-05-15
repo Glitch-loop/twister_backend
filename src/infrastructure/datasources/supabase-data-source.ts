@@ -10,12 +10,12 @@ export class SupabaseDataSource {
   private client: SupabaseClient;
 
   constructor() {
-    const supabaseUrl = process.env.PUBLIC_SUPABASE_URL;
-    const supabaseAnonKey = process.env.PUBLIC_SUPABASE_ANON_KEY;
+    const supabaseUrl = process.env.PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;
+    const supabaseAnonKey = process.env.PUBLIC_SUPABASE_ANON_KEY ?? process.env.SUPABASE_ANON_KEY;
 
     if (!supabaseUrl || !supabaseAnonKey) {
       throw new Error(
-        'Supabase credentials not found in environment variables',
+        'Supabase credentials not found in environment variables. Expected one of: PUBLIC_SUPABASE_URL or SUPABASE_URL, and PUBLIC_SUPABASE_ANON_KEY or SUPABASE_ANON_KEY.',
       );
     }
 

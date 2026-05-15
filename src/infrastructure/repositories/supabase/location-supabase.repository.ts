@@ -12,7 +12,7 @@ import { NoteObjectValue } from '@/src/core/object-values/note.object-value';
 
 // Datasource
 import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
-import { Mapper } from '@/src/application/mappers/mapper';
+import { Mapper } from '@/src/application/mappers/entity-model.mapper';
 import { LocationModel } from '@/src/application/models/location.model';
 import { LocationNoteModel } from '@/src/application/models/location-note.model';
 import { LocationTypeModel } from '@/src/application/models/location-type.model';
