@@ -16,8 +16,5 @@ export const isClientModel = (value: unknown): value is ClientModel => {
     typeof value.fiscal_regime === 'string' &&
     typeof value.name === 'string' &&
     typeof value.cellphone === 'string' &&
-    typeof value.email === 'string' &&
-    value.created_at instanceof Date &&
-    value.updated_at instanceof Date
-  );
+    typeof value.email === 'string');
 };

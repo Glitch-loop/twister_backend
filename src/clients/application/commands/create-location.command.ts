@@ -17,7 +17,7 @@ import { LocationEntity } from '@/src/clients/core/entities/location.entity';
 import { LocationTypeObjectValue } from '@/src/clients/core/object-values/location-type.object-value';
 
 @Injectable()
-export class CreateLocationTypeCommand {
+export class CreateLocationCommand {
   constructor(
     @Inject(LocationRepository) private readonly locationRepository: LocationRepository,
     @Inject(IntegrityRepository) private readonly integrityRepository: IntegrityRepository,

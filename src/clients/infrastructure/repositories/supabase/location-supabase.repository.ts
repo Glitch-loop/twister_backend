@@ -65,8 +65,15 @@ export class LocationSupabaseRepository implements LocationRepository {
       throw new Error('Failed to retrieve location by ID');
     }
 
+    if (!data || data.length === 0) {
+      return [];
+    }
 
-    return this.composeLocationEntity(data[0] as LocationModel);
+    return Promise.all(
+      (data as LocationModel[]).map((locationModel) =>
+        this.composeLocationEntity(locationModel),
+      ),
+    );
   }
 
   async retrieveLocationByClient(
@@ -82,7 +89,34 @@ export class LocationSupabaseRepository implements LocationRepository {
       throw new Error('Failed to retrieve location by client');
     }
 
-    return this.composeLocationEntity(data[0] as LocationModel);
+    if (!data || data.length === 0) {
+      return [];
+    }
+
+    return Promise.all(
+      (data as LocationModel[]).map((locationModel) =>
+        this.composeLocationEntity(locationModel),
+      ),
+    );
+  }
+
+  async retrieveFurnitureById(id_furniture: string[]): Promise<FurnitureEntity[]> {
+    const { data, error } = await this.supabase
+      .from('furnitures')
+      .select()
+      .in('id_furniture', id_furniture);
+
+    if (error) {
+      throw new Error('Failed to retrieve furniture by ID');
+    }
+
+    if (!data || data.length === 0) {
+      return [];
+    }
+
+    return (data as FurnitureModel[]).map((furniture) =>
+      this.mapper.toDomainObject(furniture),
+    );
   }
 
   async updateLocation(
@@ -121,6 +155,32 @@ export class LocationSupabaseRepository implements LocationRepository {
 
     if (updatedData.notes !== undefined) {
       await this.upsertLocationNotes(updatedData.notes, id_location);
+    }
+  }
+
+  async updateFurniture(
+    id_furniture: string,
+    updatedData: Partial<FurnitureEntity>,
+  ): Promise<void> {
+    const payload: Partial<FurnitureModel> = {
+      ...(updatedData.delivered_date !== undefined && {
+        delivered_date: updatedData.delivered_date,
+      }),
+      ...(updatedData.description_furniture !== undefined && {
+        description_furniture: updatedData.description_furniture,
+      }),
+      ...(updatedData.id_location !== undefined && {
+        id_location: updatedData.id_location,
+      }),
+    };
+
+    const { error } = await this.supabase
+      .from('furnitures')
+      .update(payload)
+      .eq('id_furniture', id_furniture);
+
+    if (error) {
+      throw new Error('Failed to update furniture');
     }
   }
 
@@ -217,13 +277,19 @@ export class LocationSupabaseRepository implements LocationRepository {
     locationModel: LocationModel,
   ): Promise<LocationEntity> {
     const [locationTypeModel, locationNotesModel] = await Promise.all([
-      this.retrieveLocationTypeById(locationModel.id_location_type),
+      this.retrieveLocationTypeById([locationModel.id_location_type]),
       this.retrieveLocationNotesByLocationId(locationModel.id_location),
     ]);
 
+    if (locationTypeModel.length === 0) {
+      throw new Error(
+        `Location type with id ${locationModel.id_location_type} does not exist.`,
+      );
+    }
+
     return this.mapper.toDomainObject(
       locationModel,
-      locationTypeModel,
+      locationTypeModel[0],
       locationNotesModel,
     );
   }

@@ -82,6 +82,33 @@ export class ClientAggregate {
     );
   }
 
+  modifyClient(
+    _legal_name?: string,
+    _postal_code?: string,
+    _fiscal_regime?: string,
+    _name?: string,
+    _cellphone?: string,
+    _email?: string,
+  ): TaxClientInformationEntity {
+    if (this._taxClientInformation === null) {
+      throw new Error('Client does not exist for modification.');
+    }
+
+    this._taxClientInformation = new TaxClientInformationEntity(
+      this._taxClientInformation.id_client,
+      _legal_name ?? this._taxClientInformation.legal_name,
+      _postal_code ?? this._taxClientInformation.postal_code,
+      _fiscal_regime ?? this._taxClientInformation.fiscal_regime,
+      _name ?? this._taxClientInformation.name,
+      _cellphone ?? this._taxClientInformation.cellphone,
+      _email ?? this._taxClientInformation.email,
+      this._taxClientInformation.created_at,
+      new Date(),
+    );
+
+    return this._taxClientInformation;
+  }
+
   createLocation(
     _id_location: string,
     _street: string,
@@ -167,6 +194,24 @@ export class ClientAggregate {
     });
   }
 
+  createNoteForLocation(
+    _id_note: string,
+    _id_location: string,
+    _note: string,
+    _created_at?: Date,
+  ): NoteObjectValue {
+    const note = new NoteObjectValue(
+      _id_note,
+      _note,
+      _id_location,
+      _created_at ?? new Date(),
+    );
+
+    this.addNoteToLocation(_id_location, [note]);
+
+    return note;
+  }
+
   addFurniture(
     _id_furniture: string,
     _delivered_date: Date,
@@ -204,10 +249,172 @@ export class ClientAggregate {
     }
   }
 
+  modifyFurniture(
+    _id_furniture: string,
+    _delivered_date?: Date,
+    _description_furniture?: string,
+    _id_location?: string,
+  ): FurnitureEntity {
+    const existingFurniture = this._furnitures.find(
+      (fur) => fur.id_furniture === _id_furniture,
+    );
+
+    if (existingFurniture === undefined) {
+      throw new Error('Furniture does not exist for this client.');
+    }
+
+    const targetLocationId = _id_location ?? existingFurniture.id_location;
+    const targetLocation = this._locations.find(
+      (loc) => loc.id_location === targetLocationId,
+    );
+
+    if (targetLocation === undefined) {
+      throw new Error('Location does not exist for this client.');
+    }
+
+    if (
+      targetLocation.status_location !== LOCATION_STATUS_ENUM.CLIENT_PROSPECT &&
+      targetLocation.status_location !== LOCATION_STATUS_ENUM.CLIENT
+    ) {
+      throw new Error(
+        'Furniture can only be assigned to locations with status CLIENT_PROSPECT or CLIENT.',
+      );
+    }
+
+    const updatedFurniture = new FurnitureEntity(
+      existingFurniture.id_furniture,
+      _delivered_date ?? existingFurniture.delivered_date,
+      _description_furniture ?? existingFurniture.description_furniture,
+      targetLocationId,
+    );
+
+    this._furnitures = this._furnitures.map((fur) =>
+      fur.id_furniture === _id_furniture ? updatedFurniture : fur,
+    );
+
+    return updatedFurniture;
+  }
+
+  modifyLocation(
+    _id_location: string,
+    _street?: string,
+    _ext_number?: string,
+    _colony?: string,
+    _postal_code?: string,
+    _location_name?: string,
+    _latitude?: string,
+    _longitude?: string,
+    _status_location?: LOCATION_STATUS_ENUM,
+    _id_creator?: string,
+    _id_client?: string,
+    _location_type?: LocationTypeObjectValue,
+    _address_reference?: string | null,
+  ): LocationEntity {
+    const existingLocation = this._locations.find(
+      (loc) => loc.id_location === _id_location,
+    );
+
+    if (existingLocation === undefined) {
+      throw new Error('Location does not exist for this client.');
+    }
+
+    const updatedLocation = new LocationEntity(
+      existingLocation.id_location,
+      _street ?? existingLocation.street,
+      _ext_number ?? existingLocation.ext_number,
+      _colony ?? existingLocation.colony,
+      _postal_code ?? existingLocation.postal_code,
+      _location_name ?? existingLocation.location_name,
+      _latitude ?? existingLocation.latitude,
+      _longitude ?? existingLocation.longitude,
+      _status_location ?? existingLocation.status_location,
+      _id_creator ?? existingLocation.id_creator,
+      _id_client ?? existingLocation.id_client,
+      existingLocation.created_at,
+      new Date(),
+      _location_type ?? existingLocation.location_type,
+      existingLocation.notes,
+      _address_reference ?? existingLocation.address_reference,
+    );
+
+    this._locations = this._locations.map((loc) =>
+      loc.id_location === _id_location ? updatedLocation : loc,
+    );
+
+    return updatedLocation;
+  }
+
+  deactivateLocation(_id_location: string): LocationEntity {
+    return this.modifyLocation(
+      _id_location,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      LOCATION_STATUS_ENUM.SHUTDOWN,
+    );
+  }
+
+  deactivateClient(): TaxClientInformationEntity {
+    if (this._taxClientInformation === null) {
+      throw new Error('Client does not exist for deactivation.');
+    }
+
+    if (this._taxClientInformation.id_client === GENERAL_PUBLIC_CLIENT.id_client) {
+      throw new Error('General public client cannot be deactivated.');
+    }
+
+    this._locations = this._locations.map((location) =>
+      new LocationEntity(
+        location.id_location,
+        location.street,
+        location.ext_number,
+        location.colony,
+        location.postal_code,
+        location.location_name,
+        location.latitude,
+        location.longitude,
+        LOCATION_STATUS_ENUM.SHUTDOWN,
+        location.id_creator,
+        location.id_client,
+        location.created_at,
+        new Date(),
+        location.location_type,
+        location.notes,
+        location.address_reference,
+      ),
+    );
+
+    this._taxClientInformation = new TaxClientInformationEntity(
+      this._taxClientInformation.id_client,
+      this._taxClientInformation.legal_name,
+      this._taxClientInformation.postal_code,
+      this._taxClientInformation.fiscal_regime,
+      this._taxClientInformation.name,
+      this._taxClientInformation.cellphone,
+      this._taxClientInformation.email,
+      this._taxClientInformation.created_at,
+      new Date(),
+    );
+
+    return this._taxClientInformation;
+  }
+
 
 
   get taxClientInformation(): TaxClientInformationEntity | null {
     return this._taxClientInformation;
+  }
+
+  get locations(): LocationEntity[] {
+    return this._locations;
+  }
+
+  get furnitures(): FurnitureEntity[] {
+    return this._furnitures;
   }
 
   // confirmClient(store: any): void {

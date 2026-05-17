@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ClientRepository } from '@/src/clients/core/interfaces/client.repository';
 import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
-import { Mapper } from '@/src/application/mappers/entity-model.mapper';
+import { Mapper } from '@/src/clients/application/mappers/entity-model.mapper';
 import { TaxClientInformationEntity } from '@/src/clients/core/entities/tax-client-information.entity';
 import { ClientModel } from '@/src/clients/application/models/client.model';
 
@@ -20,7 +20,7 @@ export class ClientSupabase implements ClientRepository {
     try {
 
       const clientModel = this.mapper.toModel(client);
-      const { data, error } = await this.supabase.from('clients').insert(clientModel);
+      const { error } = await this.supabase.from('clients').insert(clientModel);
       if (error) {
         throw new Error('Failed to create client');
       }
@@ -36,14 +36,14 @@ export class ClientSupabase implements ClientRepository {
         .select()
         .in('id_client', id_client);
 
-      if (error) {
-        throw new Error('Failed to retrieve client by ID');
+        if (error) {
+        throw new Error('Failed to retrieve client by ID' + error.message);
       }
-
+      
       if (!data || data.length === 0) {
         return [];
       }
-
+      
       return (data as ClientModel[]).map((client) => this.mapper.toDomainObject(client));
     } catch (error) {
       throw new Error('Failed to retrieve client by ID', { cause: error instanceof Error ? error : undefined });
