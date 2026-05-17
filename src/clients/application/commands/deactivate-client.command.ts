@@ -28,10 +28,7 @@ export class DeactivateClientCommand {
 			throw new Error(`Client with id ${_id_client} does not exist.`);
 		}
 
-		const allLocations: LocationEntity[] = await this.locationRepository.listLocations();
-		const clientLocations: LocationEntity[] = allLocations.filter(
-			(location) => location.id_client === _id_client,
-		);
+		const clientLocations: LocationEntity[] = await this.locationRepository.retrieveLocationByClient(_id_client);
 
 		const clientAggregate: ClientAggregate = new ClientAggregate(
 			clients[0],

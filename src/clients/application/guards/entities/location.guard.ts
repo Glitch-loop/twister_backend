@@ -18,8 +18,6 @@ export const isLocationEntity = (value: unknown): value is LocationEntity => {
     typeof value.status_location !== 'undefined' &&
     typeof value.id_creator === 'string' &&
     typeof value.id_client === 'string' &&
-    value.created_at instanceof Date &&
-    value.updated_at instanceof Date &&
     typeof value.location_type !== 'undefined' &&
     Array.isArray(value.notes) &&
     (typeof value.address_reference === 'string' || value.address_reference === null)

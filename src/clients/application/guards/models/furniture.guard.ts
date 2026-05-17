@@ -11,7 +11,6 @@ export const isFurnitureModel = (value: unknown): value is FurnitureModel => {
 
   return (
     typeof value.id_furniture === 'string' &&
-    value.delivered_date instanceof Date &&
     typeof value.description_furniture === 'string' &&
     typeof value.id_location === 'string'
   );

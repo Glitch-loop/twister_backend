@@ -1,0 +1,17 @@
+{
+  "id_location": "550e8400-e29b-41d4-a716-446655440000",
+  "street": "Calle Principal",
+  "ext_number": "123",
+  "colony": "Centro Histórico",
+  "postal_code": "28001",
+  "address_reference": "Frente a la plaza mayor",
+  "location_name": "Oficina Central",
+  "latitude": "40.4168",
+  "longitude": "-3.7038",
+  "status_location": -1,
+  "id_creator": "660e8400-e29b-41d4-a716-446655440001",
+  "id_client": "770e8400-e29b-41d4-a716-446655440002",
+  "id_location_type": "880e8400-e29b-41d4-a716-446655440003",
+  "created_at": "2026-05-13T19:01:48Z",
+  "updated_at": "2026-05-17T10:30:00Z"
+}

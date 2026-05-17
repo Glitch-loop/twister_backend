@@ -22,8 +22,6 @@ export const isLocationModel = (value: unknown): value is LocationModel => {
     typeof value.status_location === 'number' &&
     typeof value.id_creator === 'string' &&
     typeof value.id_client === 'string' &&
-    typeof value.id_location_type === 'string' &&
-    value.created_at instanceof Date &&
-    value.updated_at instanceof Date
+    typeof value.id_location_type === 'string'
   );
 };

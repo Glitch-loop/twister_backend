@@ -367,6 +367,14 @@ export class ClientAggregate {
       throw new Error('General public client cannot be deactivated.');
     }
 
+    /*
+      Business rule:
+      When client is deactivated, the client information of the location is update to 
+      general public client.
+      
+      The status of the location doesn't change. This is updated independently.
+    */
+   // TODO: Consider if before of deactivating a client, all its locations must be deactivated first.
     this._locations = this._locations.map((location) =>
       new LocationEntity(
         location.id_location,
@@ -377,7 +385,7 @@ export class ClientAggregate {
         location.location_name,
         location.latitude,
         location.longitude,
-        LOCATION_STATUS_ENUM.SHUTDOWN,
+        location.status_location,
         location.id_creator,
         location.id_client,
         location.created_at,
@@ -388,6 +396,7 @@ export class ClientAggregate {
       ),
     );
 
+    // TODO: Consider if add a status field to the client entity.
     this._taxClientInformation = new TaxClientInformationEntity(
       this._taxClientInformation.id_client,
       this._taxClientInformation.legal_name,

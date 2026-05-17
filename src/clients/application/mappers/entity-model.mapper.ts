@@ -53,17 +53,14 @@ export class Mapper {
     if (isFurnitureModel(model)) {
       return this.furnitureModelToDomainObject(model);
     }
-
     if (isClientModel(model)) {
       return this.clientModelToDomainObject(model);
     }
-
     if (isLocationModel(model)) {
       if (isLocationTypeModel(locationTypeModel) && Array.isArray(locationNotesModel) && locationNotesModel.every(isLocationNoteModel)) { 
         return this.locationModelToDomainObject(model, locationTypeModel, locationNotesModel);
       }
     }
-
     if (isLocationTypeModel(model)) {
       return this.locationTypeModelToDomainObject(model);
     }
@@ -82,7 +79,6 @@ export class Mapper {
     if (isFurnitureEntity(domainObject)) {
       return this.furnitureDomainObjectToModel(domainObject);
     }
-
     if (isTaxClientInformationEntity(domainObject)) {
       return this.taxClientInformationEntityToModel(domainObject);
     }
