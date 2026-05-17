@@ -122,7 +122,7 @@ CREATE TABLE public.clients (
 );
 CREATE TABLE public.location_types (
   id_location_type uuid NOT NULL DEFAULT gen_random_uuid(),
-  location_type_name character varying NOT NULL,
+  location_type_name character varying NOT NULL UNIQUE,
   created_at timestamp with time zone NOT NULL,
   CONSTRAINT location_types_pkey PRIMARY KEY (id_location_type)
 );

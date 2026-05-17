@@ -1,6 +1,6 @@
 import type { OrganizationStrategyModel } from '@/src/application/models/organization-strategy.model';
 
-import { isRecord } from '@/src/shared/guards/utils';
+import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isOrganizationStrategyModel = (value: unknown): value is OrganizationStrategyModel => {
   if (!isRecord(value)) {

@@ -20,8 +20,8 @@ import { ListAllUsers } from '@/src/users/application/queries/ListAllUsers';
 import { Mapper as EntityDtoMapper } from '@/src/users/application/mappers/entity-dto.mapper';
 import { Mapper as EntityModelMapper } from '@/src/users/application/mappers/entity-model.mapper';
 
-
-import { UsersController } from './users.controller';
+// Controllers
+import { UsersController } from '@/src/users/users.controller';
 
 @Module({ 
   controllers: [UsersController],
@@ -38,6 +38,5 @@ import { UsersController } from './users.controller';
     },
   ],
 })
-
 
 export class UsersModule {}

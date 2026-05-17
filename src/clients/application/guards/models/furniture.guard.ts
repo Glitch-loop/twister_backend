@@ -2,7 +2,7 @@
 import type { FurnitureModel } from '@/src/clients/application/models/furniture.model';
 
 // Guards
-import { isRecord } from '@/src/shared/guards/utils';
+import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isFurnitureModel = (value: unknown): value is FurnitureModel => {
   if (!isRecord(value)) {

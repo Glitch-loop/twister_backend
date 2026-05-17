@@ -1,8 +1,17 @@
+// Libraries
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
+
+// Controllers
+import { AppController } from '@/src/app.controller';
+
+// Services
+import { AppService } from '@/src/app.service';
+
+// Modules
+import { UsersModule } from '@/src/users/users.module';
+import { ClientsModule } from '@/src/clients/clients.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -10,6 +19,7 @@ import { UsersModule } from './users/users.module';
       envFilePath: ['.env.local', '.env'],
     }),
     UsersModule,
+    ClientsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

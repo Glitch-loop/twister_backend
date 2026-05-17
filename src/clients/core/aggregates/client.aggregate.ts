@@ -1,5 +1,8 @@
 // Enums
-import { CLIENT_STATUS_ENUM } from '../enums/client-status.enum';
+import { LOCATION_STATUS_ENUM } from '@/src/clients/core/enums/client-status.enum';
+
+// Constants
+import { GENERAL_PUBLIC_CLIENT } from '@/src/clients/core/constants/client-constants';
 
 // Object values
 import { NoteObjectValue } from '@/src/core/object-values/note.object-value';
@@ -89,13 +92,12 @@ export class ClientAggregate {
     _latitude: string,
     _longitude: string,
     _id_creator: string,
-    _id_client: string,
+    _location_type: LocationTypeObjectValue,
     _created_at: Date | null,
     _updated_at: Date | null,
-    _location_type: LocationTypeObjectValue,
-    // _notes: NoteObjectValue[],
-    _address_reference: string | null,
-  ): void {
+    _id_client?: string,
+    _address_reference?: string,
+  ): LocationEntity {
     if (
       this._locations.find((loc) => loc.id_location === _id_location) !== undefined
     ) {
@@ -113,17 +115,19 @@ export class ClientAggregate {
       _location_name,
       _latitude,
       _longitude,
-      CLIENT_STATUS_ENUM.CLIENT_PROSPECT,
+      LOCATION_STATUS_ENUM.CLIENT_PROSPECT,
       _id_creator,
-      _id_client,
+      _id_client ?? GENERAL_PUBLIC_CLIENT.id_client,
       _created_at ?? new Date(),
       _updated_at ?? new Date(),
       _location_type,
       [],
-      _address_reference,
+      _address_reference ?? null,
     );
 
     this._locations.push(newLocation);
+    
+    return newLocation;
   }
 
   addNoteToLocation(_id_location: string, _notes: NoteObjectValue[]): void {
@@ -161,6 +165,49 @@ export class ClientAggregate {
       }
       return loc;
     });
+  }
+
+  addFurniture(
+    _id_furniture: string,
+    _delivered_date: Date,
+    _description_furniture: string,
+    _id_location: string,
+  ): FurnitureEntity {
+    const existingFurniture:FurnitureEntity|undefined = this._furnitures.find((fur) => fur.id_furniture === _id_furniture);
+    
+    if (existingFurniture !== undefined) {
+      throw new Error('Furniture is already registered for this client.');
+    }
+
+    const existingLocation:LocationEntity|undefined = this._locations.find((loc) => loc.id_location === _id_location);
+
+    if (existingLocation === undefined) {
+      throw new Error('Location does not exist for this client.');
+    }
+
+    const { status_location } = existingLocation;
+
+    if (status_location === LOCATION_STATUS_ENUM.CLIENT_PROSPECT
+    || status_location === LOCATION_STATUS_ENUM.CLIENT) {
+      const newFurniture = new FurnitureEntity(
+        _id_furniture,
+        _delivered_date,
+        _description_furniture,
+        _id_location,
+      );
+
+      this._furnitures.push(newFurniture);
+
+      return newFurniture;
+    } else {
+      throw new Error('Furniture can only be added to locations with status CLIENT_PROSPECT or CLIENT.');
+    }
+  }
+
+
+
+  get taxClientInformation(): TaxClientInformationEntity | null {
+    return this._taxClientInformation;
   }
 
   // confirmClient(store: any): void {

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from '@jest/globals';
 
 import { Mapper } from '@/src/application/mappers/entity-model.mapper';
-import { CLIENT_STATUS_ENUM } from '@/src/clients/core/enums/client-status.enum';
+import { LOCATION_STATUS_ENUM } from '@/src/clients/core/enums/client-status.enum';
 import { DayEntity } from '@/src/core/entities/day.entity';
 import { UserEntity } from '@/src/users/core/entities/user.entity';
 import { TaxClientInformationEntity } from '@/src/clients/core/entities/tax-client-information.entity';
@@ -78,7 +78,7 @@ describe('Mapper.toDomainObject', () => {
       location_name: 'Store A',
       latitude: '25.68',
       longitude: '-100.31',
-      status_location: CLIENT_STATUS_ENUM.CLIENT,
+      status_location: LOCATION_STATUS_ENUM.CLIENT,
       id_creator: 'creator-1',
       id_client: 'client-1',
       id_location_type: 'type-1',
@@ -118,7 +118,7 @@ describe('Mapper.toDomainObject', () => {
         'Store A',
         '25.68',
         '-100.31',
-        CLIENT_STATUS_ENUM.CLIENT,
+        LOCATION_STATUS_ENUM.CLIENT,
         'creator-1',
         'client-1',
         locationCreatedAt,

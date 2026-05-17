@@ -1,6 +1,6 @@
 import type { WorkDayModel } from '@/src/application/models/work-day.model';
 
-import { isRecord } from '@/src/shared/guards/utils';
+import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isWorkDayModel = (value: unknown): value is WorkDayModel => {
   if (!isRecord(value)) {

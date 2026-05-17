@@ -1,6 +1,6 @@
 import type { PaymentSchemaModel } from '@/src/application/models/payment-schema.model';
 
-import { isRecord } from '@/src/shared/guards/utils';
+import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isPaymentSchemaModel = (value: unknown): value is PaymentSchemaModel => {
   if (!isRecord(value)) {

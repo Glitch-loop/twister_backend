@@ -1,5 +1,5 @@
 import { LocationNoteDto } from '@/src/clients/application/dtos/location_note.dto';
-import { isRecord } from "@/src/shared/guards/utils";
+import { isRecord } from "@/src/shared/application/guards/utils";
 
 export const isLocationNoteDto = (value: unknown): value is LocationNoteDto => {
   if (!isRecord(value)) {

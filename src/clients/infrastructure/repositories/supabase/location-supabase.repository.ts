@@ -6,16 +6,23 @@ import { LocationRepository } from '@/src/clients/core/interfaces/location.repos
 
 // Entities
 import { LocationEntity } from '@/src/clients/core/entities/location.entity';
+import { FurnitureEntity } from '@/src/clients/core/entities/furniture.entity';
 
 // Object values
 import { NoteObjectValue } from '@/src/core/object-values/note.object-value';
+import { LocationTypeObjectValue } from '@/src/clients/core/object-values/location-type.object-value';
 
-// Datasource
-import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
-import { Mapper } from '@/src/application/mappers/entity-model.mapper';
+// Models
 import { LocationModel } from '@/src/clients/application/models/location.model';
 import { LocationNoteModel } from '@/src/clients/application/models/location-note.model';
 import { LocationTypeModel } from '@/src/clients/application/models/location-type.model';
+import { FurnitureModel } from '@/src/clients/application/models/furniture.model';
+
+// Datasource
+import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
+
+// Mappers
+import { Mapper } from '@/src/clients/application/mappers/entity-model.mapper';
 
 @Injectable()
 export class LocationSupabaseRepository implements LocationRepository {
@@ -48,27 +55,23 @@ export class LocationSupabaseRepository implements LocationRepository {
 
   async retrieveLocationById(
     id_location: string[],
-  ): Promise<LocationEntity | null> {
+  ): Promise<LocationEntity[]> {
     const { data, error } = await this.supabase
       .from('locations')
       .select()
-      .in('id_location', id_location)
-      .limit(1);
+      .in('id_location', id_location);
 
     if (error) {
       throw new Error('Failed to retrieve location by ID');
     }
 
-    if (!data || data.length === 0) {
-      return null;
-    }
 
     return this.composeLocationEntity(data[0] as LocationModel);
   }
 
   async retrieveLocationByClient(
     id_client: string,
-  ): Promise<LocationEntity | null> {
+  ): Promise<LocationEntity[]> {
     const { data, error } = await this.supabase
       .from('locations')
       .select()
@@ -77,10 +80,6 @@ export class LocationSupabaseRepository implements LocationRepository {
 
     if (error) {
       throw new Error('Failed to retrieve location by client');
-    }
-
-    if (!data || data.length === 0) {
-      return null;
     }
 
     return this.composeLocationEntity(data[0] as LocationModel);
@@ -125,6 +124,21 @@ export class LocationSupabaseRepository implements LocationRepository {
     }
   }
 
+  async listLocations(): Promise<LocationEntity[]> {
+  const { data, error } = await this.supabase.from('locations').select();
+
+  if (error) {
+    throw new Error('Failed to list locations');
+  }
+
+  const locationModels = data as LocationModel[];
+  const locationEntities = await Promise.all(
+    locationModels.map((locationModel) => this.composeLocationEntity(locationModel)),
+  );
+
+  return locationEntities;
+}
+
   async deleteLocation(id_location: string): Promise<void> {
     await this.deleteLocationNotesByLocationId(id_location);
 
@@ -138,19 +152,65 @@ export class LocationSupabaseRepository implements LocationRepository {
     }
   }
 
-  async listLocations(): Promise<LocationEntity[]> {
-    const { data, error } = await this.supabase.from('locations').select();
+  async listLocationTypes(): Promise<LocationTypeObjectValue[]> {
+    try {
+      const { data, error } = await this.supabase.from('location_types').select();
 
-    if (error) {
-      throw new Error('Failed to list locations');
+      if (error) {
+        throw new Error('Failed to list location types' + (error instanceof Error ? `: ${error.message}` : ''));
+      }
+
+      return ((data ?? []) as LocationTypeModel[]).map((locationType) => this.mapper.toDomainObject(locationType));
+    } catch (error) {
+      throw new Error('Failed to list location types' + (error instanceof Error ? `: ${error.message}` : ''));
     }
+  }
 
-    const locationModels = data as LocationModel[];
-    const locationEntities = await Promise.all(
-      locationModels.map((locationModel) => this.composeLocationEntity(locationModel)),
-    );
+  async retrieveLocationTypeById(id_location_type: string[]): Promise<LocationTypeModel[]> {    
+    try {
+      const { data, error } = await this.supabase
+        .from('location_types')
+        .select()
+        .eq('id_location_type', id_location_type);
+  
+      if (error) {
+        throw new Error('Failed to retrieve location type by ID');
+      }
+  
+      return ((data ?? []) as LocationTypeModel[]).map((locationType) => this.mapper.toDomainObject(locationType));
 
-    return locationEntities;
+    } catch (error) {
+      throw new Error('Failed to retrieve location type by ID' + (error instanceof Error ? `: ${error.message}` : ''));
+    }
+  }
+
+
+  async createLocationType(locationType: LocationTypeObjectValue): Promise<void> {
+    const locationTypeModel = this.mapper.toModel(locationType);
+    try {
+      const { error } = await this.supabase.from('location_types').insert(locationTypeModel);
+
+      if (error) {
+        throw new Error('Failed to create location type' + (error instanceof Error ? `: ${error.message}` : ''));
+      }
+    } catch (error) {
+      throw new Error('Failed to create location type' + (error instanceof Error ? `: ${error.message}` : ''));
+    }
+  }
+
+  async addFurnitures(furnitures: FurnitureEntity[]): Promise<void> {
+    
+    try {
+      const furnitureModels: FurnitureModel[] = furnitures.map((furniture) => this.mapper.toModel(furniture));
+  
+      const { error } = await this.supabase.from('furnitures').insert(furnitureModels);
+  
+      if (error) {
+        throw new Error('Failed to add furnitures to location' + (error instanceof Error ? `: ${error.message}` : ''));
+      }
+    } catch (error) {
+      throw new Error('Failed to add furnitures to location' + (error instanceof Error ? `: ${error.message}` : ''));
+    }
   }
 
   private async composeLocationEntity(
@@ -185,23 +245,7 @@ export class LocationSupabaseRepository implements LocationRepository {
     }
   }
 
-  private async retrieveLocationTypeById(
-    id_location_type: string,
-  ): Promise<LocationTypeModel> {
-    const response = await this.supabase
-      .from('location_types')
-      .select()
-      .eq('id_location_type', id_location_type)
-      .limit(1)
-      .maybeSingle();
-
-    if (response.error || !response.data) {
-      throw new Error('Failed to retrieve location type by ID');
-    }
-
-    return response.data as LocationTypeModel;
-  }
-
+  
   private async retrieveLocationNotesByLocationId(
     id_location: string,
   ): Promise<LocationNoteModel[]> {

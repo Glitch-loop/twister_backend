@@ -3,7 +3,7 @@ import { NoteObjectValue } from '@/src/core/object-values/note.object-value';
 import { LocationTypeObjectValue } from '@/src/core/object-values/location-type.object-value';
 
 // Enums
-import { CLIENT_STATUS_ENUM } from '@/src/clients/core/enums/client-status.enum';
+import { LOCATION_STATUS_ENUM } from '@/src/clients/core/enums/client-status.enum';
 
 export class LocationEntity {
   constructor(
@@ -15,7 +15,7 @@ export class LocationEntity {
     public readonly location_name: string,
     public readonly latitude: string,
     public readonly longitude: string,
-    public readonly status_location: CLIENT_STATUS_ENUM,
+    public readonly status_location: LOCATION_STATUS_ENUM,
     public readonly id_creator: string,
     public readonly id_client: string,
     public readonly created_at: Date,

@@ -2,7 +2,7 @@
 import type { ClientModel } from '@/src/clients/application/models/client.model';
 
 // Guards
-import { isRecord } from '@/src/shared/guards/utils';
+import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isClientModel = (value: unknown): value is ClientModel => {
   if (!isRecord(value)) {

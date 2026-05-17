@@ -1,5 +1,5 @@
 import type { DayEntity } from '@/src/core/entities/day.entity';
-import { isRecord } from '@/src/shared/guards/utils';
+import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isDayEntity = (value: unknown): value is DayEntity => {
   if (!isRecord(value)) return false;

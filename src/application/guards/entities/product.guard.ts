@@ -1,5 +1,5 @@
 import type { ProductEntity } from '@/src/core/entities/product.entity';
-import { isRecord } from '@/src/shared/guards/utils';
+import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isProductEntity = (value: unknown): value is ProductEntity => {
   if (!isRecord(value)) return false;

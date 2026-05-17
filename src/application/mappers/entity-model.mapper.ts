@@ -3,7 +3,7 @@
 import { Injectable } from '@nestjs/common';
 
 // Enums
-import { CLIENT_STATUS_ENUM } from '@/src/clients/core/enums/client-status.enum';
+import { LOCATION_STATUS_ENUM } from '@/src/clients/core/enums/client-status.enum';
 
 // Dtos
 
@@ -224,7 +224,7 @@ export class Mapper {
         throw new Error('Invalid updated_at format in LocationModel');
     }
 
-    if (model.status_location in CLIENT_STATUS_ENUM === false) {
+    if (model.status_location in LOCATION_STATUS_ENUM === false) {
       throw new Error('Invalid status_location in LocationModel');
     }
 

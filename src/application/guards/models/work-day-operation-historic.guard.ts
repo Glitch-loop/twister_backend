@@ -1,6 +1,6 @@
 import type { WorkDayOperationHistoricModel } from '@/src/application/models/work-day-operation-historic.model';
 
-import { isRecord } from '@/src/shared/guards/utils';
+import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isWorkDayOperationHistoricModel = (value: unknown): value is WorkDayOperationHistoricModel => {
   if (!isRecord(value)) {

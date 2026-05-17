@@ -1,4 +1,4 @@
-export enum CLIENT_STATUS_ENUM {
+export enum LOCATION_STATUS_ENUM {
   CLIENT_PROSPECT = -1,
   CLIENT = 1,
   CLOSED = 2,

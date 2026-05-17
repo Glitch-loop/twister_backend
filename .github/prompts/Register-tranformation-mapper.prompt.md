@@ -94,7 +94,7 @@ Here is an example of how the transformation should be registered in the `mapper
 import { Injectable } from '@nestjs/common';
 
 // Enums
-import { CLIENT_STATUS_ENUM } from '@/src/clients/core/enums/client-status.enum';
+import { LOCATION_STATUS_ENUM } from '@/src/clients/core/enums/client-status.enum';
 
 // Dtos
 
@@ -254,7 +254,7 @@ export class Mapper {
         throw new Error('Invalid updated_at format in LocationModel');
     }
 
-    if (model.status_location in CLIENT_STATUS_ENUM === false) {
+    if (model.status_location in LOCATION_STATUS_ENUM === false) {
       throw new Error('Invalid status_location in LocationModel');
     }
 
@@ -313,7 +313,7 @@ export class Mapper {
 import { beforeEach, describe, expect, it } from '@jest/globals';
 
 import { Mapper } from '@/src/application/mappers/mapper';
-import { CLIENT_STATUS_ENUM } from '@/src/core/enums/client-status.enum';
+import { LOCATION_STATUS_ENUM } from '@/src/core/enums/client-status.enum';
 import { DayEntity } from '@/src/core/entities/day.entity';
 import { TaxClientInformationEntity } from '@/src/core/entities/tax-client-information.entity';
 import { LocationEntity } from '@/src/core/entities/location.entity';
@@ -389,7 +389,7 @@ describe('Mapper.toDomainObject', () => {
       location_name: 'Store A',
       latitude: '25.68',
       longitude: '-100.31',
-      status_location: CLIENT_STATUS_ENUM.CLIENT,
+      status_location: LOCATION_STATUS_ENUM.CLIENT,
       id_creator: 'creator-1',
       id_client: 'client-1',
       id_location_type: 'type-1',
@@ -429,7 +429,7 @@ describe('Mapper.toDomainObject', () => {
         'Store A',
         '25.68',
         '-100.31',
-        CLIENT_STATUS_ENUM.CLIENT,
+        LOCATION_STATUS_ENUM.CLIENT,
         'creator-1',
         'client-1',
         locationCreatedAt,

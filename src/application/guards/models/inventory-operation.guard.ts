@@ -1,6 +1,6 @@
 import type { InventoryOperationModel } from '@/src/application/models/inventory-operation.model';
 
-import { isRecord } from '@/src/shared/guards/utils';
+import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isInventoryOperationModel = (value: unknown): value is InventoryOperationModel => {
   if (!isRecord(value)) {

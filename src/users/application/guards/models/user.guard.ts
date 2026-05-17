@@ -2,7 +2,7 @@
 import type { UserModel } from '@/src/users/application/models/user.model';
 
 // Utils
-import { isRecord } from '@/src/shared/guards/utils';
+import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isUserModel = (value: unknown): value is UserModel => {
   if (!isRecord(value)) {

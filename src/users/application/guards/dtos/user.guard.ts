@@ -2,7 +2,7 @@
 import type { UserDto } from '@/src/users/application/dtos/user.dto';
 
 // Utils
-import { isRecord } from '@/src/shared/guards/utils';
+import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isUserDto = (value: unknown): value is UserDto => {
   if (!isRecord(value)) {

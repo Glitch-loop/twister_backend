@@ -3,7 +3,7 @@
 import { Injectable } from '@nestjs/common';
 
 // Enums
-import { CLIENT_STATUS_ENUM } from '@/src/clients/core/enums/client-status.enum';
+import { LOCATION_STATUS_ENUM } from '@/src/clients/core/enums/client-status.enum';
 
 // Dtos
 import { UserDto } from '../../users/application/dtos/user.dto';

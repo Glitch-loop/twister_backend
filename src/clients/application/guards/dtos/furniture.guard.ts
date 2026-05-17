@@ -1,5 +1,5 @@
 import { FurnitureDto } from '@/src/clients/application/dtos/furniture.dto';
-import { isRecord } from "@/src/shared/guards/utils";
+import { isRecord } from "@/src/shared/application/guards/utils";
 
 export const isFurnitureDto = (value: unknown): value is FurnitureDto => {
   if (!isRecord(value)) {

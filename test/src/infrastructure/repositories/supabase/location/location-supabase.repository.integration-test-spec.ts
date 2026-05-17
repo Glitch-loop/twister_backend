@@ -9,7 +9,7 @@ import { Mapper } from '@/src/application/mappers/entity-model.mapper';
 import { LocationEntity } from '@/src/clients/core/entities/location.entity';
 import { LocationTypeObjectValue } from '@/src/core/object-values/location-type.object-value';
 import { NoteObjectValue } from '@/src/core/object-values/note.object-value';
-import { CLIENT_STATUS_ENUM } from '@/src/clients/core/enums/client-status.enum';
+import { LOCATION_STATUS_ENUM } from '@/src/clients/core/enums/client-status.enum';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -38,7 +38,7 @@ function buildTestLocation(
     overrides.location_name ?? 'Test Location',
     overrides.latitude ?? '25.6866',
     overrides.longitude ?? '-100.3161',
-    overrides.status_location ?? CLIENT_STATUS_ENUM.CLIENT,
+    overrides.status_location ?? LOCATION_STATUS_ENUM.CLIENT,
     overrides.id_creator ?? randomUUID(),
     overrides.id_client ?? randomUUID(),
     overrides.created_at ?? new Date('2024-01-01T00:00:00.000Z'),

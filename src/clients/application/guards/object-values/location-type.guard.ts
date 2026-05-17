@@ -1,5 +1,5 @@
 import type { LocationTypeObjectValue } from '@/src/clients/core/object-values/location-type.object-value';
-import { isRecord } from '@/src/shared/guards/utils';
+import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isLocationTypeObjectValue = (value: unknown): value is LocationTypeObjectValue => {
   if (!isRecord(value)) {

@@ -5,7 +5,7 @@ import { DayEntity } from '@/src/core/entities/day.entity';
 import { LocationEntity } from '@/src/clients/core/entities/location.entity';
 import { TaxClientInformationEntity } from '@/src/clients/core/entities/tax-client-information.entity';
 import { UserEntity } from '@/src/users/core/entities/user.entity';
-import { CLIENT_STATUS_ENUM } from '@/src/clients/core/enums/client-status.enum';
+import { LOCATION_STATUS_ENUM } from '@/src/clients/core/enums/client-status.enum';
 import { LocationTypeObjectValue } from '@/src/core/object-values/location-type.object-value';
 import { NoteObjectValue } from '@/src/core/object-values/note.object-value';
 
@@ -83,7 +83,7 @@ describe('Mapper.toModel', () => {
       'Store A',
       '25.68',
       '-100.31',
-      CLIENT_STATUS_ENUM.CLIENT,
+      LOCATION_STATUS_ENUM.CLIENT,
       'creator-1',
       'client-1',
       createdAt,
@@ -105,7 +105,7 @@ describe('Mapper.toModel', () => {
       location_name: 'Store A',
       latitude: '25.68',
       longitude: '-100.31',
-      status_location: CLIENT_STATUS_ENUM.CLIENT,
+      status_location: LOCATION_STATUS_ENUM.CLIENT,
       id_creator: 'creator-1',
       id_client: 'client-1',
       created_at: createdAt,
@@ -130,7 +130,7 @@ describe('Mapper.toModel', () => {
       'Store A',
       '25.68',
       '-100.31',
-      CLIENT_STATUS_ENUM.CLIENT,
+      LOCATION_STATUS_ENUM.CLIENT,
       'creator-1',
       'client-1',
       new Date('2026-01-01T00:00:00.000Z'),

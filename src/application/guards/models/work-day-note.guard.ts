@@ -1,6 +1,6 @@
 import type { WorkDayNoteModel } from '@/src/application/models/work-day-note.model';
 
-import { isRecord } from '@/src/shared/guards/utils';
+import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isWorkDayNoteModel = (value: unknown): value is WorkDayNoteModel => {
   if (!isRecord(value)) {

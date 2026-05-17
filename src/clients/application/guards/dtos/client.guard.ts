@@ -1,5 +1,5 @@
 import { ClientDto } from '@/src/clients/application/dtos/client.dto';
-import { isRecord } from "@/src/shared/guards/utils";
+import { isRecord } from "@/src/shared/application/guards/utils";
 
 export const isClientDto = (value: unknown): value is ClientDto => {
   if (!isRecord(value)) {

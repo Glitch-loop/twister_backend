@@ -1,5 +1,5 @@
 import type { PaymentSchemaObjectValue } from '@/src/core/object-values/payment-schema.object-value';
-import { isRecord } from '@/src/shared/guards/utils';
+import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isPaymentSchemaObjectValue = (value: unknown): value is PaymentSchemaObjectValue => {
   if (!isRecord(value)) {

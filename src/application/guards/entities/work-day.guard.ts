@@ -1,5 +1,5 @@
 import type { WorkDayEntity } from '@/src/core/entities/work-day.entity';
-import { isRecord } from '@/src/shared/guards/utils';
+import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isWorkDayEntity = (value: unknown): value is WorkDayEntity => {
   if (!isRecord(value)) return false;

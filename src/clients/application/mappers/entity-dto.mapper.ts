@@ -19,7 +19,7 @@ import { NoteObjectValue } from '@/src/clients/core/object-values/note.object-va
 import { LocationTypeObjectValue } from '@/src/clients/core/object-values/location-type.object-value';
 
 // Enums
-import { CLIENT_STATUS_ENUM } from '@/src/clients/core/enums/client-status.enum';
+import { LOCATION_STATUS_ENUM } from '@/src/clients/core/enums/client-status.enum';
 
 // Dtos guards
 import { isClientDto } from '@/src/clients/application/guards/dtos/client.guard';
@@ -49,6 +49,10 @@ export class Mapper {
   toDomainObject(_dto: LocationNoteDto): NoteObjectValue;
   toDomainObject(_dto: LocationTypeDto): LocationTypeObjectValue;
   toDomainObject(dto: unknown): any {
+    if (isClientDto(dto)) {
+      return this.clientDtoToTaxClientInformationEntity(dto);
+    }
+    
     if (isLocationDto(dto)) {
       return this.locationDtoToLocationEntity(dto);
     }
@@ -66,16 +70,6 @@ export class Mapper {
     }
 
     throw new Error('Invalid input for mapping to domain object');
-  }
-
-  // toEntity overloads
-  toEntity(_dto: ClientDto): TaxClientInformationEntity;
-  toEntity(dto: ClientDto): any {
-    if (isClientDto(dto)) {
-      return this.clientDtoToTaxClientInformationEntity(dto);
-    }
-    
-    throw new Error('Invalid input for mapping to entity');
   }
 
   // toDto overloads
@@ -111,7 +105,7 @@ export class Mapper {
 
 
   // ==================== MAPPER METHODS DOMAIN OBJECT to DTO ====================
-  locationEntityToDto(domainObject: LocationEntity): LocationDto {
+  private locationEntityToDto(domainObject: LocationEntity): LocationDto {
     return {
       id_location: domainObject.id_location,
       street: domainObject.street,
@@ -131,7 +125,7 @@ export class Mapper {
     };
   }
 
-  furnitureEntityToDto(domainObject: FurnitureEntity): FurnitureDto {
+  private furnitureEntityToDto(domainObject: FurnitureEntity): FurnitureDto {
     return {
       id_furniture: domainObject.id_furniture,
       delivered_date: domainObject.delivered_date,
@@ -140,7 +134,7 @@ export class Mapper {
     };
   }
 
-  noteObjectValueToLocationNoteDto(domainObject: NoteObjectValue): LocationNoteDto {
+  private noteObjectValueToLocationNoteDto(domainObject: NoteObjectValue): LocationNoteDto {
     if (domainObject.created_at === undefined) {
       throw new Error('Invalid input for mapping to DTO');
     }
@@ -153,7 +147,7 @@ export class Mapper {
     };
   }
 
-  locationTypeObjectValueToLocationTypeDto(
+  private locationTypeObjectValueToLocationTypeDto(
     domainObject: LocationTypeObjectValue,
   ): LocationTypeDto {
     return {
@@ -163,7 +157,7 @@ export class Mapper {
     };
   }
 
-  taxClientInformationEntityToClientDto(
+  private taxClientInformationEntityToClientDto(
     domainObject: TaxClientInformationEntity,
   ): ClientDto {
     return {
@@ -180,7 +174,7 @@ export class Mapper {
   }
 
   // ==================== MAPPER METHODS DTO to DOMAIN OBJECT ====================
-  clientDtoToTaxClientInformationEntity(dto: ClientDto): TaxClientInformationEntity {
+  private clientDtoToTaxClientInformationEntity(dto: ClientDto): TaxClientInformationEntity {
     return new TaxClientInformationEntity(
       dto.id_client,
       dto.legal_name,
@@ -194,7 +188,7 @@ export class Mapper {
     );
   }
 
-  furnitureDtoToFurnitureEntity(dto: FurnitureDto): FurnitureEntity {
+  private furnitureDtoToFurnitureEntity(dto: FurnitureDto): FurnitureEntity {
     return new FurnitureEntity(
       dto.id_furniture,
       dto.delivered_date,
@@ -203,7 +197,7 @@ export class Mapper {
     );
   }
 
-  locationNoteDtoToNoteObjectValue(dto: LocationNoteDto): NoteObjectValue {
+  private locationNoteDtoToNoteObjectValue(dto: LocationNoteDto): NoteObjectValue {
     return new NoteObjectValue(
       dto.id_location_note,
       dto.note,
@@ -212,7 +206,7 @@ export class Mapper {
     );
   }
 
-  locationTypeDtoToLocationTypeObjectValue(
+  private locationTypeDtoToLocationTypeObjectValue(
     dto: LocationTypeDto,
   ): LocationTypeObjectValue {
     return new LocationTypeObjectValue(
@@ -222,8 +216,8 @@ export class Mapper {
     );
   }
 
-  locationDtoToLocationEntity(dto: LocationDto): LocationEntity {
-    if (!(dto.status_location in CLIENT_STATUS_ENUM)) {
+  private locationDtoToLocationEntity(dto: LocationDto): LocationEntity {
+    if (!(dto.status_location in LOCATION_STATUS_ENUM)) {
       throw new Error('Invalid input for mapping to domain object');
     }
 
