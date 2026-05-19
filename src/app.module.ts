@@ -12,6 +12,9 @@ import { AppService } from '@/src/app.service';
 import { UsersModule } from '@/src/users/users.module';
 import { ClientsModule } from '@/src/clients/clients.module';
 import { RouteOrganizationModule } from '@/src/route-organization/route-organization.module';
+import { BusinessOperationRouteModule } from '@/src/business-operation-route/business-operation-route.module';
+import { InventoryOperationsModule } from '@/src/inventory-operations/inventory-operations.module';
+import { ProductsModule } from '@/src/products/products.module';
 
 @Module({
   imports: [
@@ -22,6 +25,9 @@ import { RouteOrganizationModule } from '@/src/route-organization/route-organiza
     UsersModule,
     ClientsModule,
     RouteOrganizationModule,
+    BusinessOperationRouteModule,
+    InventoryOperationsModule,
+    ProductsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
