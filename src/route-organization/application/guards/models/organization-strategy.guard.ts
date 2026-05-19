@@ -1,4 +1,4 @@
-import type { OrganizationStrategyModel } from '@/src/application/models/organization-strategy.model';
+import type { OrganizationStrategyModel } from '@/src/route-organization/application/models/organization-strategy.model';
 
 import { isRecord } from '@/src/shared/application/guards/utils';
 

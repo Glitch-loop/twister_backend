@@ -1,12 +1,8 @@
-import type { RouteDayProposalModel } from '@/src/application/models/route-day-proposal.model';
-
+import type { RouteDayProposalEntity } from '@/src/route-organization/core/entities/route-day-proposal.entity';
 import { isRecord } from '@/src/shared/application/guards/utils';
 
-export const isRouteDayProposalModel = (value: unknown): value is RouteDayProposalModel => {
-  if (!isRecord(value)) {
-    return false;
-  }
-
+export const isRouteDayProposalEntity = (value: unknown): value is RouteDayProposalEntity => {
+  if (!isRecord(value)) return false;
   return (
     typeof value.id_route_day_proposal === 'string' &&
     typeof value.proposal_name === 'string' &&

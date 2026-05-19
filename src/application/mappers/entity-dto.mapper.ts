@@ -9,7 +9,7 @@ import { LOCATION_STATUS_ENUM } from '@/src/clients/core/enums/client-status.enu
 import { UserDto } from '../../users/application/dtos/user.dto';
 
 // Entities
-import { DayEntity } from '@/src/core/entities/day.entity';
+import { DayEntity } from '@/src/route-organization/core/entities/day.entity';
 import { LocationEntity } from '@/src/clients/core/entities/location.entity';
 import { TaxClientInformationEntity } from '@/src/clients/core/entities/tax-client-information.entity';
 import { UserEntity } from '@/src/users/core/entities/user.entity';
@@ -22,7 +22,7 @@ import { LocationTypeObjectValue } from '@/src/core/object-values/location-type.
 // Dtos guards
 
 // Entities guards
-import { isDayEntity } from '@/src/application/guards/entities/day.guard';
+import { isDayEntity } from '@/src/route-organization/application/guards/entities/day.guard';
 import { isLocationEntity } from '@/src/clients/application/guards/entities/location.guard';
 import { isTaxClientInformationEntity } from '@/src/clients/application/guards/entities/tax-client-information.guard';
 import { isNoteObjectValue } from '@/src/application/guards/object-values/note.guard';

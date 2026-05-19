@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from '@jest/globals';
 
 import { Mapper } from '@/src/application/mappers/entity-model.mapper';
-import { DayEntity } from '@/src/core/entities/day.entity';
+import { DayEntity } from '@/src/route-organization/core/entities/day.entity';
 import { LocationEntity } from '@/src/clients/core/entities/location.entity';
 import { TaxClientInformationEntity } from '@/src/clients/core/entities/tax-client-information.entity';
 import { UserEntity } from '@/src/users/core/entities/user.entity';

@@ -1,4 +1,4 @@
-import type { RouteDayModel } from '@/src/application/models/route-day.model';
+import type { RouteDayModel } from '@/src/route-organization/application/models/route-day.model';
 
 import { isRecord } from '@/src/shared/application/guards/utils';
 

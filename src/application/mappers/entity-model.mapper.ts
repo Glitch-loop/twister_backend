@@ -8,7 +8,7 @@ import { LOCATION_STATUS_ENUM } from '@/src/clients/core/enums/client-status.enu
 // Dtos
 
 // Entities
-import { DayEntity } from '@/src/core/entities/day.entity';
+import { DayEntity } from '@/src/route-organization/core/entities/day.entity';
 import { LocationEntity } from '@/src/clients/core/entities/location.entity';
 import { TaxClientInformationEntity } from '@/src/clients/core/entities/tax-client-information.entity';
 import { UserEntity } from '@/src/users/core/entities/user.entity';
@@ -18,7 +18,7 @@ import { NoteObjectValue } from '@/src/core/object-values/note.object-value';
 import { LocationTypeObjectValue } from '@/src/core/object-values/location-type.object-value';
 
 // Models
-import { DayModel } from '@/src/application/models/day.model';
+import { DayModel } from '@/src/route-organization/application/models/day.model';
 import { LocationModel } from '@/src/clients/application/models/location.model';
 import { ClientModel } from '@/src/clients/application/models/client.model';
 import { LocationTypeModel } from '@/src/clients/application/models/location-type.model';
@@ -28,14 +28,14 @@ import { UserModel } from '@/src/users/application/models/user.model';
 // Dtos guards
 
 // Entities guards
-import { isDayEntity } from '@/src/application/guards/entities/day.guard';
+import { isDayEntity } from '@/src/route-organization/application/guards/entities/day.guard';
 import { isLocationEntity } from '@/src/clients/application/guards/entities/location.guard';
 import { isTaxClientInformationEntity } from '@/src/clients/application/guards/entities/tax-client-information.guard';
 import { isNoteObjectValue } from '@/src/application/guards/object-values/note.guard';
 import { isUserEntity } from '@/src/users/application/guards/entities/user.guard';
 
 // Models guards
-import { isDayModel } from '@/src/application/guards/models/day.guard';
+import { isDayModel } from '@/src/route-organization/application/guards/models/day.guard';
 import { isLocationModel } from '@/src/clients/application/guards/models/location.guard';
 import { isClientModel } from '@/src/clients/application/guards/models/client.guard';
 import { isLocationTypeModel } from '@/src/clients/application/guards/models/location-type.guard';

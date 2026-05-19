@@ -1,4 +1,4 @@
-import type { OrganizationStrategyEntity } from '@/src/core/entities/organization-strategy.entity';
+import type { OrganizationStrategyEntity } from '@/src/route-organization/core/entities/organization-strategy.entity';
 import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isOrganizationStrategyEntity = (value: unknown): value is OrganizationStrategyEntity => {

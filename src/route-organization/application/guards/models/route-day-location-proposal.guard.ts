@@ -1,4 +1,4 @@
-import type { RouteDayLocationProposalModel } from '@/src/application/models/route-day-location-proposal.model';
+import type { RouteDayLocationProposalModel } from '@/src/route-organization/application/models/route-day-location-proposal.model';
 
 import { isRecord } from '@/src/shared/application/guards/utils';
 

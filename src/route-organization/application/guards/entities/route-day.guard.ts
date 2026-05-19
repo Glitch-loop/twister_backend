@@ -1,4 +1,4 @@
-import type { RouteDayEntity } from '@/src/core/entities/route-day.entity';
+import type { RouteDayEntity } from '@/src/route-organization/core/entities/route-day.entity';
 import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isRouteDayEntity = (value: unknown): value is RouteDayEntity => {
