@@ -11,6 +11,7 @@ import { AppService } from '@/src/app.service';
 // Modules
 import { UsersModule } from '@/src/users/users.module';
 import { ClientsModule } from '@/src/clients/clients.module';
+import { RouteOrganizationModule } from '@/src/route-organization/route-organization.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ClientsModule } from '@/src/clients/clients.module';
     }),
     UsersModule,
     ClientsModule,
+    RouteOrganizationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
