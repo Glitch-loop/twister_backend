@@ -48,14 +48,14 @@ export class ModifyLocationCommand {
 			throw new Error(`Location with id ${_id_location} does not exist.`);
 		}
 
-		const existingLocation = locations[0];
-		const effectiveClientId = _id_client ?? existingLocation.id_client;
+		const existingLocation: LocationEntity = locations[0];
+		const{ id_client } = existingLocation;
 		const clients: TaxClientInformationEntity[] = await this.clientRepository.retrieveClientById([
-			effectiveClientId,
+			id_client,
 		]);
 
 		if (clients.length === 0) {
-			throw new Error(`Client with id ${effectiveClientId} does not exist.`);
+			throw new Error(`Client with id ${id_client} does not exist.`);
 		}
 
 		let locationType: LocationTypeObjectValue | undefined;

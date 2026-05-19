@@ -126,9 +126,12 @@ export class ClientsController {
     return { message: 'Location modified successfully' };
   }
 
-  @Patch('/locations/:id_location/deactivate')
-  async deactivateLocation(@Param('id_location') id_location: string) {
-    await this.deactivateLocationCommand.execute(id_location);
+  @Patch('/locations/:id_location/deactivate/:deactivation_type')
+  async deactivateLocation(
+    @Param('id_location') id_location: string,
+    @Param('deactivation_type') deactivation_type: string,
+  ) {
+    await this.deactivateLocationCommand.execute(id_location, parseInt(deactivation_type, 10));
     return { message: 'Location deactivated successfully' };
   }
 

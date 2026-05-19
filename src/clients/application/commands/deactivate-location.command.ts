@@ -19,7 +19,7 @@ export class DeactivateLocationCommand {
 		@Inject(ClientRepository) private readonly clientRepository: ClientRepository,
 	) {}
 
-	async execute(_id_location: string): Promise<void> {
+	async execute(_id_location: string, _deactivation_type: number): Promise<void> {
 		const locations: LocationEntity[] = await this.locationRepository.retrieveLocationById([
 			_id_location,
 		]);
@@ -28,7 +28,7 @@ export class DeactivateLocationCommand {
 			throw new Error(`Location with id ${_id_location} does not exist.`);
 		}
 
-		const location = locations[0];
+		const location: LocationEntity = locations[0];
 		const clients: TaxClientInformationEntity[] = await this.clientRepository.retrieveClientById([
 			location.id_client,
 		]);
@@ -38,7 +38,7 @@ export class DeactivateLocationCommand {
 		}
 
 		const clientAggregate: ClientAggregate = new ClientAggregate(clients[0], [location], []);
-		const updatedLocation = clientAggregate.deactivateLocation(_id_location);
+		const updatedLocation = clientAggregate.deactivateLocation(_id_location, _deactivation_type);
 
 		await this.locationRepository.updateLocation(_id_location, {
 			status_location: updatedLocation.status_location,

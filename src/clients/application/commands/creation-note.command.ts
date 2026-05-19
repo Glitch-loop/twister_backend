@@ -12,12 +12,15 @@ import { ClientAggregate } from '@/src/clients/core/aggregates/client.aggregate'
 
 // Entities
 import { LocationEntity } from '@/src/clients/core/entities/location.entity';
+import { TaxClientInformationEntity } from '@/src/clients/core/entities/tax-client-information.entity';
+import { ClientRepository } from '@/src/clients/core/interfaces/client.repository';
 
 @Injectable()
 export class CreationNoteCommand {
 	constructor(
 		@Inject(LocationRepository) private readonly locationRepository: LocationRepository,
 		@Inject(IntegrityRepository) private readonly integrityRepository: IntegrityRepository,
+		@Inject(ClientRepository) private readonly clientRepository: ClientRepository,
 	) {}
 
 	async execute(
@@ -33,9 +36,15 @@ export class CreationNoteCommand {
 			throw new Error(`Location with id ${_id_location} does not exist.`);
 		}
 
-		const location = locations[0];
+		const location: LocationEntity = locations[0];
 
-		const clientAggregate: ClientAggregate = new ClientAggregate(null, [location], []);
+		const clients: TaxClientInformationEntity[] = await this.clientRepository.retrieveClientById([
+			location.id_client,
+		]);
+
+		const client: TaxClientInformationEntity = clients[0];
+
+		const clientAggregate: ClientAggregate = new ClientAggregate(client, [location], []);
 
 		clientAggregate.createNoteForLocation(
 			this.integrityRepository.generateUUIDv4(),

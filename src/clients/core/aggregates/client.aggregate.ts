@@ -344,18 +344,54 @@ export class ClientAggregate {
     return updatedLocation;
   }
 
-  deactivateLocation(_id_location: string): LocationEntity {
-    return this.modifyLocation(
-      _id_location,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      LOCATION_STATUS_ENUM.SHUTDOWN,
+  deactivateLocation(_id_location: string, _deactivation_type: number): LocationEntity {
+
+    /*
+      Business rule:
+      Both prospects or clients can be deactivated.
+    */
+
+    let locationStatus: LOCATION_STATUS_ENUM = LOCATION_STATUS_ENUM.CLOSED; // Default deactivation status
+
+    if (_deactivation_type === 1) {
+      locationStatus = LOCATION_STATUS_ENUM.CLOSED;
+    } else if (_deactivation_type === 2) {
+      locationStatus = LOCATION_STATUS_ENUM.SHUTDOWN;
+    } else if (_deactivation_type === 3) {
+      locationStatus = LOCATION_STATUS_ENUM.CHURNED;
+    } else {
+      throw new Error(`Invalid deactivation type: ${_deactivation_type}`);
+    }
+
+        const existingLocation = this._locations.find(
+      (loc) => loc.id_location === _id_location,
     );
+
+    if (existingLocation === undefined) {
+      throw new Error('Location does not exist for this client.');
+    }
+
+    const updatedLocation = new LocationEntity(
+      existingLocation.id_location,
+      existingLocation.street,
+      existingLocation.ext_number,
+      existingLocation.colony,
+      existingLocation.postal_code,
+      existingLocation.location_name,
+      existingLocation.latitude,
+      existingLocation.longitude,
+      locationStatus,
+      existingLocation.id_creator,
+      existingLocation.id_client,
+      existingLocation.created_at,
+      new Date(),
+      existingLocation.location_type,
+      existingLocation.notes,
+      existingLocation.address_reference,
+    );
+
+
+    return updatedLocation;
   }
 
   deactivateClient(): TaxClientInformationEntity {
