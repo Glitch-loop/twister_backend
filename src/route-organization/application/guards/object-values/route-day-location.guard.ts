@@ -1,4 +1,4 @@
-import type { RouteDayLocationObjectValue } from '@/src/route-organization/core/value-objects/route-day-location.object-value';
+import type { RouteDayLocationObjectValue } from '@/src/core/object-values/route-day-location.object-value';
 import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isRouteDayLocationObjectValue = (value: unknown): value is RouteDayLocationObjectValue => {
