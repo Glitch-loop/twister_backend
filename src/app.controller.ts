@@ -1,12 +1,16 @@
 import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
 
-@Controller()
+import { CreateRouteCommand } from '@/src/route-organization/application/commands/create-route.command';
+
+@Controller('routes')
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly createRouteCommand: CreateRouteCommand, 
+  ) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Post('')
+  async createRoute() {
+
   }
+
 }

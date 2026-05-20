@@ -2,6 +2,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 
 import { RouteRepository } from '@/src/route-organization/core/interfaces/route.repository';
+import { RouteAggregate } from '@/src/route-organization/core/aggregates/route.aggregate';
+import RouteDayAggregate from '@/src/route-organization/core/aggregates/route-day.aggregate';
+
+import { RouteEntity } from '@/src/route-organization/core/entities/route.entity';
+import { RouteDayEntity } from '@/src/route-organization/core/entities/route-day.entity';
 import { RouteDayLocationObjectValue } from '@/src/route-organization/core/value-objects/route-day-location.object-value';
 
 @Injectable()
@@ -11,30 +16,27 @@ export class OrganizeRouteDayCommand {
     ) {}
 
     async execute(id_route_day: string, routeDayLocations: RouteDayLocationObjectValue[]): Promise<void> {
-        // TODO: Verify route day only contains active stores.
-        // TODO: Verify the order of the stores is ascendent and there is not missing positions.
+        const routeDayEntities: RouteDayEntity[] = await this.routeRepository.retrieveRouteDay([id_route_day]);
 
-        const sortedLocations = [...routeDayLocations].sort(
-            (a, b) => a.position_in_route - b.position_in_route,
-        );
+        if (routeDayEntities.length === 0) {
+            throw new Error(`Route day with id ${id_route_day} does not exist.`);
+        }
 
-        const routeDayLocationsToUpdate = sortedLocations.map((location, index) => {
-            if (location.id_owner !== id_route_day) {
-                throw new Error(
-                    `Invalid location owner id ${location.id_owner}. Expected route day id ${id_route_day}.`,
-                );
-            }
+        const routeDayAggregate = new RouteDayAggregate(routeDayEntities[0], []);
+        const routeDay = routeDayAggregate.getRouteDay();
 
-            return new RouteDayLocationObjectValue(
-                index + 1,
-                location.id_location,
-                id_route_day,
-                location.id_route_day_location,
-                location.id_route_day_location_proposal,
-            );
-        });
+        const routeEntities: RouteEntity[] = await this.routeRepository.retrieveRoutesByRouteId([routeDay.id_route]);
 
-        await this.routeRepository.deleteRouteDayLocations(id_route_day);
-        await this.routeRepository.insertRouteDayLocations(routeDayLocationsToUpdate);
+        if (routeEntities.length === 0) {
+            throw new Error(`Route with id ${routeDay.id_route} does not exist.`);
+        }
+
+        const routeAggregate = new RouteAggregate(routeEntities[0]);
+        routeAggregate.validateRouteIsActive();
+
+        const updatedRouteDay = routeDayAggregate.organizeRouteDayStores(routeDayLocations);
+
+        await this.routeRepository.deleteRouteDayLocations(updatedRouteDay.id_route_day);
+        await this.routeRepository.insertRouteDayLocations(updatedRouteDay.locations);
     }
 }
