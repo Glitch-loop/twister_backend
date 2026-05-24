@@ -1,6 +1,7 @@
 // Libraries
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 // Controllers
 import { AppController } from '@/src/app.controller';
@@ -16,6 +17,9 @@ import { BusinessOperationRouteModule } from '@/src/business-operation-route/bus
 import { InventoryOperationsModule } from '@/src/inventory-operations/inventory-operations.module';
 import { ProductsModule } from '@/src/products/products.module';
 
+// Interceptor
+import { HttpInterceptor } from '@/src/http.interceptor';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -30,6 +34,12 @@ import { ProductsModule } from '@/src/products/products.module';
     ProductsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: HttpInterceptor
+    }
+  ],
 })
 export class AppModule {}

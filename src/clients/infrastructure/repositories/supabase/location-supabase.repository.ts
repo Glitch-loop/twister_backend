@@ -82,11 +82,33 @@ export class LocationSupabaseRepository implements LocationRepository {
     const { data, error } = await this.supabase
       .from('locations')
       .select()
-      .eq('id_client', id_client)
-      .limit(1);
+      .eq('id_client', id_client);
 
     if (error) {
       throw new Error('Failed to retrieve location by client');
+    }
+
+    if (!data || data.length === 0) {
+      return [];
+    }
+
+    return Promise.all(
+      (data as LocationModel[]).map((locationModel) =>
+        this.composeLocationEntity(locationModel),
+      ),
+    );
+  }
+
+  async retrieveLocationsByCreator(
+    id_creator: string,
+  ): Promise<LocationEntity[]> {
+    const { data, error } = await this.supabase
+      .from('locations')
+      .select()
+      .eq('id_creator', id_creator);
+
+    if (error) {
+      throw new Error('Failed to retrieve location by creator');
     }
 
     if (!data || data.length === 0) {

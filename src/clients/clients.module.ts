@@ -13,7 +13,11 @@ import { ClientSupabase } from '@/src/clients/infrastructure/repositories/supaba
 import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
 
 // Queries
+import { ListClientsQuery } from '@/src/clients/application/queries/list-clients.query';
+import { ListLocationsQuery } from '@/src/clients/application/queries/list-locations.query';
 import { ListLocationTypesQuery } from '@/src/clients/application/queries/list-location-types.query';
+import { RetrieveLocationsByIdClientQuery } from '@/src/clients/application/queries/retrieve-locations-by-id-client.query';
+import { RetrieveLocationsByIdCreatorQuery } from '@/src/clients/application/queries/retrieve-locations-by-id-creator.query';
 
 // Commands
 import { CreateClientCommand } from '@/src/clients/application/commands/create-client.command';
@@ -51,7 +55,11 @@ import { SharedModule } from '@/src/shared/shared.module';
     CreateLocationTypeCommand,
     CreateFurnitureCommand,
     ModifyFurnitureCommand,
+    ListClientsQuery,
+    ListLocationsQuery,
     ListLocationTypesQuery,
+    RetrieveLocationsByIdClientQuery,
+    RetrieveLocationsByIdCreatorQuery,
     EntityDtoMapper,
     EntityModelMapper,
     SupabaseDataSource,

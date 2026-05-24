@@ -1,4 +1,4 @@
-import type { ProductEntity } from '@/src/core/entities/product.entity';
+import type { ProductEntity } from '@/src/products/core/entities/product.entity';
 import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isProductEntity = (value: unknown): value is ProductEntity => {

@@ -1,5 +1,5 @@
 // Libraries
-import { Body, Controller, Post, Get, Patch, Param } from '@nestjs/common';
+import { Body, Controller, Post, Get, Patch, Param, Query } from '@nestjs/common';
 
 // DTOs
 import type { ClientDto } from '@/src/clients/application/dtos/client.dto';
@@ -20,13 +20,18 @@ import { CreateLocationTypeCommand } from '@/src/clients/application/commands/cr
 import { CreateFurnitureCommand } from '@/src/clients/application/commands/create-furniture.command';
 import { ModifyFurnitureCommand } from '@/src/clients/application/commands/modify-furniture.command';
 
-
 // Queries
 import { ListLocationTypesQuery } from '@/src/clients/application/queries/list-location-types.query';
+
+// Presentation
+import { httpControllerResponse } from '@/src/shared/presentation/http/interfaces/controller-response.interface';
+import { ListClientsQuery } from './application/queries/list-clients.query';
+import { httpFormatter } from '../shared/presentation/http/handlers/http-formatter.handler';
 
 @Controller('clients')
 export class ClientsController {
   constructor(
+    // Commands
     private readonly createClientCommand: CreateClientCommand,
     private readonly modifyClientCommand: ModifyClientCommand,
     private readonly deactivateClientCommand: DeactivateClientCommand,
@@ -37,11 +42,14 @@ export class ClientsController {
     private readonly createLocationTypeCommand: CreateLocationTypeCommand,
     private readonly createFurnitureCommand: CreateFurnitureCommand,
     private readonly modifyFurnitureCommand: ModifyFurnitureCommand,
+
+    // Query
     private readonly listLocationTypesQuery: ListLocationTypesQuery,
+    private readonly listClientsQuery: ListClientsQuery,
   ) {}
 
   @Post('/')
-  async createClient(@Body() body: Partial<ClientDto>) {
+  async createClient(@Body() body: Partial<ClientDto>): Promise<httpControllerResponse> {
     await this.createClientCommand.execute(
       body.legal_name!,
       body.postal_code!,
@@ -51,15 +59,38 @@ export class ClientsController {
       body.email!,
       body.id_client,
     );
+    const httpResponseFormatter = new httpFormatter();
+    return httpResponseFormatter.createResponse('Client created successfully');
+  }
 
-    return { message: 'Client created successfully' };
+  @Get('')
+  async listClient(
+    @Query('limit') limit?: number,
+    @Query('cellphone') cellphone?: string,
+    @Query('email') email?: string,
+    @Query('legal_name') legal_name?: string,
+    @Query('name') name?: string,
+    @Query('next_item') next_item?: string,
+  ): Promise<httpControllerResponse> {
+    const httpRequestFormatter = new httpFormatter();
+    const httpResponseFormatter = new httpFormatter();
+    if(next_item) {
+      // paginationInformation = httpRquestFormatter.decodingNextItemForPagination(next_item);
+    }
+
+    console.log("Limit: ", limit)
+
+
+    const data: ClientDto[] = await this.listClientsQuery.execute();
+    console.log(data)
+    return httpResponseFormatter.createResponse('Client listed successfully.', data, limit, 'id_client', 'created_at');
   }
 
   @Patch('/:id_client')
   async modifyClient(
     @Param('id_client') id_client: string,
     @Body() body: Partial<ClientDto>,
-  ) {
+  ): Promise<httpControllerResponse> {
     await this.modifyClientCommand.execute(
       id_client,
       body.legal_name,
@@ -69,18 +100,18 @@ export class ClientsController {
       body.cellphone,
       body.email,
     );
-
+ 
     return { message: 'Client modified successfully' };
   }
 
   @Patch('/:id_client/deactivate')
-  async deactivateClient(@Param('id_client') id_client: string) {
+  async deactivateClient(@Param('id_client') id_client: string): Promise<httpControllerResponse> {
     await this.deactivateClientCommand.execute(id_client);
     return { message: 'Client deactivated successfully' };
   }
 
   @Post('/locations')
-  async createLocation(@Body() body: Partial<LocationDto>) {
+  async createLocation(@Body() body: Partial<LocationDto>): Promise<httpControllerResponse> {
     await this.createLocationCommand.execute(
       body.street!,
       body.ext_number!,
@@ -106,7 +137,7 @@ export class ClientsController {
   async modifyLocation(
     @Param('id_location') id_location: string,
     @Body() body: Partial<LocationDto>,
-  ) {
+  ): Promise<httpControllerResponse> {
     await this.modifyLocationCommand.execute(
       id_location,
       body.street,
@@ -130,7 +161,7 @@ export class ClientsController {
   async deactivateLocation(
     @Param('id_location') id_location: string,
     @Param('deactivation_type') deactivation_type: string,
-  ) {
+  ): Promise<httpControllerResponse> {
     await this.deactivateLocationCommand.execute(id_location, parseInt(deactivation_type, 10));
     return { message: 'Location deactivated successfully' };
   }
@@ -139,7 +170,7 @@ export class ClientsController {
   async createLocationNote(
     @Param('id_location') id_location: string,
     @Body() body: Partial<LocationNoteDto>,
-  ) {
+  ): Promise<httpControllerResponse> {
     await this.creationNoteCommand.execute(
       id_location,
       body.note!,
@@ -150,20 +181,21 @@ export class ClientsController {
   }
 
   @Get('/locations/types')
-  async listLocationTypes() {
+  async listLocationTypes(): Promise<httpControllerResponse> {
     const locationTypes = await this.listLocationTypesQuery.execute();
 
-    return { message: 'Location types retrieved successfully', data: locationTypes };
+    const httpResponseFormatter = new httpFormatter();
+    return httpResponseFormatter.createResponse('Location types retrieved successfully', locationTypes);
   }
 
   @Post('/locations/types')
-  async createLocationType(@Body() body: Partial<LocationTypeDto>) {
+  async createLocationType(@Body() body: Partial<LocationTypeDto>): Promise<httpControllerResponse> {
     await this.createLocationTypeCommand.execute(body.location_type_name!);
     return { message: 'Location type created successfully' };
   }
 
   @Post('/locations/furnitures')
-  async createFurniture(@Body() body: Partial<FurnitureDto>) {
+  async createFurniture(@Body() body: Partial<FurnitureDto>): Promise<httpControllerResponse> {
     await this.createFurnitureCommand.execute(
       body.delivered_date!,
       body.description_furniture!,
@@ -177,7 +209,7 @@ export class ClientsController {
   async modifyFurniture(
     @Param('id_furniture') id_furniture: string,
     @Body() body: Partial<FurnitureDto>,
-  ) {
+  ): Promise<httpControllerResponse> {
     await this.modifyFurnitureCommand.execute(
       id_furniture,
       body.delivered_date,

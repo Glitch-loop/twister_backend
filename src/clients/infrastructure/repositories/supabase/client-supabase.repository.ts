@@ -87,9 +87,32 @@ export class ClientSupabase implements ClientRepository {
     }
   }
 
-  async listClients(): Promise<TaxClientInformationEntity[]> {
-    const { data, error } = await this.supabase.from('clients').select();
+  async listClients(
+    limit: number,
+    lastCreatedAt?: Date,
+    lastIdClient?: string,
+    cellphone?: string, 
+    email?: string, 
+    legal_name?: string, 
+    name?: string,
+  ): Promise<TaxClientInformationEntity[]> {
+    const query = this.supabase.from('clients').select();
+    
+    if(cellphone) query.eq('cellphone', cellphone)
+    if(email) query.eq('email', email)
+    
+    if(legal_name) query.ilike('legal_name', legal_name)
+    if(name) query.ilike('name', name)
 
+    if (lastCreatedAt && lastCreatedAt) {
+      query.gt("created_at", lastCreatedAt)
+      query.gt("id_client", lastIdClient)
+    }
+
+    query.order('created_at', { ascending: false})
+    query.order('id_client', { ascending: false})
+
+    const { data, error } = await query.limit(limit + 1);
     if (error) {
       throw new Error('Failed to list clients');
     }

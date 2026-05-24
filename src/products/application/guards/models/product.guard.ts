@@ -1,4 +1,4 @@
-import type { ProductModel } from '@/src/application/models/product.model';
+import type { ProductModel } from '@/src/products/application/models/product.model';
 
 import { isRecord } from '@/src/shared/application/guards/utils';
 

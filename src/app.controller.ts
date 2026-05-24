@@ -1,16 +1,11 @@
 import { Controller, Get } from '@nestjs/common';
 
-import { CreateRouteCommand } from '@/src/route-organization/application/commands/create-route.command';
-
-@Controller('routes')
+@Controller('')
 export class AppController {
-  constructor(
-    private readonly createRouteCommand: CreateRouteCommand, 
-  ) {}
+  constructor() {}
 
-  @Post('')
-  async createRoute() {
-
+  @Get()
+  helloWorld() {
+    return 'Hello world'
   }
-
 }

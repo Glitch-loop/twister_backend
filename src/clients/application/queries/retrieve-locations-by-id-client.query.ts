@@ -14,14 +14,14 @@ import { LocationDto } from '../dtos/location.dto';
 import { Mapper } from '@/src/clients/application/mappers/entity-dto.mapper';
 
 @Injectable()
-export class ListLocationsQuery {
+export class RetrieveLocationsByIdClientQuery {
 	constructor(
 		@Inject(LocationRepository) private readonly locationRepository: LocationRepository,
 		private readonly mapper: Mapper,
 	) {}
 
-	async execute(): Promise<LocationDto[]> {
-		const locations: LocationEntity[] = await this.locationRepository.listLocations();
+	async execute(id_client: string): Promise<LocationDto[]> {
+		const locations: LocationEntity[] = await this.locationRepository.retrieveLocationByClient(id_client);
 		return locations.map((location: LocationEntity) => this.mapper.toDto(location));
 	}
 }
