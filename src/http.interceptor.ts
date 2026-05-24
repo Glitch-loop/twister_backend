@@ -3,7 +3,6 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators'
 import { httpControllerResponse } from '@/src/shared/presentation/http/interfaces/controller-response.interface';
 import { httpFormatter } from '@/src/shared/presentation/http/handlers/http-formatter.handler';
-import { httpControllerResponseWithData } from './shared/presentation/http/interfaces/controller-response-with-data.interface';
 
 @Injectable()
 export class HttpInterceptor implements NestInterceptor {
@@ -15,7 +14,7 @@ export class HttpInterceptor implements NestInterceptor {
       .pipe(
         map(((value: httpControllerResponse) => {
           const { message, data, meta } = value;
-          console.log(value)
+
           if('message' in value) httpResponse.addMessage(message);
           if('data' in value) httpResponse.addData(data);
           if('meta' in value) httpResponse.addPaginationMetaData(meta);

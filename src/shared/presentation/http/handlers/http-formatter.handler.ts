@@ -32,22 +32,29 @@ export class httpFormatter {
    */
   public createResponse(message: string, data?: unknown, limit?: number, id_item_field_name?: string, created_at_field_name?: string): httpControllerResponse {
     let metadataPagination: controllerNextItemInterface|undefined = undefined 
-
+    console.log("Creating response: ", data)
     if(isArray(data) && limit) {
-      console.log("Retrieved data: ", data.length)
+      console.log("Data length: ", data.length)
       console.log("Limit: ", limit)
       if (data.length > limit) { // It means that there is a page in the table.
-        const nextItem:unknown = data.pop();
-        console.log("Next item: ", nextItem)
+        data.pop();
+        const nextItem: unknown = data[data.length - 1];
+
         if(isRecord(nextItem)) {
           if(id_item_field_name && created_at_field_name) {
             if (typeof nextItem[id_item_field_name] === "string" 
-            && (typeof nextItem[created_at_field_name] === "string" || nextItem[created_at_field_name] instanceof Date)) {
-              
+            && (
+              nextItem[created_at_field_name] instanceof Date
+              || typeof nextItem[created_at_field_name] === 'string'
+            )) {
+              const createdAtValue = nextItem[created_at_field_name] instanceof Date
+                ? nextItem[created_at_field_name].toISOString()
+                : nextItem[created_at_field_name];
+
               metadataPagination = {
                 limit: limit,
                 id: nextItem[id_item_field_name],
-                created_at: nextItem[created_at_field_name],
+                created_at: createdAtValue,
               };
             }
           }
@@ -84,7 +91,8 @@ export class httpFormatter {
   }
 
   public addPaginationMetaData(next_item: unknown): void {
-    console.log("next_item guard test: ", isControllerNextItem(next_item))
+    console.log(next_item)
+    console.log("Is controller next item; ", isControllerNextItem(next_item))
     if(isControllerNextItem(next_item)) {
       const { limit, id, created_at } = next_item;
       if(id && created_at) {
@@ -108,8 +116,6 @@ export class httpFormatter {
     } else {
       this.httpServerResponse.meta = undefined;
     }
-
-    console.log("This is meta: ", this.httpServerResponse.meta)
   }
 
   public getResponse () {
@@ -121,6 +127,7 @@ export class httpFormatter {
         next_item,
         'base64'
       ).toString('utf8');
+
 
       return JSON.parse(next_item_encoded) as controllerNextItemInterface
   }

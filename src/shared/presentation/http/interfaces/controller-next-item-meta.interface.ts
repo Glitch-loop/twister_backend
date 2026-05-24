@@ -1,5 +1,5 @@
 export interface controllerNextItemInterface {
   limit: number,
   id?: string,
-  created_at?: string|Date
+  created_at?: string
 }

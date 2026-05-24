@@ -65,25 +65,39 @@ export class ClientsController {
 
   @Get('')
   async listClient(
-    @Query('limit') limit?: number,
+    @Query('limit') limit?: string,
     @Query('cellphone') cellphone?: string,
     @Query('email') email?: string,
     @Query('legal_name') legal_name?: string,
     @Query('name') name?: string,
     @Query('next_item') next_item?: string,
   ): Promise<httpControllerResponse> {
+    let next_id: string|undefined = undefined;
+    let next_date: string|undefined = undefined
+    let parsedLimit: number|undefined = undefined;
+
     const httpRequestFormatter = new httpFormatter();
     const httpResponseFormatter = new httpFormatter();
     if(next_item) {
-      // paginationInformation = httpRquestFormatter.decodingNextItemForPagination(next_item);
+      const paginationInformation = httpRequestFormatter.decodingNextItemForPagination(next_item);
+      next_id = paginationInformation.id;
+      if(paginationInformation.created_at) next_date = paginationInformation.created_at;
+      console.log("Next item. Cursor")
+      console.log(next_id)
+      console.log(next_date)
     }
-
-    console.log("Limit: ", limit)
-
-
-    const data: ClientDto[] = await this.listClientsQuery.execute();
-    console.log(data)
-    return httpResponseFormatter.createResponse('Client listed successfully.', data, limit, 'id_client', 'created_at');
+    
+    if (limit) parsedLimit = parseInt(limit, 10)
+    const data: ClientDto[] = await this.listClientsQuery.execute(
+      parsedLimit, 
+      cellphone, 
+      email, 
+      legal_name, 
+      name, 
+      next_id, 
+      next_date);
+    
+    return httpResponseFormatter.createResponse('Client listed successfully.', data, parsedLimit, 'id_client', 'created_at');
   }
 
   @Patch('/:id_client')

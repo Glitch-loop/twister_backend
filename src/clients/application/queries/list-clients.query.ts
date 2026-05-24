@@ -22,20 +22,20 @@ export class ListClientsQuery {
 
 	async execute(
     limit?: number,
-    lastCreatedAt?: Date,
-    lastIdClient?: string,
     cellphone?: string, 
     email?: string, 
     legal_name?: string, 
     name?: string,
+    lastIdClient?: string, // Part of the cursor
+  lastCreatedAt?: string, // Part of the cursor
   ): Promise<ClientDto[]> {
-    let limit_to_use: number = 100;
+    let limit_to_use: number = 101;
 
     if(lastCreatedAt && lastIdClient === undefined || lastCreatedAt === undefined && lastIdClient) throw new Error('If consulting a page larger than 1, pagination metadata is required.')
     
     if(limit) {
       if(limit <= 100) {
-        limit_to_use = limit
+        limit_to_use = limit + 1
       }
     }
     

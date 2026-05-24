@@ -7,10 +7,9 @@ export const isControllerNextItem = (value: unknown): value is controllerNextIte
 
   const record = value as Record<string, unknown>;
 
-
   return (
-    typeof record.limit === 'string' &&
+    typeof record.limit === 'number' &&
     (typeof record.id === 'string' || typeof record.id === 'undefined') &&
-    (typeof record.created_at === 'string' || typeof record.created_at === 'undefined' || record.created_at instanceof Date)
+    (typeof record.created_at === 'undefined' || typeof record.created_at === 'string')
   );
 }
