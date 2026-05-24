@@ -16,6 +16,7 @@ import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-da
 import { ListClientsQuery } from '@/src/clients/application/queries/list-clients.query';
 import { ListLocationsQuery } from '@/src/clients/application/queries/list-locations.query';
 import { ListLocationTypesQuery } from '@/src/clients/application/queries/list-location-types.query';
+import { RetrieveClientsByIdQuery } from '@/src/clients/application/queries/retrieve-clients-by-id.query';
 import { RetrieveLocationsByIdClientQuery } from '@/src/clients/application/queries/retrieve-locations-by-id-client.query';
 import { RetrieveLocationsByIdCreatorQuery } from '@/src/clients/application/queries/retrieve-locations-by-id-creator.query';
 
@@ -58,6 +59,7 @@ import { SharedModule } from '@/src/shared/shared.module';
     ListClientsQuery,
     ListLocationsQuery,
     ListLocationTypesQuery,
+    RetrieveClientsByIdQuery,
     RetrieveLocationsByIdClientQuery,
     RetrieveLocationsByIdCreatorQuery,
     EntityDtoMapper,

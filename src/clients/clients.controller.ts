@@ -22,6 +22,7 @@ import { ModifyFurnitureCommand } from '@/src/clients/application/commands/modif
 
 // Queries
 import { ListLocationTypesQuery } from '@/src/clients/application/queries/list-location-types.query';
+import { RetrieveClientsByIdQuery } from '@/src/clients/application/queries/retrieve-clients-by-id.query';
 
 // Presentation
 import { httpControllerResponse } from '@/src/shared/presentation/http/interfaces/controller-response.interface';
@@ -46,6 +47,7 @@ export class ClientsController {
     // Query
     private readonly listLocationTypesQuery: ListLocationTypesQuery,
     private readonly listClientsQuery: ListClientsQuery,
+    private readonly retrieveClientsByIdQuery: RetrieveClientsByIdQuery,
   ) {}
 
   @Post('/')
@@ -98,6 +100,15 @@ export class ClientsController {
       next_date);
     
     return httpResponseFormatter.createResponse('Client listed successfully.', data, parsedLimit, 'id_client', 'created_at');
+  }
+
+  @Post('/clients')
+  async retrieveClientsById(@Body() body: { id_clients: string[] }): Promise<httpControllerResponse> {
+    const { id_clients } = body;
+    const data: ClientDto[] = await this.retrieveClientsByIdQuery.execute(id_clients ?? []);
+
+    const httpResponseFormatter = new httpFormatter();
+    return httpResponseFormatter.createResponse('Clients retrieved successfully.', data);
   }
 
   @Patch('/:id_client')
