@@ -75,7 +75,6 @@ export class ClientSupabase implements ClientRepository {
     }
   }
 
-
   async deleteClient(id_client: string[]): Promise<void> {
     const { error } = await this.supabase
       .from('clients')

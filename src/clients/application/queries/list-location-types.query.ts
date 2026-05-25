@@ -21,8 +21,8 @@ export class ListLocationTypesQuery {
       private readonly mapper: Mapper,
   ) {}
 
-  async execute(): Promise<LocationTypeDto[]> {
+  async execute(): Promise<LocationTypeDto[]> {   
     const locationTypes: LocationTypeObjectValue[] = await this.locationRepository.listLocationTypes();
     return locationTypes.map((locationType: LocationTypeObjectValue) => this.mapper.toDto(locationType));
-  }  
+  } 
 }

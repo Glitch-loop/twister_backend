@@ -29,12 +29,12 @@ export class ListClientsQuery {
     lastIdClient?: string, // Part of the cursor
   lastCreatedAt?: string, // Part of the cursor
   ): Promise<ClientDto[]> {
-    let limit_to_use: number = 101;
+    let limit_to_use: number = 1001;
 
     if(lastCreatedAt && lastIdClient === undefined || lastCreatedAt === undefined && lastIdClient) throw new Error('If consulting a page larger than 1, pagination metadata is required.')
     
     if(limit) {
-      if(limit <= 100) {
+      if(limit <= 1000) {
         limit_to_use = limit + 1
       }
     }

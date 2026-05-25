@@ -22,6 +22,7 @@ import { ModifyFurnitureCommand } from '@/src/clients/application/commands/modif
 
 // Queries
 import { ListLocationTypesQuery } from '@/src/clients/application/queries/list-location-types.query';
+import { ListLocationsQuery } from '@/src/clients/application/queries/list-locations.query';
 import { RetrieveClientsByIdQuery } from '@/src/clients/application/queries/retrieve-clients-by-id.query';
 
 // Presentation
@@ -46,11 +47,12 @@ export class ClientsController {
 
     // Query
     private readonly listLocationTypesQuery: ListLocationTypesQuery,
+    private readonly listLocationsQuery: ListLocationsQuery,
     private readonly listClientsQuery: ListClientsQuery,
     private readonly retrieveClientsByIdQuery: RetrieveClientsByIdQuery,
   ) {}
 
-  @Post('/')
+  @Post('')
   async createClient(@Body() body: Partial<ClientDto>): Promise<httpControllerResponse> {
     await this.createClientCommand.execute(
       body.legal_name!,
@@ -133,6 +135,76 @@ export class ClientsController {
   async deactivateClient(@Param('id_client') id_client: string): Promise<httpControllerResponse> {
     await this.deactivateClientCommand.execute(id_client);
     return { message: 'Client deactivated successfully' };
+  }
+
+  @Get('/locations')
+  async listLocations(
+    @Query('limit') limit?: string,
+    @Query('next_item') next_item?: string,
+    @Query('ext_number') ext_number?: string,
+    @Query('colony') colony?: string,
+    @Query('postal_code') postal_code?: string,
+    @Query('location_name') location_name?: string,
+    @Query('status_location') status_location?: string | string[],
+    @Query('id_creator') id_creator?: string | string[],
+    @Query('id_client') id_client?: string | string[],
+    @Query('id_location_type') id_location_type?: string | string[],
+  ): Promise<httpControllerResponse> {
+    let next_id: string | undefined = undefined;
+    let next_date: string | undefined = undefined;
+    let parsedLimit: number | undefined = undefined;
+
+    const toArray = (value?: string | string[]): string[] | undefined => {
+      if (!value) return undefined;
+      if (Array.isArray(value)) return value.filter((item) => item.length > 0);
+
+      return value
+        .split(',')
+        .map((item) => item.trim())
+        .filter((item) => item.length > 0);
+    };
+
+    const statusLocationValues = toArray(status_location);
+    const statusLocationParsed = statusLocationValues?.map((value) => Number.parseInt(value, 10))
+      .filter((value) => Number.isInteger(value));
+
+    const idCreatorValues = toArray(id_creator);
+    const idClientValues = toArray(id_client);
+    const idLocationTypeValues = toArray(id_location_type);
+
+    const httpRequestFormatter = new httpFormatter();
+    const httpResponseFormatter = new httpFormatter();
+
+    if (next_item) {
+      const paginationInformation = httpRequestFormatter.decodingNextItemForPagination(next_item);
+      next_id = paginationInformation.id;
+      if (paginationInformation.created_at) next_date = paginationInformation.created_at;
+    }
+
+    if (limit) parsedLimit = Number.parseInt(limit, 10);
+
+    const data: LocationDto[] = await this.listLocationsQuery.execute(
+      parsedLimit,
+      next_date,
+      next_id,
+      ext_number,
+      colony,
+      postal_code,
+      location_name,
+      statusLocationParsed,
+      idCreatorValues,
+      idClientValues,
+      idLocationTypeValues,
+    );
+
+    return httpResponseFormatter.createResponse(
+      'Locations listed successfully.',
+      data,
+      parsedLimit,
+      'id_location',
+      'created_at',
+    );
+
   }
 
   @Post('/locations')
