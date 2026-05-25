@@ -25,11 +25,11 @@ import { ListLocationTypesQuery } from '@/src/clients/application/queries/list-l
 import { ListLocationsQuery } from '@/src/clients/application/queries/list-locations.query';
 import { RetrieveClientsByIdQuery } from '@/src/clients/application/queries/retrieve-clients-by-id.query';
 import { RetrieveLocationsByIdLocationQuery } from '@/src/clients/application/queries/retrieve-locations-by-id-location.query';
+import { ListClientsQuery } from '@/src/clients/application/queries/list-clients.query';
 
 // Presentation
 import { httpControllerResponse } from '@/src/shared/presentation/http/interfaces/controller-response.interface';
-import { ListClientsQuery } from './application/queries/list-clients.query';
-import { httpFormatter } from '../shared/presentation/http/handlers/http-formatter.handler';
+import { httpFormatter } from '@/src/shared/presentation/http/handlers/http-formatter.handler';
 
 @Controller('clients')
 export class ClientsController {
@@ -88,12 +88,10 @@ export class ClientsController {
       const paginationInformation = httpRequestFormatter.decodingNextItemForPagination(next_item);
       next_id = paginationInformation.id;
       if(paginationInformation.created_at) next_date = paginationInformation.created_at;
-      console.log("Next item. Cursor")
-      console.log(next_id)
-      console.log(next_date)
     }
     
-    if (limit) parsedLimit = parseInt(limit, 10)
+    if (limit) parsedLimit = parseInt(limit, 10);
+    
     const data: ClientDto[] = await this.listClientsQuery.execute(
       parsedLimit, 
       cellphone, 
@@ -129,14 +127,17 @@ export class ClientsController {
       body.cellphone,
       body.email,
     );
- 
-    return { message: 'Client modified successfully' };
+
+    const httpResponseFormatter = new httpFormatter();
+    return httpResponseFormatter.createResponse('Client modified successfully');
   }
 
   @Patch('/:id_client/deactivate')
   async deactivateClient(@Param('id_client') id_client: string): Promise<httpControllerResponse> {
     await this.deactivateClientCommand.execute(id_client);
-    return { message: 'Client deactivated successfully' };
+
+    const httpResponseFormatter = new httpFormatter();
+    return httpResponseFormatter.createResponse('Client deactivated successfully');
   }
 
   @Post('/locations')
@@ -159,7 +160,8 @@ export class ClientsController {
       body.address_reference,
     );
 
-    return { message: 'Location created successfully' };
+    const httpResponseFormatter = new httpFormatter();
+    return httpResponseFormatter.createResponse('Location created successfully');
   }
 
   @Get('/locations')
@@ -262,7 +264,8 @@ export class ClientsController {
       body.address_reference ?? null,
     );
 
-    return { message: 'Location modified successfully' };
+    const httpResponseFormatter = new httpFormatter();
+    return httpResponseFormatter.createResponse('Location modified successfully');
   }
 
   @Patch('/locations/:id_location/deactivate/:deactivation_type')
@@ -271,7 +274,9 @@ export class ClientsController {
     @Param('deactivation_type') deactivation_type: string,
   ): Promise<httpControllerResponse> {
     await this.deactivateLocationCommand.execute(id_location, parseInt(deactivation_type, 10));
-    return { message: 'Location deactivated successfully' };
+
+    const httpResponseFormatter = new httpFormatter();
+    return httpResponseFormatter.createResponse('Location deactivated successfully');
   }
 
   @Post('/locations/:id_location/notes')
@@ -285,7 +290,8 @@ export class ClientsController {
       body.created_at,
     );
 
-    return { message: 'Location note created successfully' };
+    const httpResponseFormatter = new httpFormatter();
+    return httpResponseFormatter.createResponse('Location note created successfully');
   }
 
   @Get('/locations/types')
@@ -326,7 +332,9 @@ export class ClientsController {
   @Post('/locations/types')
   async createLocationType(@Body() body: Partial<LocationTypeDto>): Promise<httpControllerResponse> {
     await this.createLocationTypeCommand.execute(body.location_type_name!);
-    return { message: 'Location type created successfully' };
+
+    const httpResponseFormatter = new httpFormatter();
+    return httpResponseFormatter.createResponse('Location type created successfully');
   }
 
   @Post('/locations/furnitures')
@@ -337,7 +345,8 @@ export class ClientsController {
       body.id_location!,
     );
 
-    return { message: 'Furniture created successfully' };
+    const httpResponseFormatter = new httpFormatter();
+    return httpResponseFormatter.createResponse('Furniture created successfully');
   }
 
   @Patch('/locations/furnitures/:id_furniture')
@@ -352,6 +361,7 @@ export class ClientsController {
       body.id_location,
     );
 
-    return { message: 'Furniture modified successfully' };
+    const httpResponseFormatter = new httpFormatter();
+    return httpResponseFormatter.createResponse('Furniture modified successfully');
   }
 }
