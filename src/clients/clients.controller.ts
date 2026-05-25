@@ -24,6 +24,7 @@ import { ModifyFurnitureCommand } from '@/src/clients/application/commands/modif
 import { ListLocationTypesQuery } from '@/src/clients/application/queries/list-location-types.query';
 import { ListLocationsQuery } from '@/src/clients/application/queries/list-locations.query';
 import { RetrieveClientsByIdQuery } from '@/src/clients/application/queries/retrieve-clients-by-id.query';
+import { RetrieveLocationsByIdLocationQuery } from '@/src/clients/application/queries/retrieve-locations-by-id-location.query';
 
 // Presentation
 import { httpControllerResponse } from '@/src/shared/presentation/http/interfaces/controller-response.interface';
@@ -50,6 +51,7 @@ export class ClientsController {
     private readonly listLocationsQuery: ListLocationsQuery,
     private readonly listClientsQuery: ListClientsQuery,
     private readonly retrieveClientsByIdQuery: RetrieveClientsByIdQuery,
+    private readonly retrieveLocationsByIdLocationQuery: RetrieveLocationsByIdLocationQuery,
   ) {}
 
   @Post('')
@@ -68,7 +70,7 @@ export class ClientsController {
   }
 
   @Get('')
-  async listClient(
+  async listClients(
     @Query('limit') limit?: string,
     @Query('cellphone') cellphone?: string,
     @Query('email') email?: string,
@@ -104,7 +106,7 @@ export class ClientsController {
     return httpResponseFormatter.createResponse('Client listed successfully.', data, parsedLimit, 'id_client', 'created_at');
   }
 
-  @Post('/clients')
+  @Post('/ids')
   async retrieveClientsById(@Body() body: { id_clients: string[] }): Promise<httpControllerResponse> {
     const { id_clients } = body;
     const data: ClientDto[] = await this.retrieveClientsByIdQuery.execute(id_clients ?? []);
@@ -135,6 +137,29 @@ export class ClientsController {
   async deactivateClient(@Param('id_client') id_client: string): Promise<httpControllerResponse> {
     await this.deactivateClientCommand.execute(id_client);
     return { message: 'Client deactivated successfully' };
+  }
+
+  @Post('/locations')
+  async createLocation(@Body() body: Partial<LocationDto>): Promise<httpControllerResponse> {
+    await this.createLocationCommand.execute(
+      body.street!,
+      body.ext_number!,
+      body.colony!,
+      body.postal_code!,
+      body.location_name!,
+      body.latitude!,
+      body.longitude!,
+      body.status_location!,
+      body.id_creator!,
+      body.id_location_type!,
+      body.created_at!,
+      body.updated_at!,
+      body.id_location,
+      body.id_client,
+      body.address_reference,
+    );
+
+    return { message: 'Location created successfully' };
   }
 
   @Get('/locations')
@@ -207,27 +232,13 @@ export class ClientsController {
 
   }
 
-  @Post('/locations')
-  async createLocation(@Body() body: Partial<LocationDto>): Promise<httpControllerResponse> {
-    await this.createLocationCommand.execute(
-      body.street!,
-      body.ext_number!,
-      body.colony!,
-      body.postal_code!,
-      body.location_name!,
-      body.latitude!,
-      body.longitude!,
-      body.status_location!,
-      body.id_creator!,
-      body.id_location_type!,
-      body.created_at!,
-      body.updated_at!,
-      body.id_location,
-      body.id_client,
-      body.address_reference,
-    );
+  @Post('/locations/ids') 
+  async retrieveLocationById(@Body() body: { id_locations: string[] }): Promise<httpControllerResponse> {
+    const { id_locations } = body;
+    const data: LocationDto[] = await this.retrieveLocationsByIdLocationQuery.execute(id_locations ?? []);
 
-    return { message: 'Location created successfully' };
+    const httpResponseFormatter = new httpFormatter();
+    return httpResponseFormatter.createResponse('Locations retrieved successfully.', data);
   }
 
   @Patch('/locations/:id_location')
@@ -278,11 +289,38 @@ export class ClientsController {
   }
 
   @Get('/locations/types')
-  async listLocationTypes(): Promise<httpControllerResponse> {
-    const locationTypes = await this.listLocationTypesQuery.execute();
+  async listLocationTypes(
+    @Query('limit') limit?: string,
+    @Query('next_item') next_item?: string,
+  ): Promise<httpControllerResponse> {
+    let next_id: string | undefined = undefined;
+    let next_date: string | undefined = undefined;
+    let parsedLimit: number | undefined = undefined;
+
+    const httpRequestFormatter = new httpFormatter();
+
+    if (next_item) {
+      const paginationInformation = httpRequestFormatter.decodingNextItemForPagination(next_item);
+      next_id = paginationInformation.id;
+      if (paginationInformation.created_at) next_date = paginationInformation.created_at;
+    }
+
+    if (limit) parsedLimit = Number.parseInt(limit, 10);
+
+    const locationTypes = await this.listLocationTypesQuery.execute(
+      parsedLimit,
+      next_date,
+      next_id,
+    );
 
     const httpResponseFormatter = new httpFormatter();
-    return httpResponseFormatter.createResponse('Location types retrieved successfully', locationTypes);
+    return httpResponseFormatter.createResponse(
+      'Location types retrieved successfully',
+      locationTypes,
+      parsedLimit,
+      'id_location_type',
+      'created_at',
+    );
   }
 
   @Post('/locations/types')

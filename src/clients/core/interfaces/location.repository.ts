@@ -28,7 +28,11 @@ export abstract class LocationRepository {
     id_location_type?: string[],
 
   ): Promise<LocationEntity[]>;
-  abstract listLocationTypes(): Promise<LocationTypeObjectValue[]>;
+  abstract listLocationTypes(
+    limit?: number,
+    nextCreatedAt?: string,
+    nextId?: string,
+  ): Promise<LocationTypeObjectValue[]>;
   abstract createLocationType(locationType: LocationTypeObjectValue): Promise<void>;
   abstract retrieveLocationTypeById(id_location_type: string[]): Promise<LocationTypeObjectValue[]>;
   abstract addFurnitures(furnitures: FurnitureEntity[]): Promise<void>;

@@ -17,6 +17,7 @@ import { ListClientsQuery } from '@/src/clients/application/queries/list-clients
 import { ListLocationsQuery } from '@/src/clients/application/queries/list-locations.query';
 import { ListLocationTypesQuery } from '@/src/clients/application/queries/list-location-types.query';
 import { RetrieveClientsByIdQuery } from '@/src/clients/application/queries/retrieve-clients-by-id.query';
+import { RetrieveLocationsByIdLocationQuery } from '@/src/clients/application/queries/retrieve-locations-by-id-location.query';
 // Commands
 import { CreateClientCommand } from '@/src/clients/application/commands/create-client.command';
 import { ModifyClientCommand } from '@/src/clients/application/commands/modify-client.command';
@@ -57,6 +58,7 @@ import { SharedModule } from '@/src/shared/shared.module';
     ListLocationsQuery,
     ListLocationTypesQuery,
     RetrieveClientsByIdQuery,
+    RetrieveLocationsByIdLocationQuery,
     EntityDtoMapper,
     EntityModelMapper,
     SupabaseDataSource,

@@ -278,9 +278,28 @@ export class LocationSupabaseRepository implements LocationRepository {
     }
   }
 
-  async listLocationTypes(): Promise<LocationTypeObjectValue[]> {
+  async listLocationTypes(
+    limit?: number,
+    nextCreatedAt?: string,
+    nextId?: string,
+  ): Promise<LocationTypeObjectValue[]> {
     try {
-      const { data, error } = await this.supabase.from('location_types').select();
+      const query = this.supabase.from('location_types').select();
+
+      if (nextCreatedAt && nextId) {
+        query.or(
+          `created_at.lt."${nextCreatedAt}",and(created_at.eq."${nextCreatedAt}",id_location_type.lt."${nextId}")`,
+        );
+      }
+
+      query.order('created_at', { ascending: false });
+      query.order('id_location_type', { ascending: false });
+
+      if (typeof limit === 'number' && limit > 0) {
+        query.limit(limit);
+      }
+
+      const { data, error } = await query;
 
       if (error) {
         throw new Error('Failed to list location types' + (error instanceof Error ? `: ${error.message}` : ''));

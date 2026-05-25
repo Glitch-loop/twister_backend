@@ -21,8 +21,26 @@ export class ListLocationTypesQuery {
       private readonly mapper: Mapper,
   ) {}
 
-  async execute(): Promise<LocationTypeDto[]> {   
-    const locationTypes: LocationTypeObjectValue[] = await this.locationRepository.listLocationTypes();
+  async execute(
+    limit?: number,
+    nextCreatedAt?: string,
+    nextId?: string,
+  ): Promise<LocationTypeDto[]> {
+    let limitToUse = 1001;
+
+    if ((nextCreatedAt && !nextId) || (!nextCreatedAt && nextId)) {
+      throw new Error('If consulting a page larger than 1, pagination metadata is required.');
+    }
+
+    if (typeof limit === 'number' && limit > 0 && limit <= 1000) {
+      limitToUse = limit + 1;
+    }
+
+    const locationTypes: LocationTypeObjectValue[] = await this.locationRepository.listLocationTypes(
+      limitToUse,
+      nextCreatedAt,
+      nextId,
+    );
     return locationTypes.map((locationType: LocationTypeObjectValue) => this.mapper.toDto(locationType));
   } 
 }
