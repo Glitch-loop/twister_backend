@@ -31,7 +31,6 @@ export class RetrieveLocationsByIdLocationQuery {
 		const uniqueIds = Array.from(new Set(ids));
 
 		const locationsByClient: LocationEntity[] = await this.locationRepository.retrieveLocationById(uniqueIds)
-		
 		const locations: LocationEntity[] = locationsByClient.flat();
 		return locations.map((location: LocationEntity) => this.mapper.toDto(location));
 	}

@@ -106,13 +106,13 @@ export class Mapper {
 
   // ==================== MAPPER METHODS DOMAIN OBJECT to DTO ====================
   private locationEntityToDto(domainObject: LocationEntity): LocationDto {
+    const { notes } = domainObject;
     return {
       id_location: domainObject.id_location,
       street: domainObject.street,
       ext_number: domainObject.ext_number,
       colony: domainObject.colony,
       postal_code: domainObject.postal_code,
-      address_reference: domainObject.address_reference ?? undefined,
       location_name: domainObject.location_name,
       latitude: domainObject.latitude,
       longitude: domainObject.longitude,
@@ -122,6 +122,8 @@ export class Mapper {
       id_location_type: domainObject.location_type.id_location_type,
       created_at: domainObject.created_at,
       updated_at: domainObject.updated_at,
+      notes: notes.map((note) => { return this.noteObjectValueToLocationNoteDto(note); }),
+      address_reference: domainObject.address_reference ?? undefined,
     };
   }
 
