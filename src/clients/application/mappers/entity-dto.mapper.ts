@@ -3,11 +3,11 @@
 import { Injectable } from '@nestjs/common';
 
 // Dtos
-import { LocationDto } from '../dtos/location.dto';
-import { ClientDto } from '../dtos/client.dto';
-import { FurnitureDto } from '../dtos/furniture.dto';
-import { LocationNoteDto } from '../dtos/location_note.dto';
-import { LocationTypeDto } from '../dtos/location_type.dto';
+import { LocationDto } from '@/src/clients/application/dtos/location.dto';
+import { ClientDto } from '@/src/clients/application/dtos/client.dto';
+import { FurnitureDto } from '@/src/clients/application/dtos/furniture.dto';
+import { LocationNoteDto } from '@/src/clients/application/dtos/location_note.dto';
+import { LocationTypeDto } from '@/src/clients/application/dtos/location-type.dto';
 
 // Entities
 import { LocationEntity } from '@/src/clients/core/entities/location.entity';
@@ -26,7 +26,7 @@ import { isClientDto } from '@/src/clients/application/guards/dtos/client.guard'
 import { isFurnitureDto } from '@/src/clients/application/guards/dtos/furniture.guard';
 import { isLocationDto } from '@/src/clients/application/guards/dtos/location.guard';
 import { isLocationNoteDto } from '@/src/clients/application/guards/dtos/location_note.guard';
-import { isLocationTypeDto } from '@/src/clients/application/guards/dtos/location_type.guard';
+import { isLocationTypeDto } from '../guards/dtos/location-type.guard';
 
 // Entities guards
 import { isFurnitureEntity } from '@/src/clients/application/guards/entities/furniture.guard';
@@ -152,11 +152,12 @@ export class Mapper {
   private locationTypeObjectValueToLocationTypeDto(
     domainObject: LocationTypeObjectValue,
   ): LocationTypeDto {
-    return {
-      id_location_type: domainObject.id_location_type,
-      location_type_name: domainObject.location_type_name,
-      created_at: domainObject.created_at,
-    };
+    return new LocationTypeDto(
+      domainObject.id_location_type,
+      domainObject.location_type_name,
+      domainObject.created_at,
+    )
+    
   }
 
   private taxClientInformationEntityToClientDto(

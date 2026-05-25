@@ -5,7 +5,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { LocationRepository } from '@/src/clients/core/interfaces/location.repository';
 
 // DTOs
-import { LocationTypeDto } from '@/src/clients/application/dtos/location_type.dto';
+import { LocationTypeDto } from '@/src/clients/application/dtos/location-type.dto';
 
 // Object values
 import { LocationTypeObjectValue } from '@/src/clients/core/object-values/location-type.object-value'

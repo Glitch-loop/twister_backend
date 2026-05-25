@@ -1,4 +1,4 @@
-import { LocationTypeDto } from '@/src/clients/application/dtos/location_type.dto';
+import { LocationTypeDto } from '@/src/clients/application/dtos/location-type.dto';
 import { isRecord } from "@/src/shared/application/guards/utils";
 
 export const isLocationTypeDto = (value: unknown): value is LocationTypeDto => {

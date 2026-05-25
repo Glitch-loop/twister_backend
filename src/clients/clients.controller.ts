@@ -1,12 +1,21 @@
 // Libraries
 import { Body, Controller, Post, Get, Patch, Param, Query } from '@nestjs/common';
+import {
+  ApiBody,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 
 // DTOs
 import type { ClientDto } from '@/src/clients/application/dtos/client.dto';
 import type { LocationDto } from '@/src/clients/application/dtos/location.dto';
-import type { LocationTypeDto } from '@/src/clients/application/dtos/location_type.dto';
 import type { FurnitureDto } from '@/src/clients/application/dtos/furniture.dto';
 import type { LocationNoteDto } from '@/src/clients/application/dtos/location_note.dto';
+import { LocationTypeRequestDto } from '@/src/clients/application/dtos/location-type-request.dto';
+import { LocationTypeDto } from '@/src/clients/application/dtos/location-type.dto';
 
 // Commands
 import { CreateClientCommand } from '@/src/clients/application/commands/create-client.command';
@@ -31,6 +40,7 @@ import { ListClientsQuery } from '@/src/clients/application/queries/list-clients
 import { httpControllerResponse } from '@/src/shared/presentation/http/interfaces/controller-response.interface';
 import { httpFormatter } from '@/src/shared/presentation/http/handlers/http-formatter.handler';
 
+@ApiTags('Clients')
 @Controller('clients')
 export class ClientsController {
   constructor(
@@ -54,6 +64,16 @@ export class ClientsController {
     private readonly retrieveLocationsByIdLocationQuery: RetrieveLocationsByIdLocationQuery,
   ) {}
 
+  /**
+   * Creates a new client record.
+   * Input is received through request body and delegated to the create client command.
+   * Returns a standardized controller response using the HTTP formatter.
+   */
+  @ApiOperation({
+    summary: 'Create client',
+    description: 'Creates a client and returns a standardized controller response.',
+  })
+  @ApiOkResponse({ description: 'Standardized response with operation message.' })
   @Post('')
   async createClient(@Body() body: Partial<ClientDto>): Promise<httpControllerResponse> {
     await this.createClientCommand.execute(
@@ -69,6 +89,22 @@ export class ClientsController {
     return httpResponseFormatter.createResponse('Client created successfully');
   }
 
+  /**
+   * Lists clients as a collection endpoint.
+   * Supports filters, bounded limit, and cursor pagination via `next_item`.
+   * Returns collection data plus pagination metadata through the HTTP formatter.
+   */
+  @ApiOperation({
+    summary: 'List clients',
+    description: 'Returns a paginated collection of clients with optional filters.',
+  })
+  @ApiQuery({ name: 'limit', required: false, type: String, description: 'Page size (max 1000).' })
+  @ApiQuery({ name: 'next_item', required: false, type: String, description: 'Opaque cursor for next page.' })
+  @ApiQuery({ name: 'cellphone', required: false, type: String })
+  @ApiQuery({ name: 'email', required: false, type: String })
+  @ApiQuery({ name: 'legal_name', required: false, type: String })
+  @ApiQuery({ name: 'name', required: false, type: String })
+  @ApiOkResponse({ description: 'Standardized paginated response with clients collection.' })
   @Get('')
   async listClients(
     @Query('limit') limit?: string,
@@ -104,6 +140,28 @@ export class ClientsController {
     return httpResponseFormatter.createResponse('Client listed successfully.', data, parsedLimit, 'id_client', 'created_at');
   }
 
+  /**
+   * Retrieves specific clients by identifier list.
+   * This is a retrieve endpoint (not a list endpoint) and expects explicit IDs in body.
+   * Returns a standardized response with the retrieved records.
+   */
+  @ApiOperation({
+    summary: 'Retrieve clients by IDs',
+    description: 'Retrieves specific client records from an explicit list of IDs.',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        id_clients: {
+          type: 'array',
+          items: { type: 'string', format: 'uuid' },
+        },
+      },
+      required: ['id_clients'],
+    },
+  })
+  @ApiOkResponse({ description: 'Standardized response with retrieved clients.' })
   @Post('/ids')
   async retrieveClientsById(@Body() body: { id_clients: string[] }): Promise<httpControllerResponse> {
     const { id_clients } = body;
@@ -113,6 +171,14 @@ export class ClientsController {
     return httpResponseFormatter.createResponse('Clients retrieved successfully.', data);
   }
 
+  /**
+   * Modifies one client identified by route param.
+   * Partial update fields are accepted from body and delegated to the command layer.
+   * Returns a standardized success response.
+   */
+  @ApiOperation({ summary: 'Modify client', description: 'Updates a client by ID.' })
+  @ApiParam({ name: 'id_client', description: 'Client identifier', type: String })
+  @ApiOkResponse({ description: 'Standardized response with operation message.' })
   @Patch('/:id_client')
   async modifyClient(
     @Param('id_client') id_client: string,
@@ -132,6 +198,14 @@ export class ClientsController {
     return httpResponseFormatter.createResponse('Client modified successfully');
   }
 
+  /**
+   * Deactivates one client identified by route param.
+   * Delegates business behavior to the deactivate client command.
+   * Returns a standardized success response.
+   */
+  @ApiOperation({ summary: 'Deactivate client', description: 'Deactivates a client by ID.' })
+  @ApiParam({ name: 'id_client', description: 'Client identifier', type: String })
+  @ApiOkResponse({ description: 'Standardized response with operation message.' })
   @Patch('/:id_client/deactivate')
   async deactivateClient(@Param('id_client') id_client: string): Promise<httpControllerResponse> {
     await this.deactivateClientCommand.execute(id_client);
@@ -140,6 +214,13 @@ export class ClientsController {
     return httpResponseFormatter.createResponse('Client deactivated successfully');
   }
 
+  /**
+   * Creates a new location.
+   * Input payload is mapped as command arguments and processed in the application layer.
+   * Returns a standardized success response.
+   */
+  @ApiOperation({ summary: 'Create location', description: 'Creates a location for a client context.' })
+  @ApiOkResponse({ description: 'Standardized response with operation message.' })
   @Post('/locations')
   async createLocation(@Body() body: Partial<LocationDto>): Promise<httpControllerResponse> {
     await this.createLocationCommand.execute(
@@ -164,6 +245,50 @@ export class ClientsController {
     return httpResponseFormatter.createResponse('Location created successfully');
   }
 
+  /**
+   * Lists locations as a collection endpoint.
+   * Supports filters, bounded limit, and cursor pagination (`next_item`).
+   * Returns standardized collection response with pagination metadata.
+   */
+  @ApiOperation({
+    summary: 'List locations',
+    description: 'Returns a paginated collection of locations with optional filters.',
+  })
+  @ApiQuery({ name: 'limit', required: false, type: String, description: 'Page size (max 1000).' })
+  @ApiQuery({ name: 'next_item', required: false, type: String, description: 'Opaque cursor for next page.' })
+  @ApiQuery({ name: 'ext_number', required: false, type: String })
+  @ApiQuery({ name: 'colony', required: false, type: String })
+  @ApiQuery({ name: 'postal_code', required: false, type: String })
+  @ApiQuery({ name: 'location_name', required: false, type: String })
+  @ApiQuery({
+    name: 'status_location',
+    required: false,
+    type: String,
+    isArray: true,
+    description: 'Location status values. Accepts repeated query params or comma-separated values.',
+  })
+  @ApiQuery({
+    name: 'id_creator',
+    required: false,
+    type: String,
+    isArray: true,
+    description: 'Creator IDs. Accepts repeated query params or comma-separated values.',
+  })
+  @ApiQuery({
+    name: 'id_client',
+    required: false,
+    type: String,
+    isArray: true,
+    description: 'Client IDs. Accepts repeated query params or comma-separated values.',
+  })
+  @ApiQuery({
+    name: 'id_location_type',
+    required: false,
+    type: String,
+    isArray: true,
+    description: 'Location type IDs. Accepts repeated query params or comma-separated values.',
+  })
+  @ApiOkResponse({ description: 'Standardized paginated response with locations collection.' })
   @Get('/locations')
   async listLocations(
     @Query('limit') limit?: string,
@@ -234,6 +359,28 @@ export class ClientsController {
 
   }
 
+  /**
+   * Retrieves specific locations by identifier list.
+   * This endpoint is designed for explicit record retrieval by IDs.
+   * Returns a standardized response with matching locations.
+   */
+  @ApiOperation({
+    summary: 'Retrieve locations by IDs',
+    description: 'Retrieves specific location records from an explicit list of IDs.',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        id_locations: {
+          type: 'array',
+          items: { type: 'string', format: 'uuid' },
+        },
+      },
+      required: ['id_locations'],
+    },
+  })
+  @ApiOkResponse({ description: 'Standardized response with retrieved locations.' })
   @Post('/locations/ids') 
   async retrieveLocationById(@Body() body: { id_locations: string[] }): Promise<httpControllerResponse> {
     const { id_locations } = body;
@@ -243,6 +390,14 @@ export class ClientsController {
     return httpResponseFormatter.createResponse('Locations retrieved successfully.', data);
   }
 
+  /**
+   * Modifies one location identified by route param.
+   * Delegates update behavior to the location command.
+   * Returns a standardized success response.
+   */
+  @ApiOperation({ summary: 'Modify location', description: 'Updates a location by ID.' })
+  @ApiParam({ name: 'id_location', description: 'Location identifier', type: String })
+  @ApiOkResponse({ description: 'Standardized response with operation message.' })
   @Patch('/locations/:id_location')
   async modifyLocation(
     @Param('id_location') id_location: string,
@@ -268,6 +423,15 @@ export class ClientsController {
     return httpResponseFormatter.createResponse('Location modified successfully');
   }
 
+  /**
+   * Deactivates one location with a route-provided deactivation type.
+   * Delegates business logic to the deactivate location command.
+   * Returns a standardized success response.
+   */
+  @ApiOperation({ summary: 'Deactivate location', description: 'Deactivates a location by ID and deactivation type.' })
+  @ApiParam({ name: 'id_location', description: 'Location identifier', type: String })
+  @ApiParam({ name: 'deactivation_type', description: 'Deactivation type identifier', type: String })
+  @ApiOkResponse({ description: 'Standardized response with operation message.' })
   @Patch('/locations/:id_location/deactivate/:deactivation_type')
   async deactivateLocation(
     @Param('id_location') id_location: string,
@@ -279,6 +443,14 @@ export class ClientsController {
     return httpResponseFormatter.createResponse('Location deactivated successfully');
   }
 
+  /**
+   * Creates a note associated with a location.
+   * Accepts note payload from body and delegates to command layer.
+   * Returns a standardized success response.
+   */
+  @ApiOperation({ summary: 'Create location note', description: 'Creates a note for a location.' })
+  @ApiParam({ name: 'id_location', description: 'Location identifier', type: String })
+  @ApiOkResponse({ description: 'Standardized response with operation message.' })
   @Post('/locations/:id_location/notes')
   async createLocationNote(
     @Param('id_location') id_location: string,
@@ -294,6 +466,18 @@ export class ClientsController {
     return httpResponseFormatter.createResponse('Location note created successfully');
   }
 
+  /**
+   * Lists location types as a collection endpoint.
+   * Supports bounded limit and cursor pagination.
+   * Returns standardized collection response with pagination metadata.
+   */
+  @ApiOperation({
+    summary: 'List location types',
+    description: 'Returns a paginated collection of location types.',
+  })
+  @ApiQuery({ name: 'limit', required: false, type: String, description: 'Page size (max 1000).' })
+  @ApiQuery({ name: 'next_item', required: false, type: String, description: 'Opaque cursor for next page.' })
+  @ApiOkResponse({ description: 'Standardized paginated response with location types collection.', type: [LocationTypeDto] })
   @Get('/locations/types')
   async listLocationTypes(
     @Query('limit') limit?: string,
@@ -329,14 +513,28 @@ export class ClientsController {
     );
   }
 
+  /**
+   * Creates a location type.
+   * Delegates creation and integrity rules to command/application layer.
+   * Returns a standardized success response.
+   */
+  @ApiOperation({ summary: 'Create location type', description: 'Creates a location type.' })
+  @ApiOkResponse({ description: 'Standardized response with operation message.' })
   @Post('/locations/types')
-  async createLocationType(@Body() body: Partial<LocationTypeDto>): Promise<httpControllerResponse> {
-    await this.createLocationTypeCommand.execute(body.location_type_name!);
+  async createLocationType(@Body() body: LocationTypeRequestDto ): Promise<httpControllerResponse> {
+    await this.createLocationTypeCommand.execute(body.location_type_name);
 
     const httpResponseFormatter = new httpFormatter();
     return httpResponseFormatter.createResponse('Location type created successfully');
   }
 
+  /**
+   * Creates a furniture record associated with a location.
+   * Delegates behavior to command layer.
+   * Returns a standardized success response.
+   */
+  @ApiOperation({ summary: 'Create furniture', description: 'Creates a furniture record.' })
+  @ApiOkResponse({ description: 'Standardized response with operation message.' })
   @Post('/locations/furnitures')
   async createFurniture(@Body() body: Partial<FurnitureDto>): Promise<httpControllerResponse> {
     await this.createFurnitureCommand.execute(
@@ -349,6 +547,14 @@ export class ClientsController {
     return httpResponseFormatter.createResponse('Furniture created successfully');
   }
 
+  /**
+   * Modifies one furniture record identified by route param.
+   * Accepts partial payload and delegates to command layer.
+   * Returns a standardized success response.
+   */
+  @ApiOperation({ summary: 'Modify furniture', description: 'Updates a furniture record by ID.' })
+  @ApiParam({ name: 'id_furniture', description: 'Furniture identifier', type: String })
+  @ApiOkResponse({ description: 'Standardized response with operation message.' })
   @Patch('/locations/furnitures/:id_furniture')
   async modifyFurniture(
     @Param('id_furniture') id_furniture: string,
