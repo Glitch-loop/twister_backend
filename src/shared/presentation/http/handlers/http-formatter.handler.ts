@@ -1,8 +1,11 @@
-import { httpResponseInterface } from "@/src/shared/presentation/http/interfaces/http-response.interface";
-import { controllerNextItemInterface } from "../interfaces/controller-next-item-meta.interface";
-import { httpControllerResponse } from "../interfaces/controller-response.interface";
+// Guards
 import { isRecord, isArray } from "@/src/shared/application/guards/utils";
-import { isControllerNextItem } from "../../guards/controller-next-item.guard";
+import { isControllerNextItem } from "@/src/shared/presentation/guards/controller-next-item.guard";
+
+// Interfaces
+import { httpResponseInterface } from "@/src/shared/presentation/http/interfaces/http-response.interface";
+import { httpControllerResponse } from "@/src/shared/presentation/http/interfaces/controller-response.interface";
+import { controllerNextItemInterface } from "@/src/shared/presentation/http/interfaces/controller-next-item-meta.interface";
 
 export class httpFormatter {
   private httpServerResponse:httpResponseInterface;

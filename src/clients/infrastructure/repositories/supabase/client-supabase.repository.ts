@@ -1,9 +1,20 @@
+// Libraries
 import { Injectable } from '@nestjs/common';
+
+// Interfaces
 import { ClientRepository } from '@/src/clients/core/interfaces/client.repository';
+
+// Datasources
 import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
-import { Mapper } from '@/src/clients/application/mappers/entity-model.mapper';
+
+// Entities
 import { TaxClientInformationEntity } from '@/src/clients/core/entities/tax-client-information.entity';
+
+// Models
 import { ClientModel } from '@/src/clients/application/models/client.model';
+
+// Mapper
+import { Mapper } from '@/src/clients/application/mappers/entity-model.mapper';
 
 @Injectable()
 export class ClientSupabase implements ClientRepository {
