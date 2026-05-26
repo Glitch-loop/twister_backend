@@ -433,11 +433,14 @@ export class ClientsController {
    * Delegates business logic to the deactivate location command.
    * Returns a standardized success response.
    */
-  @ApiOperation({ summary: 'Deactivate location', description: `Deactivates a location by ID and deactivation type.
-    Deactivation reason/type:
-    - Closed: When a client ends their economical activity.
-    - Shutdown: When a client suddenly closes the business with the expectation of open in the future.
-    - Churned: When a client change to another supplied (preference).` })
+  @ApiOperation({ summary: 'Deactivate location', description: `Deactivates a location by ID and deactivation type.    
+Deactivation reason/type:
+
+- ***Closed*** - When a client ends their economical activity.
+
+- ***Shutdown*** - When a client suddenly closes the business with the expectation of open in the future.
+
+- ***Churned*** - When a client change to another supplied (preference).` })
   @ApiParam({ name: 'id_location', description: 'Location identifier', type: String })
   @ApiParam({ name: 'deactivation_type', description: 'Deactivation type identifier', type: String })
   @ApiOkResponse({ description: `Standardized response with operation message.` })
