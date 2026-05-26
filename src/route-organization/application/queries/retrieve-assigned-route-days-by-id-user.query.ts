@@ -14,11 +14,10 @@ export class RetrieveAssignedRouteDaysByIdUserQuery {
   ) {}
 
   async execute(id_user: string[]): Promise<RouteDayDto[]> {
-    if (id_user.length > 10) {
-      throw new Error('A maximum of 10 user ids is allowed.');
-    }
+		const maxIds = 10;
+		const idUserToRetrieve = id_user.slice(0, maxIds);
 
-    const routeDaysByUser: RouteDayEntity[] = await this.routeRepository.retrieveRouteDayByUserId(id_user);
+    const routeDaysByUser: RouteDayEntity[] = await this.routeRepository.retrieveRouteDayByUserId(idUserToRetrieve);
     return routeDaysByUser.map((routeDay: RouteDayEntity) => this.mapper.toDto(routeDay));
   }
 } 

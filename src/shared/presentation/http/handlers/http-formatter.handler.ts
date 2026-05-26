@@ -35,10 +35,7 @@ export class httpFormatter {
    */
   public createResponse(message: string, data?: unknown, limit?: number, id_item_field_name?: string, created_at_field_name?: string): httpControllerResponse {
     let metadataPagination: controllerNextItemInterface|undefined = undefined 
-    console.log("Creating response: ", data)
     if(isArray(data) && limit) {
-      console.log("Data length: ", data.length)
-      console.log("Limit: ", limit)
       if (data.length > limit) { // It means that there is a page in the table.
         data.pop();
         const nextItem: unknown = data[data.length - 1];
@@ -94,8 +91,6 @@ export class httpFormatter {
   }
 
   public addPaginationMetaData(next_item: unknown): void {
-    console.log(next_item)
-    console.log("Is controller next item; ", isControllerNextItem(next_item))
     if(isControllerNextItem(next_item)) {
       const { limit, id, created_at } = next_item;
       if(id && created_at) {

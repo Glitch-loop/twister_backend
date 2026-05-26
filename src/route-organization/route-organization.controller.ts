@@ -13,7 +13,9 @@ import {
 // import type { Route } from '@/src/route-organization/application/dtos/route.dto';
 import { RouteRequestDto } from './application/dtos/route-request.dto';
 import { CreateRouteDayProposalRequestDto } from '@/src/route-organization/application/dtos/create-route-day-proposal-request.dto';
+import { RouteDayDto } from '@/src/route-organization/application/dtos/route-day.dto';
 import { RouteDayProposalDto } from '@/src/route-organization/application/dtos/route-day-proposal.dto';
+import { RouteDto } from '@/src/route-organization/application/dtos/route.dto';
 import { UpdateRouteDayProposalRequestDto } from '@/src/route-organization/application/dtos/update-route-day-proposal-request.dto';
 
 // Presentation
@@ -36,8 +38,11 @@ import { DeleteRouteDayProposalCommand } from '@/src/route-organization/applicat
 import { UpdateRouteDayProposalCommand } from '@/src/route-organization/application/commands/update-route-day-proposal.command';
 
 // Queries
+import { ListRouteDaysQuery } from '@/src/route-organization/application/queries/list-route-days.query';
 import { ListRouteDaysProposalsQuery } from '@/src/route-organization/application/queries/list-route-days-proposals.query';
+import { ListRoutesQuery } from '@/src/route-organization/application/queries/list-routes.query';
 import { RetrieveRouteDaysProposalsByIdProposalQuery } from '@/src/route-organization/application/queries/retrieve-route-days-proposals-by-proposal-id_proposal.query';
+import { RetrieveRouteDayByRouteDayIdQuery } from '@/src/route-organization/application/queries/retrieve-route-day-by-route_day-id.query';
 import { RetrieveAssignedRouteDaysByIdUserQuery } from './application/queries/retrieve-assigned-route-days-by-id-user.query';
 
 @ApiTags('Route Organization')
@@ -51,6 +56,9 @@ export class RouteOrganizationController {
 		private readonly updateRouteCommand: UpdateRouteCommand,
 		private readonly reactivateRouteCommand: ReactivateRouteCommand,
 		private readonly unassignRouteToVendorCommand: UnassignRouteToVendorCommand,
+		private readonly listRoutesQuery: ListRoutesQuery,
+		private readonly listRouteDaysQuery: ListRouteDaysQuery,
+		private readonly retrieveRouteDayByRouteDayIdQuery: RetrieveRouteDayByRouteDayIdQuery,
 		private readonly retrieveAssignedRouteDaysByIdUserQuery: RetrieveAssignedRouteDaysByIdUserQuery,
 
 		// Related to route proposals
@@ -108,10 +116,11 @@ that route day was assigned to the vendor (his default route).`,
 		@Param('id_user') id_user: string,
 		@Body() body: { expired_at?: Date },
 	): Promise<httpControllerResponse> {
+
 		await this.assignRouteToVendorCommand.execute(
 			id_user,
 			id_route_day,
-			body.expired_at,
+			body ? body.expired_at : undefined,
 		);
 
 		const httpResponseFormatter = new httpFormatter();
@@ -139,6 +148,81 @@ that route day was assigned to the vendor (his default route).`,
 
 		const httpResponseFormatter = new httpFormatter();
 		return httpResponseFormatter.createResponse('Route updated successfully');
+	}
+
+	@ApiOperation({
+		summary: 'List routes',
+		description: 'Returns a collection of routes with optional filters. This endpoint does not use pagination by design.',
+	})
+	@ApiQuery({ name: 'route_name', required: false, type: String, description: 'Filter by route name.' })
+	@ApiQuery({ name: 'route_status', required: false, type: String, description: 'Filter by route status (numeric enum).' })
+	@ApiOkResponse({ description: 'Standardized response with routes collection.' })
+	@Get('/routes')
+	async listRoutes(
+		@Query('route_name') route_name?: string,
+		@Query('route_status') route_status?: string,
+	): Promise<httpControllerResponse> {
+		const parsedRouteStatus = route_status !== undefined ? Number.parseInt(route_status, 10) : undefined;
+		const routes: RouteDto[] = await this.listRoutesQuery.execute(route_name, parsedRouteStatus);
+
+		const httpResponseFormatter = new httpFormatter();
+		return httpResponseFormatter.createResponse('Routes listed successfully.', routes);
+	}
+
+	@ApiOperation({
+		summary: 'List route days by route ids',
+		description: 'Retrieves route days for the provided route ids. Maximum 100 route ids and no pagination.',
+	})
+	@ApiBody({
+		schema: {
+			type: 'object',
+			properties: {
+				id_routes: {
+					type: 'array',
+					items: { type: 'string', format: 'uuid' },
+				},
+			},
+			required: ['id_routes'],
+		},
+	})
+	@ApiOkResponse({ description: 'Standardized response with route days collection.' })
+	@Post('/routes/days/routes/ids')
+	async listRouteDaysByRouteIds(
+		@Body() body: { id_routes: string[] },
+	): Promise<httpControllerResponse> {
+		const routeDays: RouteDayDto[] = await this.listRouteDaysQuery.execute(body.id_routes ?? []);
+
+		const httpResponseFormatter = new httpFormatter();
+		return httpResponseFormatter.createResponse('Route days listed successfully.', routeDays);
+	}
+
+	@ApiOperation({
+		summary: 'Retrieve route days by ids',
+		description: 'Retrieves specific route days by ids. Limit is 100 and there is no pagination.',
+	})
+	@ApiBody({
+		schema: {
+			type: 'object',
+			properties: {
+				id_route_days: {
+					type: 'array',
+					items: { type: 'string', format: 'uuid' },
+				},
+			},
+			required: ['id_route_days'],
+		},
+	})
+	@ApiOkResponse({ description: 'Standardized response with retrieved route days.' })
+	@Post('/routes/days/ids')
+	async retrieveRouteDayByRouteDayId(
+		@Body() body: { id_route_days: string[] },
+	): Promise<httpControllerResponse> {
+		const routeDays: RouteDayDto[] = await this.retrieveRouteDayByRouteDayIdQuery.execute(
+			body.id_route_days ?? [],
+		);
+
+		const httpResponseFormatter = new httpFormatter();
+		return httpResponseFormatter.createResponse('Route days retrieved successfully.', routeDays);
 	}
 
 	@ApiOperation({

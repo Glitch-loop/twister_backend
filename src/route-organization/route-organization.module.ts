@@ -29,6 +29,9 @@ import { DeleteRouteDayProposalCommand } from '@/src/route-organization/applicat
 
 // Queries
 import { ListRouteDaysProposalsQuery } from '@/src/route-organization/application/queries/list-route-days-proposals.query';
+import { ListRouteDaysQuery } from '@/src/route-organization/application/queries/list-route-days.query';
+import { ListRoutesQuery } from '@/src/route-organization/application/queries/list-routes.query';
+import { RetrieveRouteDayByRouteDayIdQuery } from '@/src/route-organization/application/queries/retrieve-route-day-by-route_day-id.query';
 import { RetrieveRouteDaysProposalsByIdProposalQuery } from '@/src/route-organization/application/queries/retrieve-route-days-proposals-by-proposal-id_proposal.query';
 
 // Mappers
@@ -51,9 +54,12 @@ import { SharedModule } from '@/src/shared/shared.module';
     CreateRouteDayProposalCommand,
     DeleteRouteDayProposalCommand,
     DeactivateRouteCommand,
+    ListRouteDaysQuery,
     ListRouteDaysProposalsQuery,
+    ListRoutesQuery,
     OrganizeRouteDayCommand,
     ReactivateRouteCommand,
+    RetrieveRouteDayByRouteDayIdQuery,
     RetrieveRouteDaysProposalsByIdProposalQuery,
     SupabaseRouteProposalsRepository,
     UnassignRouteToVendorCommand,

@@ -16,6 +16,7 @@ export abstract class RouteRepository {
   abstract removeRouteDayAssignation(assignedRouteDay: AssignedRouteDayEntity[]): Promise<void>;
   abstract createRouteDay(routeDayEntity: RouteDayEntity): Promise<void>;
   abstract listDays(): Promise<DayEntity[]>;
+  abstract listRoutes(route_name?: string, route_status?: number): Promise<RouteEntity[]>;
   abstract retrieveRoutesByRouteId(idRoutes: string[]): Promise<RouteEntity[]>;
   abstract retrieveRouteDayByRouteId(idRoutes: string[]): Promise<RouteDayEntity[]>;
   abstract retrieveRouteDayByUserId(idUsers: string[]): Promise<RouteDayEntity[]>;

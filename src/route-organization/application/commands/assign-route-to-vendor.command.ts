@@ -9,6 +9,7 @@ import RouteDayAggregate from '@/src/route-organization/core/aggregates/route-da
 import { AssignedRouteDayEntity } from '@/src/route-organization/core/entities/assigned-route-day.entity';
 import { RouteEntity } from '@/src/route-organization/core/entities/route.entity';
 import { RouteDayEntity } from '@/src/route-organization/core/entities/route-day.entity';
+import { BusinessRuleException } from '../../errors/BusinessRuleException';
 
 @Injectable()
 export class AssignRouteToVendorCommand {
@@ -36,6 +37,15 @@ export class AssignRouteToVendorCommand {
 
     if (routeEntities.length === 0) {
       throw new Error(`Route with id ${routeDay.id_route} does not exist.`);
+    }
+
+    const routeDayAssignedToUser:AssignedRouteDayEntity[] = await this.routeRepository.retrieveRouteDayAssignaments([id_route_day]); 
+
+    const isAlreadyAssigned:boolean = routeDayAssignedToUser
+      .some((routeAssignation) => { return routeAssignation.id_route_day === id_route_day && routeAssignation.id_user === id_user });
+
+    if (isAlreadyAssigned) {
+      throw new BusinessRuleException(`Route day with id ${routeDay.id_route_day} is already assigned to user ${id_user}.`);
     }
 
     const routeAggregate = new RouteAggregate(routeEntities[0]);

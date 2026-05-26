@@ -228,6 +228,37 @@ export class SupabaseRouteRepository implements RouteRepository {
     }
   }
 
+  async listRoutes(route_name?: string, route_status?: number): Promise<RouteEntity[]> {
+    try {
+      let query = this.supabase
+        .from('routes')
+        .select('*')
+        .order('route_name', { ascending: true });
+
+      if (route_name) {
+        query = query.ilike('route_name', `%${route_name}%`);
+      }
+
+      if (route_status !== undefined) {
+        query = query.eq('route_status', route_status);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        throw new Error(`Failed to list routes: ${error.message}`);
+      }
+
+      return ((data ?? []) as RouteModel[]).map((routeModel) =>
+        this.mapper.toDomainObject(routeModel),
+      );
+    } catch (error) {
+      throw new Error(
+        `Failed to list routes: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+  }
+
   async retrieveRoutesByRouteId(idRetrieveRoutes: string[]): Promise<RouteEntity[]> {
     if (idRetrieveRoutes.length === 0) {
       return [];
@@ -397,8 +428,7 @@ export class SupabaseRouteRepository implements RouteRepository {
       if (error) {
         throw new Error(`Failed to retrieve route days locations by route day id: ${error.message}`);
       }
-
-      return ((data ?? []) as AssignedRouteDayModel[]).map((assignation) => this.mapper.toDomainObject(assignation));
+      return data.map((assignation) => this.mapper.toDomainObject(assignation));
 
     } catch (error) {
       throw new Error(

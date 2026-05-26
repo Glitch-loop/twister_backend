@@ -8,6 +8,6 @@ export const isAssignedRouteDayEntity = (value: unknown): value is AssignedRoute
     value.created_at instanceof Date &&
     typeof value.id_route_day === 'string' &&
     typeof value.id_user === 'string' &&
-    (value.expired_at === undefined || value.expired_at instanceof Date)
+    (value.expired_at === undefined || value.expired_at === "string" || value.expired_at instanceof Date)
   );
 };

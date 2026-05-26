@@ -6,17 +6,17 @@ import { RouteDayEntity } from '@/src/route-organization/core/entities/route-day
 import { RouteRepository } from '@/src/route-organization/core/interfaces/route.repository';
 
 @Injectable()
-export class RetrieveRouteDayByRouteDayIdQuery {
+export class ListRouteDaysQuery {
 	constructor(
 		@Inject(RouteRepository) private readonly routeRepository: RouteRepository,
 		private readonly mapper: Mapper,
 	) {}
 
-	async execute(id_route_days: string[]): Promise<RouteDayDto[]> {
+	async execute(id_routes: string[]): Promise<RouteDayDto[]> {
 		const maxIds = 100;
-		const idClientToRetreive = id_route_days.slice(0, maxIds);
+		const routeIdsToList = id_routes.slice(0, maxIds);
 
-		const routeDays: RouteDayEntity[] = await this.routeRepository.retrieveRouteDay(idClientToRetreive);
+		const routeDays: RouteDayEntity[] = await this.routeRepository.retrieveRouteDayByRouteId(routeIdsToList);
 		return routeDays.map((routeDay) => this.mapper.toDto(routeDay));
 	}
 }
