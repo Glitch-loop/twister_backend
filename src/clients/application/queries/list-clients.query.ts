@@ -27,7 +27,7 @@ export class ListClientsQuery {
     legal_name?: string, 
     name?: string,
     lastIdClient?: string, // Part of the cursor
-  lastCreatedAt?: string, // Part of the cursor
+    lastCreatedAt?: string, // Part of the cursor
   ): Promise<ClientDto[]> {
     let limit_to_use: number = 1001;
 
