@@ -59,7 +59,13 @@ export class RouteOrganizationController {
 
 	@ApiOperation({
 		summary: 'Create route',
-		description: 'Creates a new route with a name and optional description.',
+		description: `Creates a new route with a name and optional description.
+When the user creates a new route, it is also created a route day per day.
+Right now (26-05-26), a route day is created from "Monday" to "Saturday".
+
+Although it could be a configuration on which the user decides the days which 
+route days will be created, so far there was not be an 'use case' on which 
+this behavior is needed.`,
 	})
 	@ApiBody({ type: RouteRequestDto })
 	@ApiOkResponse({ description: 'Standardized response with operation message.' })
@@ -74,9 +80,12 @@ export class RouteOrganizationController {
 		return httpResponseFormatter.createResponse('Route created successfully');
 	}
 
+	
 	@ApiOperation({
 		summary: 'Assign route day to vendor',
-		description: 'Assigns one route day to a vendor, optionally with an expiration date.',
+		description: `Assigns one route day to a vendor, optionally with an expiration date.
+If user don't set an expiration date for a route day assignation, it is considered that
+that route day was assigned to the vendor (his default route).`,
 	})
 	@ApiParam({ name: 'id_route_day', description: 'Route day identifier', type: String })
 	@ApiParam({ name: 'id_user', description: 'Vendor user identifier', type: String })
