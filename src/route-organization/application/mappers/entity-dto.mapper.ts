@@ -1,0 +1,227 @@
+// Libraries
+import { Injectable } from '@nestjs/common';
+
+// Enums
+import { ROUTE_STATUS_ENUM } from '@/src/route-organization/core/enums/route-status.enum';
+
+// Dtos
+import { RouteDayLocationProposalDto } from '@/src/route-organization/application/dtos/route-day-location-proposal.dto';
+import { RouteDayLocationDto } from '@/src/route-organization/application/dtos/route-day-location.dto';
+import { RouteDayProposalDto } from '@/src/route-organization/application/dtos/route-day-proposal.dto';
+import { RouteDayDto } from '@/src/route-organization/application/dtos/route-day.dto';
+import { RouteDto } from '@/src/route-organization/application/dtos/route.dto';
+
+// Entities
+import { RouteDayEntity } from '@/src/route-organization/core/entities/route-day.entity';
+import { RouteDayProposalEntity } from '@/src/route-organization/core/entities/route-day-proposal.entity';
+import { RouteEntity } from '@/src/route-organization/core/entities/route.entity';
+
+// Object values
+import { RouteDayLocationObjectValue } from '@/src/route-organization/core/value-objects/route-day-location.object-value';
+
+// Models
+import { RouteDayModel } from '@/src/route-organization/application/models/route-day.model';
+
+// Dtos guards
+import { isRouteDayLocationProposalDto } from '@/src/route-organization/application/guards/dtos/route-day-location-proposal.guard';
+import { isRouteDayProposalDto } from '@/src/route-organization/application/guards/dtos/route-day-proposal.guard';
+import { isRouteDayDto } from '@/src/route-organization/application/guards/dtos/route-day.guard';
+import { isRouteDto } from '@/src/route-organization/application/guards/dtos/route.guard';
+
+// Entities guards
+import { isRouteDayEntity } from '@/src/route-organization/application/guards/entities/route-day.guard';
+import { isRouteDayProposalEntity } from '@/src/route-organization/application/guards/entities/route-day-proposal.guard';
+import { isRouteEntity } from '@/src/route-organization/application/guards/entities/route.guard';
+
+@Injectable()
+export class Mapper {
+	constructor() {}
+
+	// ==================== OVERLOADED FUNCTIONS FOR MAPPING ====================
+	// toDomainObject overloads
+	toDomainObject(dto: RouteDayLocationProposalDto, idOwner: string): RouteDayLocationObjectValue;
+	toDomainObject(dto: RouteDayProposalDto): RouteDayProposalEntity;
+	toDomainObject(dto: RouteDayDto): RouteDayEntity;
+	toDomainObject(dto: RouteDto): RouteEntity;
+	toDomainObject(
+		dto: RouteDayLocationProposalDto | RouteDayProposalDto | RouteDayDto | RouteDto,
+		idOwner?: string,
+	): RouteDayLocationObjectValue | RouteDayProposalEntity | RouteDayEntity | RouteEntity {
+		if (isRouteDayLocationProposalDto(dto) && typeof idOwner === 'string') {
+			return this.routeDayLocationProposalDtoToDomainObject(dto, idOwner);
+		}
+
+		if (isRouteDayProposalDto(dto)) {
+			return this.routeDayProposalDtoToDomainObject(dto);
+		}
+
+		if (isRouteDayDto(dto)) {
+			return this.routeDayDtoToDomainObject(dto);
+		}
+
+		if (isRouteDto(dto)) {
+			return this.routeDtoToDomainObject(dto);
+		}
+
+		throw new Error('Invalid input for mapping to domain object');
+	}
+
+	// toDto overloads
+	toDto(domainObject: RouteDayLocationObjectValue, asProposalDto: true): RouteDayLocationProposalDto;
+	toDto(domainObject: RouteDayLocationObjectValue): RouteDayLocationDto;
+	toDto(domainObject: RouteDayProposalEntity, proposalLocations: RouteDayLocationObjectValue[]): RouteDayProposalDto;
+	toDto(domainObject: RouteDayEntity): RouteDayDto;
+	toDto(domainObject: RouteEntity): RouteDto;
+	toDto(
+		domainObject: RouteDayLocationObjectValue | RouteDayProposalEntity | RouteDayEntity | RouteEntity,
+		metadata?: boolean | RouteDayLocationObjectValue[],
+	): RouteDayLocationProposalDto | RouteDayLocationDto | RouteDayProposalDto | RouteDayDto | RouteDto {
+		if (domainObject instanceof RouteDayLocationObjectValue) {
+			if (metadata === true) {
+				return this.routeDayLocationDomainObjectToRouteDayLocationProposalDto(domainObject);
+			}
+
+			return this.routeDayLocationDomainObjectToDto(domainObject);
+		}
+
+		if (isRouteDayProposalEntity(domainObject)) {
+			if (!Array.isArray(metadata)) {
+				throw new Error('Invalid input for mapping RouteDayProposalEntity to dto: proposal locations are required');
+			}
+
+			return this.routeDayProposalDomainObjectToDto(domainObject, metadata);
+		}
+
+		if (isRouteDayEntity(domainObject)) {
+			return this.routeDayDomainObjectToDto(domainObject);
+		}
+
+		if (isRouteEntity(domainObject)) {
+			return this.routeDomainObjectToDto(domainObject);
+		}
+
+		throw new Error('Invalid input for mapping to dto');
+	}
+
+	// This conversion was requested explicitly for route-day DTO to route-day model.
+	toModel(dto: RouteDayDto): RouteDayModel {
+		if (!isRouteDayDto(dto)) {
+			throw new Error('Invalid input for mapping to model');
+		}
+
+		return this.routeDayDtoToModel(dto);
+	}
+
+	// ==================== MAPPER METHODS DOMAIN OBJECT to DTO ====================
+	private routeDayLocationDomainObjectToDto(domainObject: RouteDayLocationObjectValue): RouteDayLocationDto {
+		return new RouteDayLocationDto(
+			domainObject.position_in_route,
+			domainObject.id_location,
+			domainObject.id_owner,
+			domainObject.id_route_day_location ?? '',
+		);
+	}
+
+	private routeDayLocationDomainObjectToRouteDayLocationProposalDto(domainObject: RouteDayLocationObjectValue): RouteDayLocationProposalDto {
+		return new RouteDayLocationProposalDto(
+			domainObject.id_route_day_location,
+			domainObject.position_in_route,
+			domainObject.id_location,
+		);
+	}
+
+	private routeDayDomainObjectToDto(domainObject: RouteDayEntity): RouteDayDto {
+		return new RouteDayDto(
+			domainObject.id_route_day,
+			domainObject.id_route,
+			domainObject.id_day,
+			domainObject.locations.map((location) => this.routeDayLocationDomainObjectToDto(location)),
+		);
+	}
+
+	private routeDomainObjectToDto(domainObject: RouteEntity): RouteDto {
+		return {
+			id_route: domainObject.id_route,
+			route_name: domainObject.route_name,
+			description: domainObject.description,
+		};
+	}
+
+	private routeDayProposalDomainObjectToDto(
+		domainObject: RouteDayProposalEntity,
+		proposalLocations: RouteDayLocationObjectValue[],
+	): RouteDayProposalDto {
+		return new RouteDayProposalDto(
+			domainObject.id_route_day_proposal,
+			domainObject.proposal_name,
+			domainObject.created_at,
+			domainObject.id_route_day,
+			proposalLocations.map((location) => this.routeDayLocationDomainObjectToRouteDayLocationProposalDto(location)),
+		);
+	}
+
+	// ==================== MAPPER METHODS DTO to DOMAIN OBJECT ====================
+	private routeDayDtoToDomainObject(dto: RouteDayDto): RouteDayEntity {
+		return new RouteDayEntity(
+			dto.id_route_day,
+			dto.id_route,
+			dto.id_day,
+			dto.locations.map((location) =>
+				new RouteDayLocationObjectValue(
+					location.position_in_route,
+					location.id_location,
+					location.id_user,
+					location.id_route_day_location,
+				),
+			),
+		);
+	}
+
+	private routeDtoToDomainObject(dto: RouteDto): RouteEntity {
+		return new RouteEntity(
+			dto.id_route,
+			dto.route_name,
+			ROUTE_STATUS_ENUM.ACTIVE,
+			dto.description,
+		);
+	}
+
+	private routeDayLocationProposalDtoToDomainObject(
+		dto: RouteDayLocationProposalDto,
+		idOwner: string,
+	): RouteDayLocationObjectValue {
+		return new RouteDayLocationObjectValue(
+			dto.position_in_route,
+			dto.id_location,
+			idOwner,
+			dto.id_route_day_location_proposal,
+		);
+	}
+
+	private routeDayProposalDtoToDomainObject(dto: RouteDayProposalDto): RouteDayProposalEntity {
+		return new RouteDayProposalEntity(
+			dto.id_route_day_proposal,
+			dto.proposal_name,
+			dto.created_at instanceof Date ? dto.created_at : new Date(dto.created_at),
+			dto.id_route_day,
+		);
+	}
+
+	// ==================== MAPPER METHODS DTO to MODEL ====================
+	private routeDayDtoToModel(dto: RouteDayDto): RouteDayModel {
+		return {
+			id_route_day: dto.id_route_day,
+			id_route: dto.id_route,
+			id_day: dto.id_day,
+		};
+	}
+
+	// ==================== SPECIALIZED TRANSFORMATIONS ====================
+	routeDayDomainObjectToRouteDto(domainObject: RouteDayEntity): RouteDto {
+		return {
+			id_route: domainObject.id_route,
+			route_name: '',
+			description: undefined,
+		};
+	}
+}

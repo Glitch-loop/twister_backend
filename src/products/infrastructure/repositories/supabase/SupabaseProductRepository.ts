@@ -78,9 +78,33 @@ export class SupabaseProductRepository implements ProductRepository {
     }
   }
 
-  async listAllProducts(): Promise<ProductEntity[]> {
+  async listProducts(
+    limit: number,
+    lastCreatedAt?: string,
+    lastIdProduct?: string,
+    filter?: string,
+  ): Promise<ProductEntity[]> {
     try {
-      const { data: products, error } = await this.supabase.from('products').select('*');
+      let query = this.supabase
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: true })
+        .order('id_product', { ascending: true })
+        .limit(limit);
+
+      if (lastCreatedAt) {
+        query = query.gt('created_at', lastCreatedAt);
+      }
+
+      if (lastIdProduct) {
+        query = query.neq('id_product', lastIdProduct);
+      }
+
+      if (filter) {
+        query = query.or(`product_name.ilike.%${filter}%,barcode.ilike.%${filter}%`);
+      }
+
+      const { data: products, error } = await query;
       if (error) throw new Error(`Failed to list products: ${error.message}`);
 
       const productModels = (products ?? []) as ProductModel[];
@@ -100,7 +124,7 @@ export class SupabaseProductRepository implements ProductRepository {
       );
     } catch (error) {
       throw new Error(
-        `Failed to list all products: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to list products: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
   }

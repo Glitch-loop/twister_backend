@@ -43,7 +43,6 @@ export class UpdateRouteDayProposalCommand {
         index + 1,
         location.id_location,
         id_route_day_proposal,
-        undefined,
         this.integrityRepository.generateUUIDv4(),
       ));
   }

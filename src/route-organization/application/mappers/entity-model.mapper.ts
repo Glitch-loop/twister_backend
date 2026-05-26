@@ -55,7 +55,7 @@ export class Mapper {
   toDomainObject(model: RouteDayLocationProposalModel): RouteDayLocationObjectValue;
   toDomainObject(model: RouteDayLocationModel): RouteDayLocationObjectValue;
   toDomainObject(model: RouteDayProposalModel): RouteDayProposalEntity;
-  toDomainObject(model: RouteDayModel): RouteDayEntity;
+  toDomainObject(model: RouteDayModel, routeDayLocationModels: RouteDayLocationModel[]): RouteDayEntity;
   toDomainObject(
     model:
       | AssignedRouteDayModel
@@ -65,6 +65,7 @@ export class Mapper {
       | RouteDayLocationModel
       | RouteDayProposalModel
       | RouteDayModel,
+    routeDayLocationModels?: RouteDayLocationModel[],
   ):
     | AssignedRouteDayEntity
     | DayEntity
@@ -97,7 +98,7 @@ export class Mapper {
     }
 
     if (isRouteDayModel(model)) {
-      return this.routeDayModelToDomainObject(model);
+      return this.routeDayModelToDomainObject(model, routeDayLocationModels);
     }
 
     throw new Error('Invalid input for mapping to domain object');
@@ -182,12 +183,12 @@ export class Mapper {
   }
 
   private routeDayLocationProposalDomainObjectToModel(domainObject: RouteDayLocationObjectValue): RouteDayLocationProposalModel {
-    if (!domainObject.id_route_day_location_proposal) {
-      throw new Error('Missing id_route_day_location_proposal in RouteDayLocationObjectValue');
+    if (!domainObject.id_route_day_location) {
+      throw new Error('Missing id_route_day_location in RouteDayLocationObjectValue');
     }
 
     return {
-      id_route_day_location_proposal: domainObject.id_route_day_location_proposal,
+      id_route_day_location_proposal: domainObject.id_route_day_location,
       position_in_route: domainObject.position_in_route,
       id_route_day_proposal: domainObject.id_owner,
       id_location: domainObject.id_location,
@@ -195,10 +196,6 @@ export class Mapper {
   }
 
   private routeDayLocationDomainObjectToModel(domainObject: RouteDayLocationObjectValue): RouteDayLocationModel | RouteDayLocationProposalModel {
-    if (domainObject.id_route_day_location_proposal) {
-      return this.routeDayLocationProposalDomainObjectToModel(domainObject);
-    }
-
     if (!domainObject.id_route_day_location) {
       throw new Error('Missing id_route_day_location in RouteDayLocationObjectValue');
     }
@@ -270,7 +267,6 @@ export class Mapper {
       model.position_in_route,
       model.id_location,
       model.id_route_day_proposal,
-      undefined,
       model.id_route_day_location_proposal,
     );
   }
@@ -281,7 +277,6 @@ export class Mapper {
       model.id_location,
       model.id_route_day,
       model.id_route_day_location,
-      undefined,
     );
   }
 
@@ -298,12 +293,12 @@ export class Mapper {
     );
   }
 
-  private routeDayModelToDomainObject(model: RouteDayModel): RouteDayEntity {
+  private routeDayModelToDomainObject(model: RouteDayModel, routeDayLocationModels: RouteDayLocationModel[] = []): RouteDayEntity {
     return new RouteDayEntity(
       model.id_route_day,
       model.id_route,
       model.id_day,
-      [],
+      routeDayLocationModels.map((routeDayLocationModel) => this.routeDayLocationModelToDomainObject(routeDayLocationModel)),
     );
   }
 

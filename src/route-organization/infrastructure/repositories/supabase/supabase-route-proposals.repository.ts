@@ -39,8 +39,8 @@ export class SupabaseRouteProposalsRepository implements RouteProposalRepository
       }
 
       const routeDayLocationProposalModels: RouteDayLocationProposalModel[] = routeDayLocationProposals.map((location) => {
-        if (!location.id_route_day_location_proposal) {
-          throw new Error('Missing id_route_day_location_proposal in route day proposal location payload.');
+        if (!location.id_route_day_location) {
+          throw new Error('Missing id_route_day_location in route day proposal location payload.');
         }
 
         if (location.id_owner !== routeDayProposal.id_route_day_proposal) {
@@ -50,7 +50,7 @@ export class SupabaseRouteProposalsRepository implements RouteProposalRepository
         }
 
         return {
-          id_route_day_location_proposal: location.id_route_day_location_proposal,
+          id_route_day_location_proposal: location.id_route_day_location,
           position_in_route: location.position_in_route,
           id_route_day_proposal: location.id_owner,
           id_location: location.id_location,
@@ -111,8 +111,8 @@ export class SupabaseRouteProposalsRepository implements RouteProposalRepository
       }
 
       const routeDayLocationProposalModels: RouteDayLocationProposalModel[] = routeDayLocationProposals.map((location) => {
-        if (!location.id_route_day_location_proposal) {
-          throw new Error('Missing id_route_day_location_proposal in route day proposal location payload.');
+        if (!location.id_route_day_location) {
+          throw new Error('Missing id_route_day_location in route day proposal location payload.');
         }
 
         if (location.id_owner !== idRouteDayProposal) {
@@ -122,7 +122,7 @@ export class SupabaseRouteProposalsRepository implements RouteProposalRepository
         }
 
         return {
-          id_route_day_location_proposal: location.id_route_day_location_proposal,
+          id_route_day_location_proposal: location.id_route_day_location,
           position_in_route: location.position_in_route,
           id_route_day_proposal: location.id_owner,
           id_location: location.id_location,

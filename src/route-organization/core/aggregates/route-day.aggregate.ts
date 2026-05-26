@@ -35,7 +35,6 @@ export default class RouteDayAggregate {
                         location.id_location,
                         location.id_owner,
                         location.id_route_day_location,
-                        location.id_route_day_location_proposal,
                     ),
                 );
             }
@@ -81,14 +80,13 @@ export default class RouteDayAggregate {
       );
 
       this._routeDayLocations = filteredLocations.map((location, index) => {
-        const { id_location, id_owner, id_route_day_location, id_route_day_location_proposal } = location;
+        const { id_location, id_owner, id_route_day_location } = location;
 
         return new RouteDayLocationObjectValue(
           index + 1,
           id_location,
           id_owner,
           id_route_day_location,
-          id_route_day_location_proposal,
         );
         });
 
@@ -146,7 +144,6 @@ export default class RouteDayAggregate {
           location.id_location,
           id_route_day,
           location.id_route_day_location,
-          location.id_route_day_location_proposal,
         );
       });
 

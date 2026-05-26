@@ -20,6 +20,10 @@ import { DeactivateProductCommand } from '@/src/products/application/commands/de
 import { CreatePriceCommand } from '@/src/products/application/commands/create-price.command';
 import { RemovePriceCommand } from '@/src/products/application/commands/remove-price.command';
 
+// Queries
+import { ListProductsQuery } from '@/src/products/application/queries/list-products';
+import { RetrieveProductByIdProductQuery } from '@/src/products/application/queries/retrieve-product-by-id-product';
+
 // Controllers
 import { ProductsController } from '@/src/products/products.controller';
 
@@ -35,6 +39,8 @@ import { SharedModule } from '@/src/shared/shared.module';
     DeactivateProductCommand,
     CreatePriceCommand,
     RemovePriceCommand,
+    ListProductsQuery,
+    RetrieveProductByIdProductQuery,
     Mapper,
     {
       provide: ProductRepository,

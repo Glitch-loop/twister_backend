@@ -6,13 +6,14 @@ import { RouteRepository } from '@/src/route-organization/core/interfaces/route.
 import { RouteProposalRepository } from '@/src/route-organization/core/interfaces/route-proposals.repository';
 
 // Repositories
-import { SupabaseRouteRepository } from '@/src/route-organization/infrastructure/repositories/supabase/supabase-route-repository';
-import { SupabaseRouteProposalsRepository } from '@/src/route-organization/infrastructure/repositories/supabase/supabase-route-proposals-repository';
+import { SupabaseRouteRepository } from '@/src/route-organization/infrastructure/repositories/supabase/supabase-route.repository';
+import { SupabaseRouteProposalsRepository } from '@/src/route-organization/infrastructure/repositories/supabase/supabase-route-proposals.repository';
 
 // Datasources
 import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
 
 // Queries
+import { RetrieveAssignedRouteDaysByIdUserQuery } from '@/src/route-organization/application/queries/retrieve-assigned-route-days-by-id-user.query';
 
 // Commands
 import { CreateNewRouteCommand } from '@/src/route-organization/application/commands/create-new-route.command';
@@ -27,12 +28,12 @@ import { UpdateRouteDayProposalCommand } from '@/src/route-organization/applicat
 import { DeleteRouteDayProposalCommand } from '@/src/route-organization/application/commands/delete-route-day-proposal.command';
 
 // Queries
-import { ListRouteDaysProposalsQuery } from '@/src/route-organization/application/queries/list-route-days-proposals';
-import { RetrieveRouteDaysProposalsByIdProposalQuery } from '@/src/route-organization/application/queries/retrieve-route-days-proposals-by-id_proposal';
+import { ListRouteDaysProposalsQuery } from '@/src/route-organization/application/queries/list-route-days-proposals.query';
+import { RetrieveRouteDaysProposalsByIdProposalQuery } from '@/src/route-organization/application/queries/retrieve-route-days-proposals-by-proposal-id_proposal.query';
 
 // Mappers
 import { Mapper as EntityModelMapper } from '@/src/route-organization/application/mappers/entity-model.mapper';
-// import { Mapper as EntityDtoMapper } from '@/src/route-organization/application/mappers/entity-dto.mapper';
+import { Mapper as EntityDtoMapper } from '@/src/route-organization/application/mappers/entity-dto.mapper';
 
 // Controllers
 import { RouteOrganizationController } from '@/src/route-organization/route-organization.controller';
@@ -58,8 +59,9 @@ import { SharedModule } from '@/src/shared/shared.module';
     UnassignRouteToVendorCommand,
     UpdateRouteDayProposalCommand,
     UpdateRouteCommand,
+    RetrieveAssignedRouteDaysByIdUserQuery,
     EntityModelMapper,
-    // EntityDtoMapper,
+    EntityDtoMapper,
     {
       provide: RouteRepository,
       useClass: SupabaseRouteRepository,

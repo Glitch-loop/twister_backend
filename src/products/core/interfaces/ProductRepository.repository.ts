@@ -5,7 +5,12 @@ import { ProductPriceObjectValue } from "../value-objects/product-price.object-v
 export abstract class ProductRepository {
   abstract createProduct(productEntity: ProductEntity): Promise<void>;
   abstract updateProduct(productEntity: ProductEntity): Promise<void>;
-  abstract listAllProducts(): Promise<ProductEntity[]>;
+  abstract listProducts(
+    limit: number,
+    lastCreatedAt?: string,
+    lastIdProduct?: string,
+    filter?: string,
+  ): Promise<ProductEntity[]>;
   abstract retrieveProducts(idProduct: string[]): Promise<ProductEntity[]>;
   abstract createProductPrice(id_product: string, productPrice: ProductPriceObjectValue): Promise<void>;
   abstract deleteProductPrice(id_product_price: string): Promise<void>;

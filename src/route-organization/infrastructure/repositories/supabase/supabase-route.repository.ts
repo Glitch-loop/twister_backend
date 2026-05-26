@@ -341,28 +341,21 @@ export class SupabaseRouteRepository implements RouteRepository {
   private async buildRouteDay(routeDays: RouteDayModel[]): Promise<RouteDayEntity[]> {
     if (routeDays.length === 0) {
       return [];
-    }
+    } 
 
     const routeDaysId: string[] = routeDays.map((routeDay) => routeDay.id_route_day);
-    const routeDayLocationsMap: Map<string, RouteDayLocationObjectValue[]> = new Map();
+    const routeDayLocationsMap: Map<string, RouteDayLocationModel[]> = new Map();
 
     const routeDayLocationModels: RouteDayLocationModel[] = await this.retrieveRouteDayLocations(routeDaysId);
 
     for (const routeDayLocationModel of routeDayLocationModels) {
-      const routeDayLocation = this.mapper.toDomainObject(routeDayLocationModel);
       const locations = routeDayLocationsMap.get(routeDayLocationModel.id_route_day) ?? [];
-      locations.push(routeDayLocation);
+      locations.push(routeDayLocationModel);
       routeDayLocationsMap.set(routeDayLocationModel.id_route_day, locations);
     }
 
     return routeDays.map(
-      (routeDay) =>
-        new RouteDayEntity(
-          routeDay.id_route_day,
-          routeDay.id_route,
-          routeDay.id_day,
-          routeDayLocationsMap.get(routeDay.id_route_day) ?? [],
-        ),
+      (routeDay) => this.mapper.toDomainObject(routeDay, routeDayLocationsMap.get(routeDay.id_route_day) ?? []),
     );
   }
 

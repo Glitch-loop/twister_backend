@@ -36,8 +36,9 @@ import { DeleteRouteDayProposalCommand } from '@/src/route-organization/applicat
 import { UpdateRouteDayProposalCommand } from '@/src/route-organization/application/commands/update-route-day-proposal.command';
 
 // Queries
-import { ListRouteDaysProposalsQuery } from '@/src/route-organization/application/queries/list-route-days-proposals';
-import { RetrieveRouteDaysProposalsByIdProposalQuery } from '@/src/route-organization/application/queries/retrieve-route-days-proposals-by-id_proposal';
+import { ListRouteDaysProposalsQuery } from '@/src/route-organization/application/queries/list-route-days-proposals.query';
+import { RetrieveRouteDaysProposalsByIdProposalQuery } from '@/src/route-organization/application/queries/retrieve-route-days-proposals-by-proposal-id_proposal.query';
+import { RetrieveAssignedRouteDaysByIdUserQuery } from './application/queries/retrieve-assigned-route-days-by-id-user.query';
 
 @ApiTags('Route Organization')
 @Controller('route-organization')
@@ -50,6 +51,9 @@ export class RouteOrganizationController {
 		private readonly updateRouteCommand: UpdateRouteCommand,
 		private readonly reactivateRouteCommand: ReactivateRouteCommand,
 		private readonly unassignRouteToVendorCommand: UnassignRouteToVendorCommand,
+		private readonly retrieveAssignedRouteDaysByIdUserQuery: RetrieveAssignedRouteDaysByIdUserQuery,
+
+		// Related to route proposals
 		private readonly createRouteDayProposalCommand: CreateRouteDayProposalCommand,
 		private readonly updateRouteDayProposalCommand: UpdateRouteDayProposalCommand,
 		private readonly deleteRouteDayProposalCommand: DeleteRouteDayProposalCommand,
@@ -135,6 +139,34 @@ that route day was assigned to the vendor (his default route).`,
 
 		const httpResponseFormatter = new httpFormatter();
 		return httpResponseFormatter.createResponse('Route updated successfully');
+	}
+
+	@ApiOperation({
+		summary: 'Retrieve route days by user ids',
+		description: 'Retrieves all route days assigned to the provided user ids. Maximum 100 ids and no pagination.',
+	})
+	@ApiBody({
+		schema: {
+			type: 'object',
+			properties: {
+				id_users: {
+					type: 'array',
+					items: { type: 'string', format: 'uuid' },
+					example: ['53dc3ca4-f9db-4c22-86b6-8f71fc562dc5', '9f3a1e8a-23cc-49e2-8f07-c4f40c1597af'],
+				},
+			},
+			required: ['id_users'],
+		},
+	})
+	@ApiOkResponse({ description: 'Standardized response with assigned route days.' })
+	@Post('/routes/days/users/ids')
+	async retrieveRouteDayAsignedToUser(
+		@Body() body: { id_users: string[] },
+	): Promise<httpControllerResponse> {
+		const id_users = body.id_users ?? [];
+		const routeDaysAssigned = await this.retrieveAssignedRouteDaysByIdUserQuery.execute(id_users);
+		const httpResponseFormatter = new httpFormatter();
+		return httpResponseFormatter.createResponse('Route days retrieved successfully', routeDaysAssigned);
 	}
 
 	@ApiOperation({
@@ -243,7 +275,6 @@ that route day was assigned to the vendor (his default route).`,
 					location.id_location,
 					id_route_day,
 					location.id_route_day_location,
-					undefined,
 				),
 		);
 
@@ -253,6 +284,7 @@ that route day was assigned to the vendor (his default route).`,
 		return httpResponseFormatter.createResponse('Route day organized successfully');
 	}
 
+	// About route day proposals ----------------------------------------------------
 	@ApiOperation({
 		summary: 'Create route day proposal',
 		description: 'Creates a route day proposal and stores the proposed ordered locations.',
@@ -387,4 +419,5 @@ that route day was assigned to the vendor (his default route).`,
 		const httpResponseFormatter = new httpFormatter();
 		return httpResponseFormatter.createResponse('Route day proposal deleted successfully');
 	}
+
 }
