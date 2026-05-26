@@ -12,11 +12,13 @@ import {
 // DTOs
 import { LocationDto } from '@/src/clients/application/dtos/location.dto';
 import type { FurnitureDto } from '@/src/clients/application/dtos/furniture.dto';
-import type { LocationNoteDto } from '@/src/clients/application/dtos/location-note.dto';
+import { LocationNoteDto } from '@/src/clients/application/dtos/location-note.dto';
 import { ClientDto } from '@/src/clients/application/dtos/client.dto';
 import { LocationTypeRequestDto } from '@/src/clients/application/dtos/location-type-request.dto';
 import { LocationTypeDto } from '@/src/clients/application/dtos/location-type.dto';
-import { CreateLocationRequestDto } from './application/dtos/create-location-request.dto';
+import { CreateLocationRequestDto } from '@/src/clients/application/dtos/create-location-request.dto';
+import { ClientRequestDto } from '@/src/clients/application/dtos/client-request.dto';
+import { UpdateLocationRequest } from '@/src/clients/application/dtos/update-location-request.dto';
 
 // Commands
 import { CreateClientCommand } from '@/src/clients/application/commands/create-client.command';
@@ -40,8 +42,6 @@ import { ListClientsQuery } from '@/src/clients/application/queries/list-clients
 // Presentation
 import { httpControllerResponse } from '@/src/shared/presentation/http/interfaces/controller-response.interface';
 import { httpFormatter } from '@/src/shared/presentation/http/handlers/http-formatter.handler';
-import { ClientRequestDto } from './application/dtos/client-request.dto';
-import { UpdateLocationRequest } from './application/dtos/update-location-request.dto';
 
 @ApiTags('Clients')
 @Controller('clients')

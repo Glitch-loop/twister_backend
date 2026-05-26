@@ -3,9 +3,11 @@ import { Module } from '@nestjs/common';
 
 // Interfaces
 import { RouteRepository } from '@/src/route-organization/core/interfaces/route.repository';
+import { RouteProposalRepository } from '@/src/route-organization/core/interfaces/route-proposals.repository';
 
 // Repositories
-import { SupabaseRouteRepository } from '@/src/route-organization/infrastructure/repositories/supabase/SupabaseRouteRepository';
+import { SupabaseRouteRepository } from '@/src/route-organization/infrastructure/repositories/supabase/supabase-route-repository';
+import { SupabaseRouteProposalsRepository } from '@/src/route-organization/infrastructure/repositories/supabase/supabase-route-proposals-repository';
 
 // Datasources
 import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
@@ -20,6 +22,13 @@ import { ReactivateRouteCommand } from '@/src/route-organization/application/com
 import { AssignRouteToVendorCommand } from '@/src/route-organization/application/commands/assign-route-to-vendor.command';
 import { UnassignRouteToVendorCommand } from '@/src/route-organization/application/commands/unassign-route-to-vendor.command';
 import { UpdateRouteCommand } from '@/src/route-organization/application/commands/update-route.command';
+import { CreateRouteDayProposalCommand } from '@/src/route-organization/application/commands/create-route-day-proposal.command';
+import { UpdateRouteDayProposalCommand } from '@/src/route-organization/application/commands/update-route-day-proposal.command';
+import { DeleteRouteDayProposalCommand } from '@/src/route-organization/application/commands/delete-route-day-proposal.command';
+
+// Queries
+import { ListRouteDaysProposalsQuery } from '@/src/route-organization/application/queries/list-route-days-proposals';
+import { RetrieveRouteDaysProposalsByIdProposalQuery } from '@/src/route-organization/application/queries/retrieve-route-days-proposals-by-id_proposal';
 
 // Mappers
 import { Mapper as EntityModelMapper } from '@/src/route-organization/application/mappers/entity-model.mapper';
@@ -38,16 +47,27 @@ import { SharedModule } from '@/src/shared/shared.module';
   providers: [
     AssignRouteToVendorCommand,
     CreateNewRouteCommand,
+    CreateRouteDayProposalCommand,
+    DeleteRouteDayProposalCommand,
     DeactivateRouteCommand,
+    ListRouteDaysProposalsQuery,
     OrganizeRouteDayCommand,
     ReactivateRouteCommand,
+    RetrieveRouteDaysProposalsByIdProposalQuery,
+    SupabaseRouteProposalsRepository,
     UnassignRouteToVendorCommand,
+    UpdateRouteDayProposalCommand,
     UpdateRouteCommand,
     EntityModelMapper,
     // EntityDtoMapper,
     {
       provide: RouteRepository,
       useClass: SupabaseRouteRepository,
+    },
+    {
+      provide: RouteProposalRepository,
+      useFactory: (...deps: unknown[]): RouteProposalRepository => deps[0] as RouteProposalRepository,
+      inject: [SupabaseRouteProposalsRepository],
     },
     SupabaseDataSource,
   ],
