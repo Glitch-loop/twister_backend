@@ -17,12 +17,14 @@ import { LocationTypeObjectValue } from '@/src/clients/core/object-values/locati
 
 // Enums
 import { LOCATION_STATUS_ENUM } from '@/src/clients/core/enums/client-status.enum';
+import { Mapper } from '../mappers/entity-dto.mapper';
 
 @Injectable()
 export class ModifyLocationCommand {
 	constructor(
 		@Inject(LocationRepository) private readonly locationRepository: LocationRepository,
 		@Inject(ClientRepository) private readonly clientRepository: ClientRepository,
+		private readonly mapper: Mapper,
 	) {}
 
 	async execute(
@@ -34,12 +36,14 @@ export class ModifyLocationCommand {
 		_location_name?: string,
 		_latitude?: string,
 		_longitude?: string,
-		_status_location?: LOCATION_STATUS_ENUM,
+		_status_location?: number,
 		_id_creator?: string,
 		_id_client?: string,
 		_id_location_type?: string,
 		_address_reference?: string | null,
 	): Promise<void> {
+		const statusLocationCastedToEnum: LOCATION_STATUS_ENUM|undefined = _status_location ? this.mapper.toLocationStatusEnum(_status_location) : undefined;
+
 		const locations: LocationEntity[] = await this.locationRepository.retrieveLocationById([
 			_id_location,
 		]);
@@ -83,7 +87,7 @@ export class ModifyLocationCommand {
 			_location_name,
 			_latitude,
 			_longitude,
-			_status_location,
+			statusLocationCastedToEnum,
 			_id_creator,
 			_id_client,
 			locationType,

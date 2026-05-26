@@ -10,12 +10,13 @@ import {
 } from '@nestjs/swagger';
 
 // DTOs
-import type { ClientDto } from '@/src/clients/application/dtos/client.dto';
-import type { LocationDto } from '@/src/clients/application/dtos/location.dto';
+import { LocationDto } from '@/src/clients/application/dtos/location.dto';
 import type { FurnitureDto } from '@/src/clients/application/dtos/furniture.dto';
-import type { LocationNoteDto } from '@/src/clients/application/dtos/location_note.dto';
+import type { LocationNoteDto } from '@/src/clients/application/dtos/location-note.dto';
+import { ClientDto } from '@/src/clients/application/dtos/client.dto';
 import { LocationTypeRequestDto } from '@/src/clients/application/dtos/location-type-request.dto';
 import { LocationTypeDto } from '@/src/clients/application/dtos/location-type.dto';
+import { CreateLocationRequestDto } from './application/dtos/create-location-request.dto';
 
 // Commands
 import { CreateClientCommand } from '@/src/clients/application/commands/create-client.command';
@@ -39,6 +40,8 @@ import { ListClientsQuery } from '@/src/clients/application/queries/list-clients
 // Presentation
 import { httpControllerResponse } from '@/src/shared/presentation/http/interfaces/controller-response.interface';
 import { httpFormatter } from '@/src/shared/presentation/http/handlers/http-formatter.handler';
+import { ClientRequestDto } from './application/dtos/client-request.dto';
+import { UpdateLocationRequest } from './application/dtos/update-location-request.dto';
 
 @ApiTags('Clients')
 @Controller('clients')
@@ -75,14 +78,14 @@ export class ClientsController {
   })
   @ApiOkResponse({ description: 'Standardized response with operation message.' })
   @Post('')
-  async createClient(@Body() body: Partial<ClientDto>): Promise<httpControllerResponse> {
+  async createClient(@Body() body: ClientRequestDto): Promise<httpControllerResponse> {
     await this.createClientCommand.execute(
-      body.legal_name!,
-      body.postal_code!,
-      body.fiscal_regime!,
-      body.name!,
-      body.cellphone!,
-      body.email!,
+      body.legal_name,
+      body.postal_code,
+      body.fiscal_regime,
+      body.name,
+      body.cellphone,
+      body.email,
       body.id_client,
     );
     const httpResponseFormatter = new httpFormatter();
@@ -104,7 +107,7 @@ export class ClientsController {
   @ApiQuery({ name: 'email', required: false, type: String })
   @ApiQuery({ name: 'legal_name', required: false, type: String })
   @ApiQuery({ name: 'name', required: false, type: String })
-  @ApiOkResponse({ description: 'Standardized paginated response with clients collection.' })
+  @ApiOkResponse({ description: 'Standardized paginated response with clients collection.', type: ClientDto })
   @Get('')
   async listClients(
     @Query('limit') limit?: string,
@@ -161,7 +164,7 @@ export class ClientsController {
       required: ['id_clients'],
     },
   })
-  @ApiOkResponse({ description: 'Standardized response with retrieved clients.' })
+  @ApiOkResponse({ description: 'Standardized response with retrieved clients.', type: [ClientDto] })
   @Post('/ids')
   async retrieveClientsById(@Body() body: { id_clients: string[] }): Promise<httpControllerResponse> {
     const { id_clients } = body;
@@ -182,7 +185,7 @@ export class ClientsController {
   @Patch('/:id_client')
   async modifyClient(
     @Param('id_client') id_client: string,
-    @Body() body: Partial<ClientDto>,
+    @Body() body: ClientDto,
   ): Promise<httpControllerResponse> {
     await this.modifyClientCommand.execute(
       id_client,
@@ -219,23 +222,25 @@ export class ClientsController {
    * Input payload is mapped as command arguments and processed in the application layer.
    * Returns a standardized success response.
    */
-  @ApiOperation({ summary: 'Create location', description: 'Creates a location for a client context.' })
+  @ApiOperation({ summary: 'Create location', description: `Creates a location for a client context.
+    Notes:
+    - Client may provide an UUIDv4 for the new client otherwise the server will assign one.
+    - A new client will be always created with the status of "Prospect".` })
   @ApiOkResponse({ description: 'Standardized response with operation message.' })
   @Post('/locations')
-  async createLocation(@Body() body: Partial<LocationDto>): Promise<httpControllerResponse> {
+  async createLocation(@Body() body: CreateLocationRequestDto): Promise<httpControllerResponse> {
     await this.createLocationCommand.execute(
-      body.street!,
-      body.ext_number!,
-      body.colony!,
-      body.postal_code!,
-      body.location_name!,
-      body.latitude!,
-      body.longitude!,
-      body.status_location!,
-      body.id_creator!,
-      body.id_location_type!,
-      body.created_at!,
-      body.updated_at!,
+      body.street,
+      body.ext_number,
+      body.colony,
+      body.postal_code,
+      body.location_name,
+      body.latitude,
+      body.longitude,
+      body.id_creator,
+      body.id_location_type,
+      body.created_at,
+      body.updated_at,
       body.id_location,
       body.id_client,
       body.address_reference,
@@ -288,7 +293,7 @@ export class ClientsController {
     isArray: true,
     description: 'Location type IDs. Accepts repeated query params or comma-separated values.',
   })
-  @ApiOkResponse({ description: 'Standardized paginated response with locations collection.' })
+  @ApiOkResponse({ description: 'Standardized paginated response with locations collection.', type: [ClientDto] })
   @Get('/locations')
   async listLocations(
     @Query('limit') limit?: string,
@@ -380,7 +385,7 @@ export class ClientsController {
       required: ['id_locations'],
     },
   })
-  @ApiOkResponse({ description: 'Standardized response with retrieved locations.' })
+  @ApiOkResponse({ description: 'Standardized response with retrieved locations.', type: [LocationDto] })
   @Post('/locations/ids') 
   async retrieveLocationById(@Body() body: { id_locations: string[] }): Promise<httpControllerResponse> {
     const { id_locations } = body;
@@ -401,7 +406,7 @@ export class ClientsController {
   @Patch('/locations/:id_location')
   async modifyLocation(
     @Param('id_location') id_location: string,
-    @Body() body: Partial<LocationDto>,
+    @Body() body: UpdateLocationRequest,
   ): Promise<httpControllerResponse> {
     await this.modifyLocationCommand.execute(
       id_location,
@@ -428,10 +433,14 @@ export class ClientsController {
    * Delegates business logic to the deactivate location command.
    * Returns a standardized success response.
    */
-  @ApiOperation({ summary: 'Deactivate location', description: 'Deactivates a location by ID and deactivation type.' })
+  @ApiOperation({ summary: 'Deactivate location', description: `Deactivates a location by ID and deactivation type.
+    Deactivation reason/type:
+    - Closed: When a client ends their economical activity.
+    - Shutdown: When a client suddenly closes the business with the expectation of open in the future.
+    - Churned: When a client change to another supplied (preference).` })
   @ApiParam({ name: 'id_location', description: 'Location identifier', type: String })
   @ApiParam({ name: 'deactivation_type', description: 'Deactivation type identifier', type: String })
-  @ApiOkResponse({ description: 'Standardized response with operation message.' })
+  @ApiOkResponse({ description: `Standardized response with operation message.` })
   @Patch('/locations/:id_location/deactivate/:deactivation_type')
   async deactivateLocation(
     @Param('id_location') id_location: string,
@@ -519,7 +528,7 @@ export class ClientsController {
    * Returns a standardized success response.
    */
   @ApiOperation({ summary: 'Create location type', description: 'Creates a location type.' })
-  @ApiOkResponse({ description: 'Standardized response with operation message.' })
+  @ApiOkResponse({ description: 'Standardized response with operation message.', type: [LocationTypeDto] })
   @Post('/locations/types')
   async createLocationType(@Body() body: LocationTypeRequestDto ): Promise<httpControllerResponse> {
     await this.createLocationTypeCommand.execute(body.location_type_name);

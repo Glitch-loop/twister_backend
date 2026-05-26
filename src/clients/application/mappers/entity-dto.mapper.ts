@@ -6,7 +6,7 @@ import { Injectable } from '@nestjs/common';
 import { LocationDto } from '@/src/clients/application/dtos/location.dto';
 import { ClientDto } from '@/src/clients/application/dtos/client.dto';
 import { FurnitureDto } from '@/src/clients/application/dtos/furniture.dto';
-import { LocationNoteDto } from '@/src/clients/application/dtos/location_note.dto';
+import { LocationNoteDto } from '@/src/clients/application/dtos/location-note.dto';
 import { LocationTypeDto } from '@/src/clients/application/dtos/location-type.dto';
 
 // Entities
@@ -104,6 +104,20 @@ export class Mapper {
   }
 
 
+  // toEnum
+  toLocationStatusEnum(value: number): LOCATION_STATUS_ENUM {
+    const LOCATION_STATUS_VALUES: LOCATION_STATUS_ENUM[] =
+    Object.values(LOCATION_STATUS_ENUM).filter(
+      (value): value is LOCATION_STATUS_ENUM => typeof value === 'number',
+    );
+
+    if (!LOCATION_STATUS_VALUES.includes(value)) {
+      throw new Error(`Invalid status_location: ${value}`);
+    }
+
+    return value;
+  }
+
   // ==================== MAPPER METHODS DOMAIN OBJECT to DTO ====================
   private locationEntityToDto(domainObject: LocationEntity): LocationDto {
     const { notes } = domainObject;
@@ -141,12 +155,12 @@ export class Mapper {
       throw new Error('Invalid input for mapping to DTO');
     }
 
-    return {
-      id_location_note: domainObject.id_note,
-      note: domainObject.note,
-      id_location: domainObject.id_owner,
-      created_at: domainObject.created_at,
-    };
+    return new LocationNoteDto(
+      domainObject.id_note,
+      domainObject.note,
+      domainObject.id_owner,
+      domainObject.created_at,
+    );
   }
 
   private locationTypeObjectValueToLocationTypeDto(
@@ -156,26 +170,25 @@ export class Mapper {
       domainObject.id_location_type,
       domainObject.location_type_name,
       domainObject.created_at,
-    )
-    
+    ); 
   }
 
   private taxClientInformationEntityToClientDto(
     domainObject: TaxClientInformationEntity,
   ): ClientDto {
-    return {
-      id_client: domainObject.id_client,
-      legal_name: domainObject.legal_name,
-      postal_code: domainObject.postal_code,
-      fiscal_regime: domainObject.fiscal_regime,
-      name: domainObject.name,
-      cellphone: domainObject.cellphone,
-      email: domainObject.email,
-      created_at: domainObject.created_at,
-      updated_at: domainObject.updated_at,
-    };
-  }
-
+    return new ClientDto(
+      domainObject.id_client,
+      domainObject.legal_name,
+      domainObject.postal_code,
+      domainObject.fiscal_regime,
+      domainObject.name,
+      domainObject.cellphone,
+      domainObject.email,
+      domainObject.created_at,
+      domainObject.updated_at,
+    );
+  };
+  
   // ==================== MAPPER METHODS DTO to DOMAIN OBJECT ====================
   private clientDtoToTaxClientInformationEntity(dto: ClientDto): TaxClientInformationEntity {
     return new TaxClientInformationEntity(

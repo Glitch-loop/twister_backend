@@ -31,7 +31,6 @@ export class CreateLocationCommand {
     _location_name: string,
     _latitude: string,
     _longitude: string,
-    _status_location: number,
     _id_creator: string,
     _id_location_type: string,
     _created_at: Date,

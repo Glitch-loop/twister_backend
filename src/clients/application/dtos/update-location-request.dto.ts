@@ -1,8 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-import { LocationNoteDto } from '@/src/clients/application/dtos/location-note.dto';
-
-export class LocationDto {
+export class UpdateLocationRequest {
   @ApiProperty({ type: String, example: 'f4c9b6fd-3d5a-4f4f-9c5a-5f2c0e2ebc41' })
   public readonly id_location: string;
 
@@ -53,9 +51,6 @@ export class LocationDto {
   })
   public readonly updated_at: Date;
 
-  @ApiProperty({ type: Object, isArray: true, example: [] })
-  public readonly notes: LocationNoteDto[];
-
   @ApiPropertyOptional({ type: String, example: 'Near the rear entrance' })
   public readonly address_reference?: string;
 
@@ -74,7 +69,6 @@ export class LocationDto {
     id_location_type: string,
     created_at: Date,
     updated_at: Date,
-    notes: LocationNoteDto[],
     address_reference?: string,
   ) {
     this.id_location = id_location;
@@ -91,7 +85,6 @@ export class LocationDto {
     this.id_location_type = id_location_type;
     this.created_at = created_at;
     this.updated_at = updated_at;
-    this.notes = notes;
     this.address_reference = address_reference;
   }
 }

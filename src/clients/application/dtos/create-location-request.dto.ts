@@ -1,8 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-import { LocationNoteDto } from '@/src/clients/application/dtos/location-note.dto';
-
-export class LocationDto {
+export class CreateLocationRequestDto {
   @ApiProperty({ type: String, example: 'f4c9b6fd-3d5a-4f4f-9c5a-5f2c0e2ebc41' })
   public readonly id_location: string;
 
@@ -27,9 +25,6 @@ export class LocationDto {
   @ApiProperty({ type: String, example: '-99.133209' })
   public readonly longitude: string;
 
-  @ApiProperty({ type: Number, example: 1 })
-  public readonly status_location: number;
-
   @ApiProperty({ type: String, example: 'a188c43a-0397-474a-a3ce-b4ee041a1cc5' })
   public readonly id_creator: string;
 
@@ -53,9 +48,6 @@ export class LocationDto {
   })
   public readonly updated_at: Date;
 
-  @ApiProperty({ type: Object, isArray: true, example: [] })
-  public readonly notes: LocationNoteDto[];
-
   @ApiPropertyOptional({ type: String, example: 'Near the rear entrance' })
   public readonly address_reference?: string;
 
@@ -74,7 +66,6 @@ export class LocationDto {
     id_location_type: string,
     created_at: Date,
     updated_at: Date,
-    notes: LocationNoteDto[],
     address_reference?: string,
   ) {
     this.id_location = id_location;
@@ -85,13 +76,11 @@ export class LocationDto {
     this.location_name = location_name;
     this.latitude = latitude;
     this.longitude = longitude;
-    this.status_location = status_location;
     this.id_creator = id_creator;
     this.id_client = id_client;
     this.id_location_type = id_location_type;
     this.created_at = created_at;
     this.updated_at = updated_at;
-    this.notes = notes;
     this.address_reference = address_reference;
   }
 }
