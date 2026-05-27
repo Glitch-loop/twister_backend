@@ -6,7 +6,6 @@ export const isWorkDayOperationHistoricEntity = (value: unknown): value is WorkD
   return (
     typeof value.id_work_day_operation === 'string' &&
     typeof value.id_operation_type === 'string' &&
-    value.created_at instanceof Date &&
     typeof value.id_work_day === 'string' &&
     (value.id_client === undefined || typeof value.id_client === 'string') &&
     (value.id_route_transaction === undefined || typeof value.id_route_transaction === 'string') &&

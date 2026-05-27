@@ -9,8 +9,6 @@ export const isWorkDayModel = (value: unknown): value is WorkDayModel => {
 
   return (
     typeof value.id_work_day === 'string' &&
-    value.start_date instanceof Date &&
-    (value.finish_date === undefined || value.finish_date instanceof Date) &&
     typeof value.id_route === 'string' &&
     typeof value.start_petty_cash === 'number' &&
     (value.final_petty_cash === undefined || typeof value.final_petty_cash === 'number') &&
