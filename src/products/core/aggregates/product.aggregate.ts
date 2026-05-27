@@ -175,9 +175,13 @@ export class ProductAggregate {
 
   removePrice(id_product_price: string): ProductPriceObjectValue {
     if (this._product === null) throw new BusinessRuleException('Product is not initialized.');
+    
+    // Business rule: Product must be actice.
     if (this._product.product_status === PRODUCT_STATUS_ENUM.INACTIVE) 
       throw new BusinessRuleException(`Cannot perform this operation. Product "${this._product.id_product}" is inactive.`);
     const index = this._prices.findIndex((p) => p.id_product_price === id_product_price);
+    
+    // Data integrity: Price to remove must belong to this product.
     if (index === -1) {
       throw new BusinessRuleException(
         `Price with id "${id_product_price}" does not exist on this product.`,
