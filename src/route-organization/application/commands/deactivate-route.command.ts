@@ -47,16 +47,11 @@ export class DeactivateRouteCommand {
       assignations.push(assignation);
       assignationsByRouteDay.set(assignation.id_route_day, assignations);
     }
-
-    console.log("Assignation by route day: ", assignationsByRouteDay)
     
-
     for (const routeDayEntity of routeDayEntities) {
       const { id_route_day } = routeDayEntity;
       const assignations: AssignedRouteDayEntity[] = assignationsByRouteDay.get(id_route_day) ?? [];
       const routeDayAggregate = new RouteDayAggregate(routeDayEntity, assignations);
-      console.log("routeDayEntity: ", routeDayEntity)
-      console.log("assignations: ", assignations)
       for (const assignation of assignations) {
         // All assignations for this particular route day must be removed from the route day
         assignationsToDelete.push(
@@ -69,7 +64,6 @@ export class DeactivateRouteCommand {
     const deactivatedRoute = routeAggregate.deactivateRoute();
     
     // Persist changes
-    console.log("Assignation to delete: ", assignationsToDelete)
     await this.routeRepository.removeRouteDayAssignation(assignationsToDelete);
 
     await this.routeRepository.updateRoute(id_route, {

@@ -91,42 +91,6 @@ this behavior is needed.`,
 		return httpResponseFormatter.createResponse('Route created successfully');
 	}
 
-	
-	@ApiOperation({
-		summary: 'Assign route day to vendor',
-		description: `Assigns one route day to a vendor, optionally with an expiration date.
-If user don't set an expiration date for a route day assignation, it is considered that
-that route day was assigned to the vendor (his default route).`,
-	})
-	@ApiParam({ name: 'id_route_day', description: 'Route day identifier', type: String })
-	@ApiParam({ name: 'id_user', description: 'Vendor user identifier', type: String })
-	@ApiBody({
-		schema: {
-			type: 'object',
-			properties: {
-				expired_at: { type: 'string', format: 'date-time', example: '2026-05-30T17:00:00.000Z' },
-			},
-		},
-	})
-	@ApiOkResponse({ description: 'Standardized response with operation message.' })
-	@Patch('/routes/days/:id_route_day/assign/:id_user')
-	async assignRouteDayToVendor(
-		@Param('id_route_day') id_route_day: string,
-		@Param('id_user') id_user: string,
-		@Body() body: { expired_at?: Date },
-	): Promise<httpControllerResponse> {
-
-		await this.assignRouteToVendorCommand.execute(
-			id_user,
-			id_route_day,
-			body ? body.expired_at : undefined,
-		);
-
-		const httpResponseFormatter = new httpFormatter();
-		return httpResponseFormatter.createResponse('Route day assigned successfully');
-	}
-
-
 	@ApiOperation({
 		summary: 'Update route',
 		description: 'Updates route information by route identifier.',
@@ -155,7 +119,7 @@ that route day was assigned to the vendor (his default route).`,
 	})
 	@ApiQuery({ name: 'route_name', required: false, type: String, description: 'Filter by route name.' })
 	@ApiQuery({ name: 'route_status', required: false, type: String, description: 'Filter by route status (numeric enum).' })
-	@ApiOkResponse({ description: 'Standardized response with routes collection.' })
+	@ApiOkResponse({ description: 'Standardized response with routes collection.', type: RouteDto })
 	@Get('/routes')
 	async listRoutes(
 		@Query('route_name') route_name?: string,
@@ -184,7 +148,7 @@ that route day was assigned to the vendor (his default route).`,
 			required: ['id_routes'],
 		},
 	})
-	@ApiOkResponse({ description: 'Standardized response with route days collection.' })
+	@ApiOkResponse({ description: 'Standardized response with route days collection.', type: RouteDayDto })
 	@Post('/routes/days/routes/ids')
 	async listRouteDaysByRouteIds(
 		@Body() body: { id_routes: string[] },
@@ -211,7 +175,7 @@ that route day was assigned to the vendor (his default route).`,
 			required: ['id_route_days'],
 		},
 	})
-	@ApiOkResponse({ description: 'Standardized response with retrieved route days.' })
+	@ApiOkResponse({ description: 'Standardized response with retrieved route days.', type: RouteDto })
 	@Post('/routes/days/ids')
 	async retrieveRouteDayByRouteDayId(
 		@Body() body: { id_route_days: string[] },
@@ -242,7 +206,7 @@ that route day was assigned to the vendor (his default route).`,
 			required: ['id_users'],
 		},
 	})
-	@ApiOkResponse({ description: 'Standardized response with assigned route days.' })
+	@ApiOkResponse({ description: 'Standardized response with assigned route days.', type: RouteDto })
 	@Post('/routes/days/users/ids')
 	async retrieveRouteDayAsignedToUser(
 		@Body() body: { id_users: string[] },
@@ -279,6 +243,40 @@ that route day was assigned to the vendor (his default route).`,
 
 		const httpResponseFormatter = new httpFormatter();
 		return httpResponseFormatter.createResponse('Route reactivated successfully');
+	}
+
+		@ApiOperation({
+		summary: 'Assign route day to vendor',
+		description: `Assigns one route day to a vendor, optionally with an expiration date.
+If user don't set an expiration date for a route day assignation, it is considered that
+that route day was assigned to the vendor (his default route).`,
+	})
+	@ApiParam({ name: 'id_route_day', description: 'Route day identifier', type: String })
+	@ApiParam({ name: 'id_user', description: 'Vendor user identifier', type: String })
+	@ApiBody({
+		schema: {
+			type: 'object',
+			properties: {
+				expired_at: { type: 'string', format: 'date-time', example: '2026-05-30T17:00:00.000Z' },
+			},
+		},
+	})
+	@ApiOkResponse({ description: 'Standardized response with operation message.' })
+	@Patch('/routes/days/:id_route_day/assign/:id_user')
+	async assignRouteDayToVendor(
+		@Param('id_route_day') id_route_day: string,
+		@Param('id_user') id_user: string,
+		@Body() body: { expired_at?: Date },
+	): Promise<httpControllerResponse> {
+
+		await this.assignRouteToVendorCommand.execute(
+			id_user,
+			id_route_day,
+			body ? body.expired_at : undefined,
+		);
+
+		const httpResponseFormatter = new httpFormatter();
+		return httpResponseFormatter.createResponse('Route day assigned successfully');
 	}
 
 	@ApiOperation({

@@ -1,7 +1,12 @@
-
-import { RouteDayEntity } from '@/src/route-organization/core/entities/route-day.entity';
+// Object values
 import { RouteDayLocationObjectValue } from '@/src/route-organization/core/value-objects/route-day-location.object-value';
-import { AssignedRouteDayEntity } from '../entities/assigned-route-day.entity';
+
+// Entities
+import { RouteDayEntity } from '@/src/route-organization/core/entities/route-day.entity';
+import { AssignedRouteDayEntity } from '@/src/route-organization/core/entities/assigned-route-day.entity';
+
+// Errors
+import { BusinessRuleException } from '@/src/route-organization/errors/BusinessRuleException';
 
 export default class RouteDayAggregate {
   private _routeDay: RouteDayEntity | null = null;
@@ -13,7 +18,7 @@ export default class RouteDayAggregate {
       private readonly _routeDayParam: RouteDayEntity | null, 
       private readonly _assignations: AssignedRouteDayEntity[]) {
         if(_routeDayParam === null && _assignations.length > 0) {
-            throw new Error(
+            throw new BusinessRuleException(
                 `Invalid route day assignations. Route day has not been initialized.`,
             );
         }
@@ -24,7 +29,7 @@ export default class RouteDayAggregate {
             for (const location of locations) {
                 const { id_location, id_owner } = location;
                 if (id_owner !== id_route_day) {
-                    throw new Error(
+                    throw new BusinessRuleException(
                         `Invalid location with id ${id_location} for route day with id ${id_route_day}. The location's owner id ${id_owner} does not match the route day id ${id_route_day}.`,
                     );
                 }
@@ -44,8 +49,6 @@ export default class RouteDayAggregate {
 
             // Verify all the assignations belongs to this route day
             for (const assignation of _assignations) {
-              
-
               if (assignation.id_route_day === id_route_day) {
                 this._assignedVendors.push(
                   new AssignedRouteDayEntity(
@@ -57,7 +60,7 @@ export default class RouteDayAggregate {
                   )
                 );
               } else {
-                throw new Error(
+                throw new BusinessRuleException(
                   `Invalid route day assignation: ${assignation.id_assigned_route_day}. This assingation is not assigend to the route day: ${id_route_day}.`,
                 )
               }
@@ -72,7 +75,7 @@ export default class RouteDayAggregate {
     }
 
     public removeStoreFromRouteDay(idRouteDayStore: string): void {
-      if (this._routeDay === null) throw new Error('Route day not initialized');
+      if (this._routeDay === null) throw new BusinessRuleException('Route day not initialized');
       
       const orderedLocations = [...this._routeDayLocations].sort((a, b) => a.position_in_route - b.position_in_route);
       const filteredLocations = orderedLocations.filter(
@@ -123,6 +126,9 @@ export default class RouteDayAggregate {
     }
 
     public organizeRouteDayStores(locations: RouteDayLocationObjectValue[]): RouteDayEntity {
+      /*
+        TODO: The user must not necessarily provide the UUID for the location in the route
+      */
       if (this._routeDay === null) throw new Error('Route day not initialized');
 
       const { id_route_day } = this._routeDay;
@@ -154,19 +160,31 @@ export default class RouteDayAggregate {
     public assignRouteDayToUser(id_assignation: string, id_user: string, expired_at: Date | undefined): AssignedRouteDayEntity {
       if (this._routeDay === null) throw new Error('Route day not initialized');
 
-      /*
-        Business rule
-        A user can be assigned to a route day only once.
-      */
+      const { id_route_day } = this._routeDay;
 
-      const alreadyAssigned = this._assignedVendors.some(
-        (assignation) => assignation.id_user === id_user,
-      );
+      // Business rule: An user can be assigned to a route day only once (no matter if it is a temporal or permanent assignation).
+      const isUserAlreadyAssigned:boolean = this._assignedVendors
+      .some((routeAssignation) => { return routeAssignation.id_route_day === id_route_day && routeAssignation.id_user === id_user });
 
-      if (alreadyAssigned) {
-        throw new Error(`User with id ${id_user} is already assigned to route day with id ${this._routeDay.id_route_day}.`);
+      if (isUserAlreadyAssigned) {
+        throw new BusinessRuleException(`Route day with id ${id_route_day} is already assigned to user ${id_user}.`);
       }
 
+
+      if (expired_at === undefined) {
+        // Business rule: A route day only can have 1 permanent assignament.
+        // Note: Following the business rule, therefore, a route day might have several temporal assignations.
+        const isPermanentUserAlreadyAssigned:boolean = this._assignedVendors
+          .some((routeAssignation) => { 
+            return (routeAssignation.id_route_day === id_route_day 
+                && routeAssignation.expired_at === undefined
+              )
+          })
+        
+        if (isPermanentUserAlreadyAssigned) {
+          throw new BusinessRuleException(`A route day can only have one permanent assignation.`);
+        }
+      }
       
       const newAssignation:AssignedRouteDayEntity = new AssignedRouteDayEntity(
         id_assignation,
@@ -176,12 +194,9 @@ export default class RouteDayAggregate {
         expired_at,
       );
 
-      this._assignedVendors.push(
-        newAssignation
-      );
+      this._assignedVendors.push(newAssignation);
 
       return newAssignation;
-
     }
 
     public unassignAssignationFromRouteDay(id_assigned_route_day) {
