@@ -6,27 +6,28 @@ description: This prompt is used when the user wants to create a new Supabase im
 This prompt is used when the user asks for implementing a repository using supabase as datasource.
 
 # Input:
+- You'll recieve the module where you are going to create the implementation.
 - You'll recieve the name of the repository to implement.
 - Schema of the database table that are implied in the implementation of the repository.
 
 > Remember the schema will be used in a typescript application. So you have to define the schema in typescript.
 
 # Steps to follow:
-* You have to locate the repository file, you'll find it in `@/src/infrastructure/repositories/supabase`..
+* You have to locate the repository file, you'll find it in `@/src/<module name>/infrastructure/repositories/supabase`..
 * Understand the repository and its methods that you have to implement.
 * Identify the domain object that are implied
-- entities `src/core/entities`
-- object values `src/core/object-values` 
-- enums `src/core/enums` that are implied.
-- models `src/application/models` that are implied.
+- entities `src/<module name>/core/entities`
+- object values `src/<module name>/core/object-values` 
+- enums `src/<module name>/core/enums` that are implied.
+- models `src/<module name>/application/models` that are implied.
   - If an entity is composed by object values, enums or other entities, you must find and understand them before making any implementation.
-* Once you have identified all the domain objects that compound the repository, you have to find the "tables" that are implied `src/infrastructure/postgres/schema`.  
+* Once you have identified all the domain objects that compound the repository, you have to find the "tables" that are implied `src/shared/infrastructure/postgres/schema`.  
 * Once you have the table schema and domain object understood, you are going to implement the repository using supabase as datasource.
 - The implementation will have 2 dependencies:
-- `SupabaseDataSource` located at `src/infrastructure/datasources/supabase/supabase.datasource.ts` and the `Mapper` located at `src/application/mappers/mapper.ts`.
+- `SupabaseDataSource` located at `src/shared/infrastructure/datasources/supabase/supabase.datasource.ts` and the `Mapper` located at `src/application/mappers/mapper.ts`.
 * Once you have created the method to get the supabase client, you can start implementing the methods of the repository.
 * Remember each method implementation should be wrapped in a try catch block, and in case of an error, you should throw an error with a descriptive message of what happened.
-* You'll locate the file with the implementation at `src/infrastructure/repositories/supabase` and the file name should be the name of the repository + `-supabase` and `.repository.ts` . i.e. if the repository is `ClientRepository` the file name should be `client-supabase.repository.ts`.
+* You'll locate the file with the implementation at `src/<module name>/infrastructure/repositories/supabase` and the file name should be the name of the repository + `-supabase` and `.repository.ts` . i.e. if the repository is `ClientRepository` the file name should be `client-supabase.repository.ts`.
 
 Example: 
 # Input
@@ -35,14 +36,14 @@ The tables that are implied are:
 - clients
 
 # Process
-1. I need to implement a repository called `ClientRepository` using supabase as datasource. This is located at `src/infrastructure/repositories/ClientRepository.ts`.
+1. I need to implement a repository called `ClientRepository` using supabase as datasource. This is located at `src/<module name>/infrastructure/repositories/ClientRepository.ts`.
 2. I see that the methods that I have to implement are: `createClient`, `getClientById`, `updateClient`, `deleteClient` and `listClients`. 
-  - I need to identify the domain object that are implied in the repository. I see that the main entity is `ClientEntity` located at `src/core/entities/clientEntity.ts`. I need to understand this entity before making any implementation.
+  - I need to identify the domain object that are implied in the repository. I see that the main entity is `ClientEntity` located at `src/<module name>/core/entities/clientEntity.ts`. I need to understand this entity before making any implementation.
   - I see that `ClientEntity` is composed by the following attributes: `id_client`, `legal_name`, `postal_code`, `fiscal_regime`, `name`, `cellphone`, `email`, `created_at` and `updated_at`. I need to understand each of these attributes and their types before making any implementation.
   - I see that `ClientEntity` has a relation with `LocationEntity` through the attribute `id_client`, I need to understand `LocationEntity` before making any implementation.
   - I see that `LocationEntity` has a relation with `LocationTypeEnum` through the attribute `type`, I need to understand `LocationTypeEnum` before making any implementation.
   - Once I have understood the entity and its relations, I need to find the tables schema that are implied in the implementation according to the user's input. According to users input the tables implied are `locations`, `furnitures`, `location_notes` and `location_types`.
-  I consult the file located at `src/infrastructure/postgres/schema/locationSchema.ts`. I found: 
+  I consult the file located at `src/shared/infrastructure/postgres/schema/locationSchema.ts`. I found: 
   ```
     CREATE TABLE public.locations (
       id_location uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -93,11 +94,11 @@ The tables that are implied are:
 At the end I'll have a complete implementation of the repository using supabase as datasource, and I can move on to the next task.
 ```typescript
 import { Injectable } from '@nestjs/common';
-import { ClientRepository } from '@/src/core/Interfaces/client.repository';
-import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
-import { Mapper } from '@/src/application/mappers/mapper';
-import { TaxClientInformationEntity } from '@/src/core/entities/tax-client-information.entity';
-import { ClientModel } from '@/src/application/models/client.model';
+import { ClientRepository } from '@/src/clients/core/Interfaces/client.repository';
+import { SupabaseDataSource } from '@/src/shared/infrastructure/datasources/supabase-data-source';
+import { Mapper } from '@/src/clients/application/mappers/mapper';
+import { TaxClientInformationEntity } from '@/src/clients/core/entities/tax-client-information.entity';
+import { ClientModel } from '@/src/clients/application/models/client.model';
 
 @Injectable()
 export class ClientSupabase implements ClientRepository {
