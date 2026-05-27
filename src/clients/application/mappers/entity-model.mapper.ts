@@ -29,7 +29,7 @@ import { LocationNoteModel } from '@/src/clients/application/models/location-not
 import { isFurnitureEntity } from '@/src/clients/application/guards/entities/furniture.guard';
 import { isLocationEntity } from '@/src/clients/application/guards/entities/location.guard';
 import { isTaxClientInformationEntity } from '@/src/clients/application/guards/entities/tax-client-information.guard';
-import { isNoteObjectValue } from '@/src/application/guards/object-values/note.guard';
+import { isNoteObjectValue } from '@/src/business-operation-route/application/guards/object-values/note.guard';
 
 // Models guards
 import { isFurnitureModel } from '@/src/clients/application/guards/models/furniture.guard';

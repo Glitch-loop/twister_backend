@@ -1,4 +1,4 @@
-import type { WorkDayOperationHistoricEntity } from '@/src/core/entities/work-day-operation-historic.entity';
+import type { WorkDayOperationHistoricEntity } from '@/src/business-operation-route/core/entities/work-day-operation-historic.entity';
 import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isWorkDayOperationHistoricEntity = (value: unknown): value is WorkDayOperationHistoricEntity => {

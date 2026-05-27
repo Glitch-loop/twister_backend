@@ -31,7 +31,7 @@ import { UserModel } from '@/src/users/application/models/user.model';
 import { isDayEntity } from '@/src/route-organization/application/guards/entities/day.guard';
 import { isLocationEntity } from '@/src/clients/application/guards/entities/location.guard';
 import { isTaxClientInformationEntity } from '@/src/clients/application/guards/entities/tax-client-information.guard';
-import { isNoteObjectValue } from '@/src/application/guards/object-values/note.guard';
+import { isNoteObjectValue } from '@/src/business-operation-route/application/guards/object-values/note.guard';
 import { isUserEntity } from '@/src/users/application/guards/entities/user.guard';
 
 // Models guards

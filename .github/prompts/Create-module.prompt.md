@@ -28,6 +28,7 @@ User will provide you with the following information:
       - `object-values` folder: This folder will contain the object values for the guards.
     - `mappers` folder: This folder will contain the mappers for the module.
     - `queries` folder: This folder will contain the query handlers for the module.
+    - `models` folder: This folder will contain the models that represent database table for the module.
   - `core` folder: This folder will contain the core layer of the module, including aggregates, entities, repositories, and value objects.
     - `aggregates` folder: This folder will contain the aggregate roots for the module.
     - `constants` folder: This folder will contain the constants for the module.

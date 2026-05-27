@@ -1,4 +1,4 @@
-import type { WorkDayEntity } from '@/src/core/entities/work-day.entity';
+import type { WorkDayEntity } from '@/src/business-operation-route/core/entities/work-day.entity';
 import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isWorkDayEntity = (value: unknown): value is WorkDayEntity => {

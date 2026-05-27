@@ -1,4 +1,4 @@
-import type { MeasurementUnitModel } from '@/src/application/models/measurement-unit.model';
+import type { MeasurementUnitModel } from '@/src/products/application/models/measurement-unit.model';
 
 import { isRecord } from '@/src/shared/application/guards/utils';
 
