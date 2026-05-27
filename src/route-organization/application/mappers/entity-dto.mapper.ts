@@ -5,6 +5,7 @@ import { Injectable } from '@nestjs/common';
 import { ROUTE_STATUS_ENUM } from '@/src/route-organization/core/enums/route-status.enum';
 
 // Dtos
+import { AssignRouteDayToVendorDto } from '@/src/route-organization/application/dtos/assign-route-day-to-vendor.dto';
 import { RouteDayLocationProposalDto } from '@/src/route-organization/application/dtos/route-day-location-proposal.dto';
 import { RouteDayLocationDto } from '@/src/route-organization/application/dtos/route-day-location.dto';
 import { RouteDayProposalDto } from '@/src/route-organization/application/dtos/route-day-proposal.dto';
@@ -12,6 +13,7 @@ import { RouteDayDto } from '@/src/route-organization/application/dtos/route-day
 import { RouteDto } from '@/src/route-organization/application/dtos/route.dto';
 
 // Entities
+import { AssignedRouteDayEntity } from '@/src/route-organization/core/entities/assigned-route-day.entity';
 import { RouteDayEntity } from '@/src/route-organization/core/entities/route-day.entity';
 import { RouteDayProposalEntity } from '@/src/route-organization/core/entities/route-day-proposal.entity';
 import { RouteEntity } from '@/src/route-organization/core/entities/route.entity';
@@ -23,12 +25,14 @@ import { RouteDayLocationObjectValue } from '@/src/route-organization/core/value
 import { RouteDayModel } from '@/src/route-organization/application/models/route-day.model';
 
 // Dtos guards
+import { isAssignRouteDayToVendorDto } from '@/src/route-organization/application/guards/dtos/assign-route-day-to-vendor.guard';
 import { isRouteDayLocationProposalDto } from '@/src/route-organization/application/guards/dtos/route-day-location-proposal.guard';
 import { isRouteDayProposalDto } from '@/src/route-organization/application/guards/dtos/route-day-proposal.guard';
 import { isRouteDayDto } from '@/src/route-organization/application/guards/dtos/route-day.guard';
 import { isRouteDto } from '@/src/route-organization/application/guards/dtos/route.guard';
 
 // Entities guards
+import { isAssignedRouteDayEntity } from '@/src/route-organization/application/guards/entities/assigned-route-day.guard';
 import { isRouteDayEntity } from '@/src/route-organization/application/guards/entities/route-day.guard';
 import { isRouteDayProposalEntity } from '@/src/route-organization/application/guards/entities/route-day-proposal.guard';
 import { isRouteEntity } from '@/src/route-organization/application/guards/entities/route.guard';
@@ -39,14 +43,19 @@ export class Mapper {
 
 	// ==================== OVERLOADED FUNCTIONS FOR MAPPING ====================
 	// toDomainObject overloads
+	toDomainObject(dto: AssignRouteDayToVendorDto): AssignedRouteDayEntity;
 	toDomainObject(dto: RouteDayLocationProposalDto, idOwner: string): RouteDayLocationObjectValue;
 	toDomainObject(dto: RouteDayProposalDto): RouteDayProposalEntity;
 	toDomainObject(dto: RouteDayDto): RouteDayEntity;
 	toDomainObject(dto: RouteDto): RouteEntity;
 	toDomainObject(
-		dto: RouteDayLocationProposalDto | RouteDayProposalDto | RouteDayDto | RouteDto,
+		dto: AssignRouteDayToVendorDto | RouteDayLocationProposalDto | RouteDayProposalDto | RouteDayDto | RouteDto,
 		idOwner?: string,
-	): RouteDayLocationObjectValue | RouteDayProposalEntity | RouteDayEntity | RouteEntity {
+	): AssignedRouteDayEntity | RouteDayLocationObjectValue | RouteDayProposalEntity | RouteDayEntity | RouteEntity {
+		if (isAssignRouteDayToVendorDto(dto)) {
+			return this.assignRouteDayToVendorDtoToDomainObject(dto);
+		}
+
 		if (isRouteDayLocationProposalDto(dto) && typeof idOwner === 'string') {
 			return this.routeDayLocationProposalDtoToDomainObject(dto, idOwner);
 		}
@@ -67,15 +76,20 @@ export class Mapper {
 	}
 
 	// toDto overloads
+	toDto(domainObject: AssignedRouteDayEntity): AssignRouteDayToVendorDto;
 	toDto(domainObject: RouteDayLocationObjectValue, asProposalDto: true): RouteDayLocationProposalDto;
 	toDto(domainObject: RouteDayLocationObjectValue): RouteDayLocationDto;
 	toDto(domainObject: RouteDayProposalEntity, proposalLocations: RouteDayLocationObjectValue[]): RouteDayProposalDto;
 	toDto(domainObject: RouteDayEntity): RouteDayDto;
 	toDto(domainObject: RouteEntity): RouteDto;
 	toDto(
-		domainObject: RouteDayLocationObjectValue | RouteDayProposalEntity | RouteDayEntity | RouteEntity,
+		domainObject: AssignedRouteDayEntity | RouteDayLocationObjectValue | RouteDayProposalEntity | RouteDayEntity | RouteEntity,
 		metadata?: boolean | RouteDayLocationObjectValue[],
-	): RouteDayLocationProposalDto | RouteDayLocationDto | RouteDayProposalDto | RouteDayDto | RouteDto {
+	): AssignRouteDayToVendorDto | RouteDayLocationProposalDto | RouteDayLocationDto | RouteDayProposalDto | RouteDayDto | RouteDto {
+		if (isAssignedRouteDayEntity(domainObject)) {
+			return this.assignedRouteDayDomainObjectToDto(domainObject);
+		}
+
 		if (domainObject instanceof RouteDayLocationObjectValue) {
 			if (metadata === true) {
 				return this.routeDayLocationDomainObjectToRouteDayLocationProposalDto(domainObject);
@@ -161,6 +175,20 @@ export class Mapper {
 	}
 
 	// ==================== MAPPER METHODS DTO to DOMAIN OBJECT ====================
+	private assignRouteDayToVendorDtoToDomainObject(dto: AssignRouteDayToVendorDto): AssignedRouteDayEntity {
+		if (!dto.id_assigned_route_day) {
+			throw new Error('id_assigned_route_day is required for mapping AssignRouteDayToVendorDto to AssignedRouteDayEntity');
+		}
+
+		return new AssignedRouteDayEntity(
+			dto.id_assigned_route_day,
+			new Date(),
+			dto.id_route_day,
+			dto.id_user,
+			dto.expired_at,
+		);
+	}
+
 	private routeDayDtoToDomainObject(dto: RouteDayDto): RouteDayEntity {
 		return new RouteDayEntity(
 			dto.id_route_day,
@@ -204,6 +232,15 @@ export class Mapper {
 			dto.proposal_name,
 			dto.created_at instanceof Date ? dto.created_at : new Date(dto.created_at),
 			dto.id_route_day,
+		);
+	}
+
+	private assignedRouteDayDomainObjectToDto(domainObject: AssignedRouteDayEntity): AssignRouteDayToVendorDto {
+		return new AssignRouteDayToVendorDto(
+			domainObject.id_route_day,
+			domainObject.id_user,
+			domainObject.id_assigned_route_day,
+			domainObject.expired_at,
 		);
 	}
 

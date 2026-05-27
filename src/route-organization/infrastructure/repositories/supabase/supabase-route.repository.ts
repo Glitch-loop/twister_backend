@@ -176,7 +176,7 @@ export class SupabaseRouteRepository implements RouteRepository {
       const { error } = await this.supabase
         .from('assigned_route_days')
         .delete()
-        .in('id_route_day', assignationToDelete);
+        .in('id_assigned_route_day', assignationToDelete);
       
       if (error) {
         throw new Error(`Failed to unassign route day from vendor: ${error.message}`);
@@ -285,6 +285,7 @@ export class SupabaseRouteRepository implements RouteRepository {
   }
 
   async retrieveRouteDay(idRetrieveRouteDays: string[]): Promise<RouteDayEntity[]> {
+    console.log("IDS: ", idRetrieveRouteDays)
     if (idRetrieveRouteDays.length === 0) {
       return [];
     }
@@ -294,7 +295,7 @@ export class SupabaseRouteRepository implements RouteRepository {
         .from('route_days')
         .select('*')
         .in('id_route_day', idRetrieveRouteDays);
-
+      
       if (error) {
         throw new Error(`Failed to retrieve route days: ${error.message}`);
       }
@@ -428,7 +429,7 @@ export class SupabaseRouteRepository implements RouteRepository {
       if (error) {
         throw new Error(`Failed to retrieve route days locations by route day id: ${error.message}`);
       }
-      return data.map((assignation) => this.mapper.toDomainObject(assignation));
+      return data.map((assignation:AssignedRouteDayModel) => this.mapper.toDomainObject(assignation));
 
     } catch (error) {
       throw new Error(

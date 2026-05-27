@@ -15,7 +15,7 @@ export class RetrieveRouteDayByRouteDayIdQuery {
 	async execute(id_route_days: string[]): Promise<RouteDayDto[]> {
 		const maxIds = 100;
 		const idClientToRetreive = id_route_days.slice(0, maxIds);
-
+		console.log("Querying by route day id")
 		const routeDays: RouteDayEntity[] = await this.routeRepository.retrieveRouteDay(idClientToRetreive);
 		return routeDays.map((routeDay) => this.mapper.toDto(routeDay));
 	}

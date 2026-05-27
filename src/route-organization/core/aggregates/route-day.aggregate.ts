@@ -12,7 +12,7 @@ export default class RouteDayAggregate {
     constructor(
       private readonly _routeDayParam: RouteDayEntity | null, 
       private readonly _assignations: AssignedRouteDayEntity[]) {
-        if(_routeDayParam !== null && _assignations.length > 0) {
+        if(_routeDayParam === null && _assignations.length > 0) {
             throw new Error(
                 `Invalid route day assignations. Route day has not been initialized.`,
             );
@@ -187,7 +187,7 @@ export default class RouteDayAggregate {
     public unassignAssignationFromRouteDay(id_assigned_route_day) {
       if (this._routeDay === null) throw new Error('Route day not initialized');
       const assignationIndex: number = this._assignedVendors.findIndex(
-        (assignation) => assignation.id_user === id_assigned_route_day,
+        (assignation) => assignation.id_assigned_route_day === id_assigned_route_day,
       );
 
       if (assignationIndex === -1) {

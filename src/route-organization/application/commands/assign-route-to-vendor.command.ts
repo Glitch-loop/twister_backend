@@ -48,6 +48,11 @@ export class AssignRouteToVendorCommand {
       throw new BusinessRuleException(`Route day with id ${routeDay.id_route_day} is already assigned to user ${id_user}.`);
     }
 
+    /*
+      TODO: A route day might have assigend multiple temporal users but a single route day might have
+      multiple permanent users?
+    */
+
     const routeAggregate = new RouteAggregate(routeEntities[0]);
     routeAggregate.validateRouteIsActive();
 

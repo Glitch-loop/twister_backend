@@ -10,7 +10,6 @@ import {
 } from '@nestjs/swagger';
 
 // DTOs
-// import type { Route } from '@/src/route-organization/application/dtos/route.dto';
 import { RouteRequestDto } from './application/dtos/route-request.dto';
 import { CreateRouteDayProposalRequestDto } from '@/src/route-organization/application/dtos/create-route-day-proposal-request.dto';
 import { RouteDayDto } from '@/src/route-organization/application/dtos/route-day.dto';
@@ -217,6 +216,7 @@ that route day was assigned to the vendor (his default route).`,
 	async retrieveRouteDayByRouteDayId(
 		@Body() body: { id_route_days: string[] },
 	): Promise<httpControllerResponse> {
+		console.log(body)
 		const routeDays: RouteDayDto[] = await this.retrieveRouteDayByRouteDayIdQuery.execute(
 			body.id_route_days ?? [],
 		);
