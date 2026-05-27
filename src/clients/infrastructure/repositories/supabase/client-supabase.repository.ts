@@ -5,7 +5,7 @@ import { Injectable } from '@nestjs/common';
 import { ClientRepository } from '@/src/clients/core/interfaces/client.repository';
 
 // Datasources
-import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
+import { SupabaseDataSource } from '@/src/shared/infrastructure/datasources/supabase-data-source';
 
 // Entities
 import { TaxClientInformationEntity } from '@/src/clients/core/entities/tax-client-information.entity';

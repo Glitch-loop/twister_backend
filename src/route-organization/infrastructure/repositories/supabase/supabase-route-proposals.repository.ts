@@ -6,7 +6,7 @@ import { Mapper } from '@/src/route-organization/application/mappers/entity-mode
 import { RouteDayProposalEntity } from '@/src/route-organization/core/entities/route-day-proposal.entity';
 import { RouteProposalRepository } from '@/src/route-organization/core/interfaces/route-proposals.repository';
 import { RouteDayLocationObjectValue } from '@/src/route-organization/core/value-objects/route-day-location.object-value';
-import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
+import { SupabaseDataSource } from '@/src/shared/infrastructure/datasources/supabase-data-source';
 
 @Injectable()
 export class SupabaseRouteProposalsRepository implements RouteProposalRepository {

@@ -4,7 +4,7 @@ dotenv.config();
 
 import { randomUUID } from 'crypto';
 import { UserSupabaseRepository } from '@/src/users/infrastructure/repositories/supabase/user-supabase.repository';
-import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
+import { SupabaseDataSource } from '@/src/shared/infrastructure/datasources/supabase-data-source';
 import { Mapper } from '@/src/application/mappers/entity-model.mapper';
 import { UserEntity } from '@/src/users/core/entities/user.entity';
 

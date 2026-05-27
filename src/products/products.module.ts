@@ -8,7 +8,7 @@ import { ProductRepository } from '@/src/products/core/interfaces/ProductReposit
 import { SupabaseProductRepository } from '@/src/products/infrastructure/repositories/supabase/SupabaseProductRepository';
 
 // Datasources
-import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
+import { SupabaseDataSource } from '@/src/shared/infrastructure/datasources/supabase-data-source';
 
 // Mappers
 import { Mapper } from '@/src/products/application/mappers/entity-model.mapper';

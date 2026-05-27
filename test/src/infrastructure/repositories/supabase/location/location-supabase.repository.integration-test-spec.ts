@@ -4,7 +4,7 @@ dotenv.config();
 
 import { randomUUID } from 'crypto';
 import { LocationSupabaseRepository } from '@/src/clients/infrastructure/repositories/supabase/location-supabase.repository';
-import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
+import { SupabaseDataSource } from '@/src/shared/infrastructure/datasources/supabase-data-source';
 import { Mapper } from '@/src/application/mappers/entity-model.mapper';
 import { LocationEntity } from '@/src/clients/core/entities/location.entity';
 import { LocationTypeObjectValue } from '@/src/core/object-values/location-type.object-value';

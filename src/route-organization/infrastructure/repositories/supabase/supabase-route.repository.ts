@@ -14,7 +14,7 @@ import { DayEntity } from '@/src/route-organization/core/entities/day.entity';
 import { RouteDayLocationObjectValue } from '@/src/route-organization/core/value-objects/route-day-location.object-value';
 
 // Datasources
-import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
+import { SupabaseDataSource } from '@/src/shared/infrastructure/datasources/supabase-data-source';
 
 // Models
 import { RouteModel } from '@/src/route-organization/application/models/route.model';

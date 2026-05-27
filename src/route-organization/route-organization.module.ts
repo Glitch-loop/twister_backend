@@ -10,7 +10,7 @@ import { SupabaseRouteRepository } from '@/src/route-organization/infrastructure
 import { SupabaseRouteProposalsRepository } from '@/src/route-organization/infrastructure/repositories/supabase/supabase-route-proposals.repository';
 
 // Datasources
-import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
+import { SupabaseDataSource } from '@/src/shared/infrastructure/datasources/supabase-data-source';
 
 // Queries
 import { RetrieveAssignedRouteDaysByIdUserQuery } from '@/src/route-organization/application/queries/retrieve-assigned-route-days-by-id-user.query';

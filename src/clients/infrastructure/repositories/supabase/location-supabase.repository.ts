@@ -19,7 +19,7 @@ import { LocationTypeModel } from '@/src/clients/application/models/location-typ
 import { FurnitureModel } from '@/src/clients/application/models/furniture.model';
 
 // Datasource
-import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
+import { SupabaseDataSource } from '@/src/shared/infrastructure/datasources/supabase-data-source';
 
 // Mappers
 import { Mapper } from '@/src/clients/application/mappers/entity-model.mapper';

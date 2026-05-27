@@ -8,7 +8,7 @@ import { UserRepository } from '@/src/users/core/interfaces/user.repository';
 import { UserSupabaseRepository } from '@/src/users/infrastructure/repositories/supabase/user-supabase.repository';
 
 // Datasources
-import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
+import { SupabaseDataSource } from '@/src/shared/infrastructure/datasources/supabase-data-source';
 
 // Commands
 import { CreateUser } from '@/src/users/application/commands/CreateUser';

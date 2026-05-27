@@ -11,7 +11,7 @@ import { UserEntity } from '@/src/users/core/entities/user.entity';
 import { UserModel } from '@/src/users/application/models/user.model';
 
 // Infrastructure
-import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
+import { SupabaseDataSource } from '@/src/shared/infrastructure/datasources/supabase-data-source';
 
 // Mappers
 import { Mapper } from '@/src/users/application/mappers/entity-model.mapper';

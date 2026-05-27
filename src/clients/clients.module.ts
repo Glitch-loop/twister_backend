@@ -10,7 +10,7 @@ import { LocationSupabaseRepository } from '@/src/clients/infrastructure/reposit
 import { ClientSupabase } from '@/src/clients/infrastructure/repositories/supabase/client-supabase.repository';
 
 // Datasources
-import { SupabaseDataSource } from '@/src/infrastructure/datasources/supabase-data-source';
+import { SupabaseDataSource } from '@/src/shared/infrastructure/datasources/supabase-data-source';
 
 // Queries
 import { ListClientsQuery } from '@/src/clients/application/queries/list-clients.query';
