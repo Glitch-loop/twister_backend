@@ -5,8 +5,8 @@ import { LOCATION_STATUS_ENUM } from '@/src/clients/core/enums/client-status.enu
 import { GENERAL_PUBLIC_CLIENT } from '@/src/clients/core/constants/client-constants';
 
 // Object values
-import { NoteObjectValue } from '@/src/core/object-values/note.object-value';
-import { LocationTypeObjectValue } from '@/src/core/object-values/location-type.object-value';
+import { NoteObjectValue } from '@/src/clients/core/object-values/note.object-value';
+import { LocationTypeObjectValue } from '@/src/clients/core/object-values/location-type.object-value';
 
 // Entities
 import { TaxClientInformationEntity } from '@/src/clients/core/entities/tax-client-information.entity';

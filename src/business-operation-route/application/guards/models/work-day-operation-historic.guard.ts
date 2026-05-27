@@ -1,4 +1,4 @@
-import type { WorkDayOperationHistoricModel } from '@/src/application/models/work-day-operation-historic.model';
+import type { WorkDayOperationHistoricModel } from '@/src/business-operation-route/application/models/work-day-operation-historic.model';
 
 import { isRecord } from '@/src/shared/application/guards/utils';
 

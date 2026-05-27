@@ -13,8 +13,8 @@ import { LocationEntity } from '@/src/clients/core/entities/location.entity';
 import { TaxClientInformationEntity } from '@/src/clients/core/entities/tax-client-information.entity';
 
 // Object values
-import { NoteObjectValue } from '@/src/core/object-values/note.object-value';
-import { LocationTypeObjectValue } from '@/src/core/object-values/location-type.object-value';
+import { NoteObjectValue } from '@/src/clients/core/object-values/note.object-value';
+import { LocationTypeObjectValue } from '@/src/clients/core/object-values/location-type.object-value';
 
 // Models
 import { FurnitureModel } from '@/src/clients/application/models/furniture.model';

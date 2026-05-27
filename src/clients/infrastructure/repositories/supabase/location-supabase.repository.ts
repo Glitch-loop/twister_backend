@@ -9,7 +9,7 @@ import { LocationEntity } from '@/src/clients/core/entities/location.entity';
 import { FurnitureEntity } from '@/src/clients/core/entities/furniture.entity';
 
 // Object values
-import { NoteObjectValue } from '@/src/core/object-values/note.object-value';
+import { NoteObjectValue } from '@/src/clients/core/object-values/note.object-value';
 import { LocationTypeObjectValue } from '@/src/clients/core/object-values/location-type.object-value';
 
 // Models

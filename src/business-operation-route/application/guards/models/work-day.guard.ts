@@ -1,4 +1,4 @@
-import type { WorkDayModel } from '@/src/application/models/work-day.model';
+import type { WorkDayModel } from '@/src/business-operation-route/application/models/work-day.model';
 
 import { isRecord } from '@/src/shared/application/guards/utils';
 

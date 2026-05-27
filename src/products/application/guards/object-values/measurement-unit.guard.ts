@@ -1,4 +1,4 @@
-import type { MeasurementUnitObjectValue } from '@/src/core/object-values/measurement-unit.object-value';
+import type { MeasurementUnitObjectValue } from '@/src/products/core/value-objects/measurement-unit.object-value';
 import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isMeasurementUnitObjectValue = (value: unknown): value is MeasurementUnitObjectValue => {

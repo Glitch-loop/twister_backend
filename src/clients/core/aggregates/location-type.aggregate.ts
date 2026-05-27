@@ -1,5 +1,5 @@
 // Object values
-import { LocationTypeObjectValue } from '@/src/core/object-values/location-type.object-value';
+import { LocationTypeObjectValue } from '@/src/clients/core/object-values/location-type.object-value';
 
 export class LocationTypeAggregate {
   private _locationTypes: LocationTypeObjectValue[];

@@ -1,4 +1,4 @@
-import type { WorkDayNoteModel } from '@/src/application/models/work-day-note.model';
+import type { WorkDayNoteModel } from '@/src/business-operation-route/application/models/work-day-note.model';
 
 import { isRecord } from '@/src/shared/application/guards/utils';
 
