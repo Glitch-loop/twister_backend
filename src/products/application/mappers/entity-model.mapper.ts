@@ -59,6 +59,7 @@ export class Mapper {
       cost: entity.cost,
       product_status: entity.product_status,
       quantity_presentation: entity.quantity_presentation,
+      created_at: entity.created_at,
       order_to_show: entity.order_to_show,
       id_measurement_unit: entity.id_measurement_unit,
     };
@@ -70,7 +71,7 @@ export class Mapper {
       price: value.price,
       created_at: value.created_at,
       id_product,
-      id_client: value.id_client,
+      id_facility: value.id_facility,
       id_location: value.id_location,
       id_route_day: value.id_route_day,
     };
@@ -87,6 +88,7 @@ export class Mapper {
       model.order_to_show,
       model.id_measurement_unit,
       productPrices,
+      model.created_at,
       model.barcode,
     );
   }
@@ -96,7 +98,7 @@ export class Mapper {
       model.id_product_price,
       model.price,
       model.created_at instanceof Date ? model.created_at : new Date(model.created_at),
-      model.id_client,
+      model.id_facility,
       model.id_location,
       model.id_route_day,
     );

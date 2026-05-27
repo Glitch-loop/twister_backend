@@ -12,8 +12,8 @@ CREATE TABLE public.users (
   rfc character varying,
   imss character varying,
   salary numeric NOT NULL,
-  created_at timestamp with time zone NOT NULL,
-  updated_at timestamp with time zone NOT NULL,
+  created_at timestamp without time zone NOT NULL,
+  updated_at timestamp without time zone NOT NULL,
   CONSTRAINT users_pkey PRIMARY KEY (id_user)
 );
 
@@ -42,8 +42,8 @@ CREATE TABLE public.route_days (
 );
 CREATE TABLE public.assigned_route_days (
   id_assigned_route_day uuid NOT NULL DEFAULT gen_random_uuid(),
-  created_at timestamp with time zone NOT NULL,
-  expired_at timestamp with time zone,
+  created_at timestamp without time zone NOT NULL,
+  expired_at timestamp without time zone,
   id_route_day uuid NOT NULL,
   id_user uuid NOT NULL,
   CONSTRAINT assigned_route_days_pkey PRIMARY KEY (id_assigned_route_day),
@@ -54,13 +54,13 @@ CREATE TABLE public.organization_strategies (
   id_organization_strategy uuid NOT NULL DEFAULT gen_random_uuid(),
   organization_strategy_name character varying NOT NULL UNIQUE,
   is_used smallint NOT NULL,
-  created_at timestamp with time zone NOT NULL,
+  created_at timestamp without time zone NOT NULL,
   CONSTRAINT organization_strategies_pkey PRIMARY KEY (id_organization_strategy)
 );
 CREATE TABLE public.route_day_proposals (
   id_route_day_proposal uuid NOT NULL DEFAULT gen_random_uuid(),
   proposal_name character varying NOT NULL UNIQUE,
-  created_at timestamp with time zone NOT NULL,
+  created_at timestamp without time zone NOT NULL,
   id_route_day uuid NOT NULL,
   CONSTRAINT route_day_proposals_pkey PRIMARY KEY (id_route_day_proposal),
   CONSTRAINT route_day_proposals_id_route_day_fkey FOREIGN KEY (id_route_day) REFERENCES public.route_days(id_route_day)
@@ -71,8 +71,8 @@ CREATE TABLE public.route_day_proposals (
 -- About business operation -----------------------------------------------------------------
 CREATE TABLE public.work_days (
   id_work_day uuid NOT NULL DEFAULT gen_random_uuid(),
-  start_date timestamp with time zone NOT NULL,
-  finish_date timestamp with time zone,
+  start_date timestamp without time zone NOT NULL,
+  finish_date timestamp without time zone,
   id_route uuid NOT NULL,
   start_petty_cash numeric NOT NULL,
   final_petty_cash numeric,
@@ -88,7 +88,7 @@ CREATE TABLE public.work_days (
 CREATE TABLE public.work_day_notes (
   id_work_day_notes uuid NOT NULL DEFAULT gen_random_uuid(),
   note text NOT NULL,
-  created_at timestamp with time zone NOT NULL,
+  created_at timestamp without time zone NOT NULL,
   id_work_day uuid NOT NULL,
   CONSTRAINT work_day_notes_pkey PRIMARY KEY (id_work_day_notes),
   CONSTRAINT work_day_notes_id_work_day_fkey FOREIGN KEY (id_work_day) REFERENCES public.work_days(id_work_day)
@@ -100,7 +100,7 @@ CREATE TABLE public.work_day_operations_historic (
   id_route_transaction uuid,
   id_route uuid,
   id_operation_type uuid NOT NULL,
-  created_at timestamp with time zone NOT NULL,
+  created_at timestamp without time zone NOT NULL,
   id_day_operation_dependent uuid,
   id_work_day uuid NOT NULL,
   CONSTRAINT work_day_operations_historic_pkey PRIMARY KEY (id_work_day_operation),
@@ -116,14 +116,14 @@ CREATE TABLE public.clients (
     name character varying NOT NULL,
     cellphone character varying NOT NULL,
     email character varying NOT NULL,
-    created_at timestamp with time zone NOT NULL,
-    updated_at timestamp with time zone NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
     CONSTRAINT clients_pkey PRIMARY KEY (id_client)
 );
 CREATE TABLE public.location_types (
   id_location_type uuid NOT NULL DEFAULT gen_random_uuid(),
   location_type_name character varying NOT NULL UNIQUE,
-  created_at timestamp with time zone NOT NULL,
+  created_at timestamp without time zone NOT NULL,
   CONSTRAINT location_types_pkey PRIMARY KEY (id_location_type)
 );
 CREATE TABLE public.locations (
@@ -140,8 +140,8 @@ CREATE TABLE public.locations (
   id_creator uuid NOT NULL,
   id_client uuid NOT NULL,
   id_location_type uuid NOT NULL,
-  created_at timestamp with time zone NOT NULL,
-  updated_at timestamp with time zone NOT NULL,
+  created_at timestamp without time zone NOT NULL,
+  updated_at timestamp without time zone NOT NULL,
   CONSTRAINT locations_pkey PRIMARY KEY (id_location),
   CONSTRAINT locations_id_creator_fkey FOREIGN KEY (id_creator) REFERENCES public.users (id_user),
   CONSTRAINT locations_id_client_fkey FOREIGN KEY (id_client) REFERENCES public.clients (id_client),
@@ -151,13 +151,13 @@ CREATE TABLE public.location_notes (
   id_location_note uuid NOT NULL DEFAULT gen_random_uuid(),
   note text NOT NULL,
   id_location uuid NOT NULL,
-  created_at timestamp with time zone NOT NULL,
+  created_at timestamp without time zone NOT NULL,
   CONSTRAINT location_notes_pkey PRIMARY KEY (id_location_note),
   CONSTRAINT location_notes_id_location_fkey FOREIGN KEY (id_location) REFERENCES public.locations (id_location)
 );
 CREATE TABLE public.furnitures (
     id_furniture uuid NOT NULL DEFAULT gen_random_uuid(),
-    delivered_date timestamp with time zone NOT NULL,
+    delivered_date timestamp without time zone NOT NULL,
     description_furniture text NOT NULL,
     id_location uuid NOT NULL,
     CONSTRAINT furnitures_pkey PRIMARY KEY (id_furniture),
@@ -200,6 +200,7 @@ CREATE TABLE public.products (
   product_status smallint NOT NULL,
   quantity_presentation integer NOT NULL,
   order_to_show integer NOT NULL,
+  created_at timestamp without time zone NOT NULL,
   id_measurement_unit uuid NOT NULL,
   CONSTRAINT products_pkey PRIMARY KEY (id_product),
   CONSTRAINT products_id_measurement_unit_fkey FOREIGN KEY (id_measurement_unit) REFERENCES public.measurements_units (id_measurement_unit)
@@ -208,14 +209,14 @@ CREATE TABLE public.products (
 CREATE TABLE public.product_prices (
   id_product_price uuid NOT NULL DEFAULT gen_random_uuid(),
   price numeric NOT NULL,
-  created_at timestamp with time zone NOT NULL,
+  created_at timestamp without time zone NOT NULL,
   id_product uuid NOT NULL,
-  id_client uuid,
+  id_facility uuid,
   id_location uuid,
   id_route_day uuid,
   CONSTRAINT product_prices_pkey PRIMARY KEY (id_product_price),
   CONSTRAINT product_prices_id_product_fkey FOREIGN KEY (id_product) REFERENCES public.products (id_product),
-  CONSTRAINT product_prices_id_client_fkey FOREIGN KEY (id_client) REFERENCES public.clients (id_client),
+  -- CONSTRAINT product_prices_id_client_fkey FOREIGN KEY (id_client) REFERENCES public.clients (id_client),
   CONSTRAINT product_prices_id_location_fkey FOREIGN KEY (id_location) REFERENCES public.locations (id_location),
   CONSTRAINT product_prices_id_route_day_fkey FOREIGN KEY (id_route_day) REFERENCES public.route_days (id_route_day)
 );
@@ -228,7 +229,7 @@ CREATE TABLE public.inventory_operation_types (
 );
 CREATE TABLE public.inventory_operations (
   sign_confirmation character varying NOT NULL,
-  date timestamp with time zone NOT NULL,
+  date timestamp without time zone NOT NULL,
   audit smallint NOT NULL,
   id_inventory_operation uuid NOT NULL DEFAULT gen_random_uuid(),
   id_inventory_operation_type uuid NOT NULL,
@@ -244,7 +245,7 @@ CREATE TABLE public.inventory_operation_descriptions (
   price_at_moment numeric NOT NULL,
   id_inventory_operation uuid NOT NULL,
   id_product uuid NOT NULL,
-  created_at timestamp with time zone NOT NULL,
+  created_at timestamp without time zone NOT NULL,
   id_inventory_operation_description uuid NOT NULL DEFAULT gen_random_uuid(),
   CONSTRAINT inventory_operation_descriptions_pkey PRIMARY KEY (id_inventory_operation_description),
   CONSTRAINT inventory_operation_descriptions_id_inventory_operation_fkey FOREIGN KEY (id_inventory_operation) REFERENCES public.inventory_operations(id_inventory_operation),
@@ -278,7 +279,7 @@ CREATE TABLE public.transactions (
   state smallint NOT NULL,
   amount numeric NOT NULL,
   id_invoice_concept uuid NOT NULL,
-  created_at timestamp with time zone NOT NULL,
+  created_at timestamp without time zone NOT NULL,
   id_location uuid,
   id_client uuid NOT NULL,
   id_work_day uuid NOT NULL,
@@ -297,7 +298,7 @@ CREATE TABLE public.transaction_descriptions (
   price_at_moment numeric NOT NULL,
   cost_at_moment numeric NOT NULL,
   amount numeric NOT NULL,
-  created_at timestamp with time zone NOT NULL,
+  created_at timestamp without time zone NOT NULL,
   id_transaction uuid NOT NULL,
   id_transaction_operation_type uuid NOT NULL,
   id_product uuid NOT NULL,
@@ -312,7 +313,7 @@ CREATE TABLE public.transaction_locations (
   longitude character varying,
   latitude character varying,
   id_transaction uuid NOT NULL,
-  created_at timestamp with time zone NOT NULL,
+  created_at timestamp without time zone NOT NULL,
   CONSTRAINT transaction_locations_pkey PRIMARY KEY (id_invoice_concept),
   CONSTRAINT transaction_locations_id_transaction_fkey FOREIGN KEY (id_transaction) REFERENCES public.transactions(id_transaction)
 );
@@ -322,7 +323,7 @@ CREATE TABLE public.taxes (
   tax_name character varying NOT NULL,
   tax_rate character varying NOT NULL,
   id_transaction uuid NOT NULL,
-  created_at timestamp with time zone NOT NULL,
+  created_at timestamp without time zone NOT NULL,
   CONSTRAINT taxes_pkey PRIMARY KEY (id_tax),
   CONSTRAINT taxes_id_transaction_fkey FOREIGN KEY (id_transaction) REFERENCES public.transactions(id_transaction)
 );
@@ -332,7 +333,7 @@ CREATE TABLE public.taxes_in_transactions (
   id_transaction uuid NOT NULL,
   id_tax uuid NOT NULL,
   tax_rate_at_moment_of_transaction numeric NOT NULL,
-  created_at timestamp with time zone NOT NULL,
+  created_at timestamp without time zone NOT NULL,
   CONSTRAINT taxes_in_transactions_pkey PRIMARY KEY (id_tax_in_transaction),
   CONSTRAINT taxes_in_transactions_id_transaction_fkey FOREIGN KEY (id_transaction) REFERENCES public.transactions(id_transaction),
   CONSTRAINT taxes_in_transactions_id_tax_fkey FOREIGN KEY (id_tax) REFERENCES public.taxes(id_tax)

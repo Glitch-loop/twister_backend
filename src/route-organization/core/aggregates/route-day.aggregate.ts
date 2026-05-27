@@ -6,7 +6,7 @@ import { RouteDayEntity } from '@/src/route-organization/core/entities/route-day
 import { AssignedRouteDayEntity } from '@/src/route-organization/core/entities/assigned-route-day.entity';
 
 // Errors
-import { BusinessRuleException } from '@/src/route-organization/errors/BusinessRuleException';
+import { BusinessRuleException } from '@/src/shared/errors/BusinessRuleException';
 
 export default class RouteDayAggregate {
   private _routeDay: RouteDayEntity | null = null;

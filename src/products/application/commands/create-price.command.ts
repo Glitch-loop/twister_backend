@@ -25,9 +25,7 @@ export class CreatePriceCommand {
     if (products.length === 0) {
       throw new Error(`Product with id ${id_product} does not exist.`);
     }
-
-    const aggregate = new ProductAggregate(products[0]);
-
+    
     const newPrice = new ProductPriceObjectValue(
       this.integrityRepository.generateUUIDv4(),
       price,
@@ -37,13 +35,30 @@ export class CreatePriceCommand {
       id_route_day,
     );
 
+    const productAggregate = new ProductAggregate(products[0]);
+
+    if(id_client === undefined && id_location === undefined && id_route_day === undefined) { 
+      // User is trying to add a new base price to the product.
+      const basePrice:ProductPriceObjectValue|undefined = productAggregate.getProductBasePrice();
+
+      if(basePrice) {
+        const { id_product_price } = basePrice;
+
+        const productBasePriceToRemove:ProductPriceObjectValue = productAggregate.removePrice(id_product_price);
+
+        await this.productRepository.deleteProductPrice(productBasePriceToRemove.id_product_price);
+      }
+    } else {
+      // User is trying to add a price for a particular entity
+    }
+
     /*
       Business rules enforced inside aggregate:
       - Product must be active
       - Only one FK allowed
       - No duplicate price per entity
     */
-    aggregate.addPrice(newPrice);
+    productAggregate.addPrice(newPrice);
 
     await this.productRepository.createProductPrice(id_product, newPrice);
   }

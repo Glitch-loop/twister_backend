@@ -28,7 +28,7 @@ export class CreateProductCommand {
       product_name,
       cost,
       quantity_presentation,
-      order_to_show,
+      order_to_show, 
       id_measurement_unit,
       this.integrityRepository.generateUUIDv4(),
       base_price,

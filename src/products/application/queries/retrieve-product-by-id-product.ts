@@ -42,7 +42,7 @@ export class RetrieveProductByIdProductQuery {
 			price.id_product_price,
 			price.price,
 			price.created_at,
-			price.id_client,
+			price.id_facility,
 			price.id_location,
 			price.id_route_day,
 		);

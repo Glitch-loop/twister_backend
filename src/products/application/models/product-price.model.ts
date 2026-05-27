@@ -3,7 +3,7 @@ export interface ProductPriceModel {
   price: number;
   created_at: Date;
   id_product: string;
-  id_client?: string;
+  id_facility?: string;
   id_location?: string;
   id_route_day?: string;
 }

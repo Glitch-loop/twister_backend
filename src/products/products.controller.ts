@@ -13,6 +13,7 @@ import {
 import { CreateProductCommand } from '@/src/products/application/commands/create-product.command';
 import { UpdateProductCommand } from '@/src/products/application/commands/update-product.command';
 import { DeactivateProductCommand } from '@/src/products/application/commands/deactivate-product.command';
+import { ReactivateProductCommand } from '@/src/products/application/commands/reactivate-product.command';
 import { CreatePriceCommand } from '@/src/products/application/commands/create-price.command';
 import { RemovePriceCommand } from '@/src/products/application/commands/remove-price.command';
 
@@ -38,6 +39,7 @@ export class ProductsController {
     private readonly createProductCommand: CreateProductCommand,
     private readonly updateProductCommand: UpdateProductCommand,
     private readonly deactivateProductCommand: DeactivateProductCommand,
+    private readonly reactivateProductCommand: ReactivateProductCommand,
     private readonly createPriceCommand: CreatePriceCommand,
     private readonly removePriceCommand: RemovePriceCommand,
     private readonly listProductsQuery: ListProductsQuery,
@@ -171,6 +173,22 @@ export class ProductsController {
 
     const httpResponseFormatter = new httpFormatter();
     return httpResponseFormatter.createResponse('Product deactivated successfully');
+  }
+
+  @ApiOperation({
+    summary: 'Reactivate product',
+    description: 'Reactivates a product by product identifier.',
+  })
+  @ApiParam({ name: 'id_product', description: 'Product identifier', type: String })
+  @ApiOkResponse({ description: 'Standardized response with operation message.' })
+  @Patch('/:id_product/reactivate')
+  async reactivateProduct(
+    @Param('id_product') id_product: string,
+  ): Promise<httpControllerResponse> {
+    await this.reactivateProductCommand.execute(id_product);
+
+    const httpResponseFormatter = new httpFormatter();
+    return httpResponseFormatter.createResponse('Product reactivated successfully');
   }
 
   @ApiOperation({

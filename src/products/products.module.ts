@@ -17,6 +17,7 @@ import { Mapper } from '@/src/products/application/mappers/entity-model.mapper';
 import { CreateProductCommand } from '@/src/products/application/commands/create-product.command';
 import { UpdateProductCommand } from '@/src/products/application/commands/update-product.command';
 import { DeactivateProductCommand } from '@/src/products/application/commands/deactivate-product.command';
+import { ReactivateProductCommand } from '@/src/products/application/commands/reactivate-product.command';
 import { CreatePriceCommand } from '@/src/products/application/commands/create-price.command';
 import { RemovePriceCommand } from '@/src/products/application/commands/remove-price.command';
 
@@ -37,6 +38,7 @@ import { SharedModule } from '@/src/shared/shared.module';
     CreateProductCommand,
     UpdateProductCommand,
     DeactivateProductCommand,
+    ReactivateProductCommand,
     CreatePriceCommand,
     RemovePriceCommand,
     ListProductsQuery,
