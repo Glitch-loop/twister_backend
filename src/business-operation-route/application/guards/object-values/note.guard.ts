@@ -1,4 +1,5 @@
-import type { NoteObjectValue } from '@/src/core/object-values/note.object-value';
+import { NoteObjectValue } from "@/src/business-operation-route/core/value-objects/note.object-value";
+
 import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isNoteObjectValue = (value: unknown): value is NoteObjectValue => {
