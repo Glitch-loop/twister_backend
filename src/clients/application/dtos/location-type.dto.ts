@@ -10,9 +10,9 @@ export class LocationTypeDto {
   public created_at: Date;
 
   constructor (
-    private readonly _id_location_type: string,
-    private readonly _location_type_name: string,
-    private readonly _created_at: Date,
+    _id_location_type: string,
+    _location_type_name: string,
+    _created_at: Date,
   ) {
     this.id_location_type = _id_location_type
     this.location_type_name = _location_type_name

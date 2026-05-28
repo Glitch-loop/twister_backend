@@ -20,15 +20,15 @@ export class ClientDto {
   @ApiProperty({ type: String, example: '2026-05-22 17:20:42.136+00' })
   updated_at: Date;
   constructor (
-    private readonly _id_client: string,
-    private readonly _legal_name: string,
-    private readonly _postal_code: string,
-    private readonly _fiscal_rgime: string,
-    private readonly _name: string,
-    private readonly _cellphone: string,
-    private readonly _email: string,
-    private readonly _created_at: Date,
-    private readonly _updated_at: Date,
+    _id_client: string,
+    _legal_name: string,
+    _postal_code: string,
+    _fiscal_rgime: string,
+    _name: string,
+    _cellphone: string,
+    _email: string,
+    _created_at: Date,
+    _updated_at: Date,
   ) {
     this.id_client = _id_client;
     this.legal_name = _legal_name;

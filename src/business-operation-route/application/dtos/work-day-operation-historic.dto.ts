@@ -27,14 +27,14 @@ export class WorkDayOperationHistoricDto {
 	public readonly id_work_day: string;
 
 	constructor(
-		private readonly _id_work_day_operation: string,
-		private readonly _id_operation_type: DAY_OPERATIONS_ENUM,
-		private readonly _created_at: Date,
-		private readonly _id_work_day: string,
-		private readonly _id_client?: string,
-		private readonly _id_route_transaction?: string,
-		private readonly _id_route_day?: string,
-		private readonly _id_day_operation_dependent?: string,
+		_id_work_day_operation: string,
+		_id_operation_type: DAY_OPERATIONS_ENUM,
+		_created_at: Date,
+		_id_work_day: string,
+		_id_client?: string,
+		_id_route_transaction?: string,
+		_id_route_day?: string,
+		_id_day_operation_dependent?: string,
 	) {
 		this.id_work_day_operation = _id_work_day_operation;
 		this.id_client = _id_client;

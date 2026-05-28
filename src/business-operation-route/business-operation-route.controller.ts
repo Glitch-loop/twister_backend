@@ -19,7 +19,7 @@ import { WorkDayOperationHistoricDto } from '@/src/business-operation-route/appl
 // Commands
 import { StartWorkDayCommand } from '@/src/business-operation-route/application/commands/start-work-day.command';
 import { UpdateWorkDayCommand } from '@/src/business-operation-route/application/commands/finish-work-day.command';
-import { AddNoteWorkDayCommand } from '@/src/business-operation-route/application/commands/add-note-work-day.command';
+import { CreateWorkDayNoteCommand } from '@/src/business-operation-route/application/commands/create-work-day-note.command';
 import { AddWorkDayCommand } from '@/src/business-operation-route/application/commands/add-work-day.command';
 
 // Queries
@@ -41,7 +41,7 @@ export class BusinessOperationRouteController {
 	constructor(
 		private readonly startWorkDayCommand: StartWorkDayCommand,
 		private readonly updateWorkDayCommand: UpdateWorkDayCommand,
-		private readonly addNoteWorkDayCommand: AddNoteWorkDayCommand,
+		private readonly createWorkDayNoteCommand: CreateWorkDayNoteCommand,
 		private readonly addWorkDayCommand: AddWorkDayCommand,
 		private readonly listWorkDayQuery: ListWorkDayQuery,
 		private readonly listWorkDayOperationsHistoricQuery: ListWorkDayOperationsHistoricQuery,
@@ -93,14 +93,17 @@ export class BusinessOperationRouteController {
 		summary: 'Create work day note',
 		description: 'Creates a note for a work day and returns a standardized controller response.',
 	})
+	@ApiParam({ name: 'id_work_day', description: 'Work day identifier', type: String })
 	@ApiOkResponse({ description: 'Standardized response with operation message.' })
-	@Post('/work-days/notes')
-	async createWorkDayNote(@Body() body: CreateWorkDayNoteRequestDto): Promise<httpControllerResponse> {
-		await this.addNoteWorkDayCommand.execute(
-			body.id_work_day,
+	@Post('/work-days/:id_work_day/notes')
+	async createWorkDayNote(
+		@Param('id_work_day') id_work_day: string,
+		@Body() body: CreateWorkDayNoteRequestDto,
+	): Promise<httpControllerResponse> {
+		await this.createWorkDayNoteCommand.execute(
+			id_work_day,
 			body.note,
 			body.created_at,
-			body.id_work_day_notes,
 		);
 
 		const httpResponseFormatter = new httpFormatter();
@@ -347,8 +350,9 @@ export class BusinessOperationRouteController {
 			type: 'object',
 			properties: {
 				id_work_days: {
-					type: 'array',
-					items: { type: 'string', format: 'uuid' },
+					type: 'string',
+					example: '5e8e8ad0-8a84-4326-95d5-84f4f2c13711,2d291bb8-2fe8-4e82-93d8-11cf80e302f8',
+					description: 'Comma-separated work day IDs.',
 				},
 			},
 			required: ['id_work_days'],
@@ -357,9 +361,14 @@ export class BusinessOperationRouteController {
 	@ApiOkResponse({ description: 'Standardized response with retrieved work days.', type: [WorkDayDto] })
 	@Post('/work-days/ids')
 	async retrieveWorkDayByWorkDayId(
-		@Body() body: { id_work_days: string[] },
+		@Body() body: { id_work_days: string },
 	): Promise<httpControllerResponse> {
-		const data: WorkDayDto[] = await this.retrieveWorkDayByWorkDayIdQuery.execute(body.id_work_days ?? []);
+		const idWorkDays = (body.id_work_days ?? '')
+			.split(',')
+			.map((item) => item.trim())
+			.filter((item) => item.length > 0);
+
+		const data: WorkDayDto[] = await this.retrieveWorkDayByWorkDayIdQuery.execute(idWorkDays);
 
 		const httpResponseFormatter = new httpFormatter();
 		return httpResponseFormatter.createResponse('Work days retrieved successfully.', data);
@@ -374,8 +383,9 @@ export class BusinessOperationRouteController {
 			type: 'object',
 			properties: {
 				id_work_days: {
-					type: 'array',
-					items: { type: 'string', format: 'uuid' },
+					type: 'string',
+					example: '5e8e8ad0-8a84-4326-95d5-84f4f2c13711,2d291bb8-2fe8-4e82-93d8-11cf80e302f8',
+					description: 'Comma-separated work day IDs.',
 				},
 			},
 			required: ['id_work_days'],
@@ -387,10 +397,15 @@ export class BusinessOperationRouteController {
 	})
 	@Post('/work-days/operations/ids')
 	async retrieveWorkDayOperationsHistoricByWorkDayId(
-		@Body() body: { id_work_days: string[] },
+		@Body() body: { id_work_days: string },
 	): Promise<httpControllerResponse> {
+		const idWorkDays = (body.id_work_days ?? '')
+			.split(',')
+			.map((item) => item.trim())
+			.filter((item) => item.length > 0);
+
 		const data: WorkDayOperationHistoricDto[] =
-			await this.retrieveWorkDayOperationsHistoricByWorkDayIdQuery.execute(body.id_work_days ?? []);
+			await this.retrieveWorkDayOperationsHistoricByWorkDayIdQuery.execute(idWorkDays);
 
 		const httpResponseFormatter = new httpFormatter();
 		return httpResponseFormatter.createResponse('Work day operations historic retrieved successfully.', data);

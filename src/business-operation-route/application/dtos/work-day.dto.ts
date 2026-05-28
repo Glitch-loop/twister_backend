@@ -34,16 +34,16 @@ export class WorkDayDto {
 	public readonly id_payment_stub?: string;
 
 	constructor(
-		private readonly _id_work_day: string,
-		private readonly _start_date: Date,
-		private readonly _id_route: string,
-		private readonly _start_petty_cash: number,
-		private readonly _id_route_day: string,
-		private readonly _id_user: string,
-		private readonly _notes: WorkDayNoteDto[],
-		private readonly _finish_date?: Date,
-		private readonly _final_petty_cash?: number,
-		private readonly _id_payment_stub?: string,
+		_id_work_day: string,
+		_start_date: Date,
+		_id_route: string,
+		_start_petty_cash: number,
+		_id_route_day: string,
+		_id_user: string,
+		_notes: WorkDayNoteDto[],
+		_finish_date?: Date,
+		_final_petty_cash?: number,
+		_id_payment_stub?: string,
 	) {
 		this.id_work_day = _id_work_day;
 		this.start_date = _start_date;

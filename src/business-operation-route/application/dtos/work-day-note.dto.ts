@@ -15,10 +15,10 @@ export class WorkDayNoteDto {
 	public readonly created_at?: Date;
 
 	constructor(
-		private readonly _id_note: string,
-		private readonly _note: string,
-		private readonly _id_owner: string,
-		private readonly _created_at?: Date,
+		_id_note: string,
+		_note: string,
+		_id_owner: string,
+		_created_at?: Date,
 	) {
 		this.id_note = _id_note;
 		this.note = _note;

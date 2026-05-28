@@ -18,10 +18,10 @@ export class LocationNoteDto {
   public created_at: Date;
 
   constructor(
-    private readonly _id_location_note: string,
-    private readonly _note: string,
-    private readonly _id_location: string,
-    private readonly _created_at: Date,
+    _id_location_note: string,
+    _note: string,
+    _id_location: string,
+    _created_at: Date,
   ) {
     this.id_location_note = _id_location_note;
     this.note = _note;
