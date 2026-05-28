@@ -184,6 +184,13 @@ export default class RouteDayAggregate {
         if (isPermanentUserAlreadyAssigned) {
           throw new BusinessRuleException(`A route day can only have one permanent assignation.`);
         }
+      } else {
+        const expirationDate = expired_at instanceof Date ? expired_at : new Date(expired_at);        
+        if (Number.isNaN(expirationDate.getTime()) || expirationDate.getTime() <= Date.now()) {
+          throw new BusinessRuleException("Invalid assignation. The expiration must be greater than the current day.");
+        }
+
+        expired_at = expirationDate;
       }
       
       const newAssignation:AssignedRouteDayEntity = new AssignedRouteDayEntity(
