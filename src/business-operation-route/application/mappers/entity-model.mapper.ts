@@ -30,6 +30,8 @@ export class Mapper {
 	toModel(
 		domainObject: WorkDayEntity | NoteObjectValue | WorkDayOperationHistoricEntity,
 	): WorkDayModel | WorkDayNoteModel | WorkDayOperationHistoricModel {
+
+    console.log(domainObject)
 		if (isWorkDayEntity(domainObject)) {
 			return this.workDayDomainObjectToModel(domainObject);
 		}

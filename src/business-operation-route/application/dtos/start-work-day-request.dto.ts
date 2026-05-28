@@ -1,7 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class StartShiftWorkDayRequestDto {
-	@ApiProperty({ type: String, example: '5e8e8ad0-8a84-4326-95d5-84f4f2c13711' })
+	@ApiPropertyOptional({ type: String, example: '5e8e8ad0-8a84-4326-95d5-84f4f2c13711' })
 	public readonly id_work_day: string;
 
 	@ApiProperty({ type: String, example: '2026-05-27T08:00:00.000Z' })

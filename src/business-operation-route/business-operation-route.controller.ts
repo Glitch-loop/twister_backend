@@ -51,7 +51,12 @@ export class BusinessOperationRouteController {
 
 	@ApiOperation({
 		summary: 'Start work day',
-		description: 'Starts a work day and returns a standardized controller response.',
+		description: `Starts a new work day.
+
+Note:
+- If "id_work_day" is not provided the server will assign an uuid automatically.
+- If "start_date" is not provided, the work day will be registered with the 
+date at moment of the creation.`,
 	})
 	@ApiOkResponse({ description: 'Standardized response with operation message.' })
 	@Post('/work-days')
@@ -188,19 +193,10 @@ export class BusinessOperationRouteController {
 		@Query('start_date_start_work_day') start_date_start_work_day?: string,
 		@Query('end_date_end_work_day') end_date_end_work_day?: string,
 		@Query('final_pretty_cash') final_pretty_cash?: string,
-		@Query('id_route_day') id_route_day?: string | string[],
-		@Query('id_vendor') id_vendor?: string | string[],
-		@Query('id_pay_stub') id_pay_stub?: string | string[],
+		@Query('id_route_day') id_route_day?: string[],
+		@Query('id_vendor') id_vendor?: string[],
+		@Query('id_pay_stub') id_pay_stub?: string[],
 	): Promise<httpControllerResponse> {
-		const toArray = (value?: string | string[]): string[] | undefined => {
-			if (!value) return undefined;
-			if (Array.isArray(value)) return value.filter((item) => item.length > 0);
-
-			return value
-				.split(',')
-				.map((item) => item.trim())
-				.filter((item) => item.length > 0);
-		};
 
 		const toDate = (value?: string): Date | undefined => {
 			if (!value) return undefined;
@@ -215,10 +211,10 @@ export class BusinessOperationRouteController {
 		const parsedFinalPettyCash = final_pretty_cash ? Number.parseFloat(final_pretty_cash) : undefined;
 		const startDate = toDate(start_date_start_work_day);
 		const endDate = toDate(end_date_end_work_day);
-		const idRouteDay = toArray(id_route_day);
-		const idVendor = toArray(id_vendor);
-		const idPayStub = toArray(id_pay_stub);
-
+		const idRouteDay = id_route_day;
+		const idVendor = id_vendor;
+		const idPayStub = id_pay_stub;
+    console.log("idVendor:", idVendor)
 		const httpRequestFormatter = new httpFormatter();
 
 		if (next_item) {
@@ -361,14 +357,10 @@ export class BusinessOperationRouteController {
 	@ApiOkResponse({ description: 'Standardized response with retrieved work days.', type: [WorkDayDto] })
 	@Post('/work-days/ids')
 	async retrieveWorkDayByWorkDayId(
-		@Body() body: { id_work_days: string },
+		@Body() body: { id_work_days: string[] },
 	): Promise<httpControllerResponse> {
-		const idWorkDays = (body.id_work_days ?? '')
-			.split(',')
-			.map((item) => item.trim())
-			.filter((item) => item.length > 0);
 
-		const data: WorkDayDto[] = await this.retrieveWorkDayByWorkDayIdQuery.execute(idWorkDays);
+		const data: WorkDayDto[] = await this.retrieveWorkDayByWorkDayIdQuery.execute(body.id_work_days);
 
 		const httpResponseFormatter = new httpFormatter();
 		return httpResponseFormatter.createResponse('Work days retrieved successfully.', data);
