@@ -8,7 +8,7 @@ export class WorkDayOperationHistoricEntity {
     public readonly id_work_day: string,
     public readonly id_client?: string,
     public readonly id_route_transaction?: string,
-    public readonly id_route?: string,
+    public readonly id_route_day?: string,
     public readonly id_day_operation_dependent?: string,
   ) {}
 }
