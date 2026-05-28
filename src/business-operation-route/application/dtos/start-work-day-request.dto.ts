@@ -1,6 +1,6 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateWorkDayRequestDto {
+export class StartShiftWorkDayRequestDto {
 	@ApiProperty({ type: String, example: '5e8e8ad0-8a84-4326-95d5-84f4f2c13711' })
 	public readonly id_work_day: string;
 
@@ -19,25 +19,13 @@ export class CreateWorkDayRequestDto {
 	@ApiProperty({ type: String, example: 'd56b4bcd-154a-42f0-b2ca-9bc77535f17f' })
 	public readonly id_user: string;
 
-	@ApiPropertyOptional({ type: String, example: '2026-05-27T18:00:00.000Z' })
-	public readonly finish_date?: Date;
-
-	@ApiPropertyOptional({ type: Number, example: 3180.75 })
-	public readonly final_petty_cash?: number;
-
-	@ApiPropertyOptional({ type: String, example: 'ed046ff9-0845-43d4-bfc2-7a5a3d8dca2c' })
-	public readonly id_payment_stub?: string;
-
 	constructor(
 		private readonly _id_work_day: string,
 		private readonly _start_date: Date,
 		private readonly _id_route: string,
 		private readonly _start_petty_cash: number,
 		private readonly _id_route_day: string,
-		private readonly _id_user: string,
-		private readonly _finish_date?: Date,
-		private readonly _final_petty_cash?: number,
-		private readonly _id_payment_stub?: string,
+		private readonly _id_user: string
 	) {
 		this.id_work_day = _id_work_day;
 		this.start_date = _start_date;
@@ -45,8 +33,5 @@ export class CreateWorkDayRequestDto {
 		this.start_petty_cash = _start_petty_cash;
 		this.id_route_day = _id_route_day;
 		this.id_user = _id_user;
-		this.finish_date = _finish_date;
-		this.final_petty_cash = _final_petty_cash;
-		this.id_payment_stub = _id_payment_stub;
 	}
 }

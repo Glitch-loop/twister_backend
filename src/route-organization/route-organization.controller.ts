@@ -44,6 +44,13 @@ import { RetrieveRouteDaysProposalsByIdProposalQuery } from '@/src/route-organiz
 import { RetrieveRouteDayByRouteDayIdQuery } from '@/src/route-organization/application/queries/retrieve-route-day-by-route_day-id.query';
 import { RetrieveAssignedRouteDaysByIdUserQuery } from './application/queries/retrieve-assigned-route-days-by-id-user.query';
 
+/*
+TODO:
+	List organization strategies
+	Select organization strategy
+
+*/
+
 @ApiTags('Route Organization')
 @Controller('route-organization')
 export class RouteOrganizationController {

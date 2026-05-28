@@ -11,7 +11,7 @@ export abstract class WorkDayRepository {
   abstract listWorkDays(
     limit: number,
     start_date_start_work_day?: Date,
-    end_date_end_work_day?: Date,
+    end_date_end_work_day?: Date|null,
     final_pretty_cash?: number,
     id_route_day?: string[],
     id_vendor?: string[],

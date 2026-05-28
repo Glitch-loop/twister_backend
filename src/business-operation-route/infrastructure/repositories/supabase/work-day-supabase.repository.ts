@@ -232,7 +232,7 @@ export class WorkDaySupabaseRepository implements WorkDayRepository {
 	private async executeListWorkDays(
 		limit: number,
 		start_date_start_work_day?: Date,
-		end_date_end_work_day?: Date,
+		end_date_end_work_day?: Date|null,
 		final_pretty_cash?: number,
 		id_route_day?: string[],
 		id_vendor?: string[],
@@ -249,7 +249,8 @@ export class WorkDaySupabaseRepository implements WorkDayRepository {
 				.limit(limit);
 
 			if (start_date_start_work_day) query = query.gte('start_date', start_date_start_work_day.toISOString());
-			if (end_date_end_work_day) query = query.lte('start_date', end_date_end_work_day.toISOString());
+			if (end_date_end_work_day !== undefined && end_date_end_work_day !== null) query = query.lte('start_date', end_date_end_work_day.toISOString());
+			if (end_date_end_work_day === null) query = query.is('start_date', null);
 			if (final_pretty_cash !== undefined) query = query.eq('final_petty_cash', final_pretty_cash);
 			if (id_route_day && id_route_day.length > 0) query = query.in('id_route_day', id_route_day);
 			if (id_vendor && id_vendor.length > 0) query = query.in('id_user', id_vendor);

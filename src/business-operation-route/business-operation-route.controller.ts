@@ -1,23 +1,24 @@
 // Libraries
-import { Body, Controller, Get, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import {
 	ApiBody,
 	ApiOkResponse,
 	ApiOperation,
+	ApiParam,
 	ApiQuery,
 	ApiTags,
 } from '@nestjs/swagger';
 
 // DTOs
-import { CreateWorkDayRequestDto } from '@/src/business-operation-route/application/dtos/create-work-day-request.dto';
-import { UpdateWorkDayRequestDto } from '@/src/business-operation-route/application/dtos/update-work-day-request.dto';
+import { StartShiftWorkDayRequestDto } from '@/src/business-operation-route/application/dtos/start-work-day-request.dto';
+import { FinishWorkDayRequestDto } from '@/src/business-operation-route/application/dtos/finish-work-day-request.dto';
 import { CreateWorkDayNoteRequestDto } from '@/src/business-operation-route/application/dtos/create-work-day-note-request.dto';
 import { WorkDayDto } from '@/src/business-operation-route/application/dtos/work-day.dto';
 import { WorkDayOperationHistoricDto } from '@/src/business-operation-route/application/dtos/work-day-operation-historic.dto';
 
 // Commands
-import { CreateWorkDayCommand } from '@/src/business-operation-route/application/commands/create-work-day.command';
-import { UpdateWorkDayCommand } from '@/src/business-operation-route/application/commands/update-work-day.command';
+import { StartWorkDayCommand } from '@/src/business-operation-route/application/commands/start-work-day.command';
+import { UpdateWorkDayCommand } from '@/src/business-operation-route/application/commands/finish-work-day.command';
 import { AddNoteWorkDayCommand } from '@/src/business-operation-route/application/commands/add-note-work-day.command';
 import { AddWorkDayCommand } from '@/src/business-operation-route/application/commands/add-work-day.command';
 
@@ -38,7 +39,7 @@ import { httpFormatter } from '@/src/shared/presentation/http/handlers/http-form
 @Controller('business-operation-route')
 export class BusinessOperationRouteController {
 	constructor(
-		private readonly createWorkDayCommand: CreateWorkDayCommand,
+		private readonly startWorkDayCommand: StartWorkDayCommand,
 		private readonly updateWorkDayCommand: UpdateWorkDayCommand,
 		private readonly addNoteWorkDayCommand: AddNoteWorkDayCommand,
 		private readonly addWorkDayCommand: AddWorkDayCommand,
@@ -49,51 +50,44 @@ export class BusinessOperationRouteController {
 	) {}
 
 	@ApiOperation({
-		summary: 'Create work day',
-		description: 'Creates a work day and returns a standardized controller response.',
+		summary: 'Start work day',
+		description: 'Starts a work day and returns a standardized controller response.',
 	})
 	@ApiOkResponse({ description: 'Standardized response with operation message.' })
 	@Post('/work-days')
-	async createWorkDay(@Body() body: CreateWorkDayRequestDto): Promise<httpControllerResponse> {
-		await this.createWorkDayCommand.execute(
+	async startWorkDay(@Body() body: StartShiftWorkDayRequestDto): Promise<httpControllerResponse> {
+		await this.startWorkDayCommand.execute(
 			body.start_date,
 			body.id_route,
 			body.start_petty_cash,
 			body.id_route_day,
 			body.id_user,
-			[],
-			body.finish_date,
-			body.final_petty_cash,
-			body.id_payment_stub,
 			body.id_work_day,
 		);
 
 		const httpResponseFormatter = new httpFormatter();
-		return httpResponseFormatter.createResponse('Work day created successfully.');
+		return httpResponseFormatter.createResponse('Work day started successfully.');
 	}
 
 	@ApiOperation({
-		summary: 'Update work day',
-		description: 'Updates a work day and returns a standardized controller response.',
+		summary: 'Finish work day',
+		description: 'Finishes a work day and returns a standardized controller response.',
 	})
+	@ApiParam({ name: 'id_work_day', description: 'Work day identifier', type: String })
 	@ApiOkResponse({ description: 'Standardized response with operation message.' })
-	@Patch('/work-days')
-	async updateWorkDay(@Body() body: UpdateWorkDayRequestDto): Promise<httpControllerResponse> {
+	@Patch('/work-days/:id_work_day')
+	async finishWorkDay(
+		@Param('id_work_day') id_work_day: string,
+		@Body() body: FinishWorkDayRequestDto,
+	): Promise<httpControllerResponse> {
 		await this.updateWorkDayCommand.execute(
-			body.id_work_day,
-			body.start_date,
-			body.id_route,
-			body.start_petty_cash,
-			body.id_route_day,
-			body.id_user,
-			[],
+			id_work_day,
 			body.finish_date,
 			body.final_petty_cash,
-			body.id_payment_stub,
 		);
 
 		const httpResponseFormatter = new httpFormatter();
-		return httpResponseFormatter.createResponse('Work day updated successfully.');
+		return httpResponseFormatter.createResponse('Work day finished successfully.');
 	}
 
 	@ApiOperation({
