@@ -1,5 +1,5 @@
-import { RouteEntity } from "../entities/route.entity";
-import { ROUTE_STATUS_ENUM } from "../enums/route-status.enum";
+import { RouteEntity } from "@/src/route-organization/core/entities/route.entity";
+import { ROUTE_STATUS_ENUM } from "@/src/route-organization/core/enums/route-status.enum";
 
 export class RouteAggregate {
   routeEntity: RouteEntity | null;
@@ -74,20 +74,15 @@ export class RouteAggregate {
     }
   }
 
-  validateRouteIsActive(): RouteEntity {
+  validateRouteIsActive(): boolean {
     if (!this.routeEntity) {
       throw new Error('Route entity does not exist.');
     }
 
     if (this.routeEntity.route_status === ROUTE_STATUS_ENUM.INACTIVE) {
-      throw new Error('Cannot perform this action because route is deactivated.');
+      return true;
+    } else {
+      return false;
     }
-
-    return new RouteEntity(
-      this.routeEntity.id_route,
-      this.routeEntity.route_name,
-      this.routeEntity.route_status,
-      this.routeEntity.description,
-    );
   }
 }

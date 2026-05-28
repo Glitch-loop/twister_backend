@@ -129,7 +129,8 @@ export class Mapper {
 	}
 
 	private workDayModelToDomainObject(model: WorkDayModel, workDayNoteModels: WorkDayNoteModel[]): WorkDayEntity {
-		return new WorkDayEntity(
+		console.log("Work day model mapper")
+    return new WorkDayEntity(
 			model.id_work_day,
 			model.start_date instanceof Date ? model.start_date : new Date(model.start_date),
 			model.id_route,

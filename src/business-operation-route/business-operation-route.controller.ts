@@ -58,7 +58,6 @@ export class BusinessOperationRouteController {
 	async startWorkDay(@Body() body: StartShiftWorkDayRequestDto): Promise<httpControllerResponse> {
 		await this.startWorkDayCommand.execute(
 			body.start_date,
-			body.id_route,
 			body.start_petty_cash,
 			body.id_route_day,
 			body.id_user,

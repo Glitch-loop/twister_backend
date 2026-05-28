@@ -41,7 +41,6 @@ import { Mapper as EntityDtoMapper } from '@/src/route-organization/application/
 // Controllers
 import { RouteOrganizationController } from '@/src/route-organization/route-organization.controller';
 
-
 // Modules
 import { SharedModule } from '@/src/shared/shared.module';
 

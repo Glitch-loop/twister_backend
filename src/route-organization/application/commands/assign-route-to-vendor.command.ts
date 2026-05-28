@@ -9,6 +9,7 @@ import RouteDayAggregate from '@/src/route-organization/core/aggregates/route-da
 import { AssignedRouteDayEntity } from '@/src/route-organization/core/entities/assigned-route-day.entity';
 import { RouteEntity } from '@/src/route-organization/core/entities/route.entity';
 import { RouteDayEntity } from '@/src/route-organization/core/entities/route-day.entity';
+import { BusinessRuleException } from '@/src/shared/errors/BusinessRuleException';
 
 @Injectable()
 export class AssignRouteToVendorCommand {
@@ -24,16 +25,16 @@ export class AssignRouteToVendorCommand {
   ): Promise<void> {
     // Retrieving necessary information
     const routeDayEntities: RouteDayEntity[] = await this.routeRepository.retrieveRouteDay([id_route_day]);
-    if (routeDayEntities.length === 0) throw new Error(`Route day with id ${id_route_day} does not exist.`);
+    if (routeDayEntities.length === 0) throw new BusinessRuleException(`Route day with id ${id_route_day} does not exist.`);
     const routeDayToAssign: RouteDayEntity = routeDayEntities[0];
 
     const routeEntities: RouteEntity[] = await this.routeRepository.retrieveRoutesByRouteId([routeDayToAssign.id_route]);
-    if (routeEntities.length === 0) throw new Error(`Route with id ${routeDayToAssign.id_route} does not exist.`);
+    if (routeEntities.length === 0) throw new BusinessRuleException(`Route with id ${routeDayToAssign.id_route} does not exist.`);
     const routeThatBelongs: RouteEntity = routeEntities[0];
 
     // Validate if the route might have assignations
     const routeAggregate = new RouteAggregate(routeThatBelongs);
-    routeAggregate.validateRouteIsActive();
+    if (!routeAggregate.validateRouteIsActive()) throw new BusinessRuleException(`You cannot make this assignation because the route is deactivated.`);
 
     const routeDayAssignedToUser:AssignedRouteDayEntity[] = await this.routeRepository.retrieveRouteDayAssignaments([id_route_day]); 
 

@@ -20,6 +20,7 @@ import { IntegrityRepository } from '@/src/shared/core/interfaces/integrity.repo
 import { RouteEntity } from '@/src/route-organization/core/entities/route.entity';
 import { RouteAggregate } from '@/src/route-organization/core/aggregates/route.aggregate';
 import { RouteRepository } from '@/src/route-organization/core/interfaces/route.repository'
+import { RouteDayEntity } from '@/src/route-organization/core/entities/route-day.entity';
 
 @Injectable()
 export class StartWorkDayCommand {
@@ -31,7 +32,6 @@ export class StartWorkDayCommand {
 
 	async execute(
 		start_date: Date,
-		id_route: string,
 		start_petty_cash: number,
 		id_route_day: string,
 		id_user: string,
@@ -41,20 +41,22 @@ export class StartWorkDayCommand {
 
 		const workDayId = id_work_day ?? this.integrityRepository.generateUUIDv4();
 
+		const routeDays: RouteDayEntity[] = await this.routesRepository.retrieveRouteDay([id_route_day]);
+		
+		if (routeDays.length === 0) throw new BusinessRuleException(`The route day with id ${id_route_day} you are trying to create a work day does not exist`);
+		
+		const { id_route } = routeDays[0];
 		const routes: RouteEntity[] = await this.routesRepository.retrieveRoutesByRouteId([id_route]);
 
-		if (routes.length === 0) throw new BusinessRuleException(`The route with id ${id_route} you are trying to create a work day does not exist`);
-		
 		const routeAggregate = new RouteAggregate(routes[0]);
 		
 		if (!routeAggregate.validateRouteIsActive()) throw new BusinessRuleException(`You cannot create a new work day because the route with id ${id_route} is innactive.`);
 		
 		const userOpenWorkDays:WorkDayEntity[] = await this.workDayRepository.listWorkDays(1, undefined, null, undefined, undefined, [id_user], undefined, undefined, undefined)
 		
-		if (userOpenWorkDays.length > 0) throw new BusinessRuleException(`User with id ${id_user} already have an opened workday. Close the current work day to create a new workday.`);
+		if (userOpenWorkDays.length > 0) throw new BusinessRuleException(`User with id ${id_user} already have an opened workday. Close the current work day to create a new one for the user.`);
 
-
-		workDayAggregate.startWorkDay(
+		workDayAggregate.startWorkDay( 
 			workDayId,
 			start_petty_cash,
 			id_route,

@@ -8,6 +8,7 @@ import RouteDayAggregate from '@/src/route-organization/core/aggregates/route-da
 import { RouteEntity } from '@/src/route-organization/core/entities/route.entity';
 import { RouteDayEntity } from '@/src/route-organization/core/entities/route-day.entity';
 import { RouteDayLocationObjectValue } from '@/src/route-organization/core/value-objects/route-day-location.object-value';
+import { BusinessRuleException } from '@/src/shared/errors/BusinessRuleException';
 
 @Injectable()
 export class OrganizeRouteDayCommand {
@@ -28,11 +29,11 @@ export class OrganizeRouteDayCommand {
         const routeEntities: RouteEntity[] = await this.routeRepository.retrieveRoutesByRouteId([routeDay.id_route]);
 
         if (routeEntities.length === 0) {
-            throw new Error(`Route with id ${routeDay.id_route} does not exist.`);
+            throw new BusinessRuleException(`Route with id ${routeDay.id_route} does not exist.`);
         }
 
         const routeAggregate = new RouteAggregate(routeEntities[0]);
-        routeAggregate.validateRouteIsActive();
+        if (!routeAggregate.validateRouteIsActive()) throw new BusinessRuleException(`You cannot perform the organization because the route is deactivated.`);
 
         const updatedRouteDay = routeDayAggregate.organizeRouteDayStores(routeDayLocations);
 
