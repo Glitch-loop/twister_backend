@@ -1,9 +1,9 @@
-import type { WorkDayOperationHistoricModel } from '@/src/business-operation-route/application/models/work-day-operation-historic.model';
+import type { WorkDayOperationHistoricDto } from '@/src/business-operation-route/application/dtos/work-day-operation-historic.dto';
 import { DAY_OPERATIONS_ENUM } from '@/src/business-operation-route/core/enums/day-operations.enum';
 
 import { isRecord } from '@/src/shared/application/guards/utils';
 
-export const isWorkDayOperationHistoricModel = (value: unknown): value is WorkDayOperationHistoricModel => {
+export const isWorkDayOperationHistoricDto = (value: unknown): value is WorkDayOperationHistoricDto => {
   if (!isRecord(value)) {
     return false;
   }

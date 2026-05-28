@@ -129,4 +129,48 @@ export class WorkDaySupabaseRepository implements WorkDayRepository {
 			);
 		}
 	}
+
+	listWorkDays(
+		start_date: Date,
+		end_date: Date,
+		final_pretty_cash: number,
+		id_route_day: string[],
+		id_vendor: string[],
+		id_pay_stub: string[],
+	): Promise<void> {
+		void start_date;
+		void end_date;
+		void final_pretty_cash;
+		void id_route_day;
+		void id_vendor;
+		void id_pay_stub;
+		return Promise.reject(new Error('Method not implemented.'));
+	}
+
+	listWorkDaysHistoric(
+		start_date: Date,
+		end_date: Date,
+		final_pretty_cash: number,
+		id_location: string[],
+		id_route_transaction: string[],
+		id_route: string[],
+	): Promise<void> {
+		void start_date;
+		void end_date;
+		void final_pretty_cash;
+		void id_location;
+		void id_route_transaction;
+		void id_route;
+		return Promise.reject(new Error('Method not implemented.'));
+	}
+
+	retrieveWorkDayByWorkDayId(work_day_operations_hisotic: WorkDayOperationHistoricEntity): Promise<void> {
+		void work_day_operations_hisotic;
+		return Promise.reject(new Error('Method not implemented.'));
+	}
+
+	retrieveWorkDayOperationsHistoricByWorkDayId(work_day_operations_hisotic: WorkDayOperationHistoricEntity): Promise<void> {
+		void work_day_operations_hisotic;
+		return Promise.reject(new Error('Method not implemented.'));
+	}
 }

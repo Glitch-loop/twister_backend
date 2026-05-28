@@ -98,7 +98,7 @@ CREATE TABLE public.work_day_operations_historic (
   id_work_day_operation uuid NOT NULL DEFAULT gen_random_uuid(),
   id_client uuid,
   id_route_transaction uuid,
-  id_route uuid,
+  id_route_day uuid,
   id_operation_type uuid NOT NULL,
   created_at timestamp without time zone NOT NULL,
   id_day_operation_dependent uuid,

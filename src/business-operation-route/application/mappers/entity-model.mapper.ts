@@ -97,7 +97,7 @@ export class Mapper {
 			id_work_day_operation: domainObject.id_work_day_operation,
 			id_client: domainObject.id_client,
 			id_route_transaction: domainObject.id_route_transaction,
-			id_route: domainObject.id_route,
+			id_route_day: domainObject.id_route_day,
 			id_operation_type: domainObject.id_operation_type,
 			created_at: domainObject.created_at,
 			id_day_operation_dependent: domainObject.id_day_operation_dependent,
@@ -114,7 +114,7 @@ export class Mapper {
 			model.id_work_day,
 			model.id_client,
 			model.id_route_transaction,
-			model.id_route,
+			model.id_route_day,
 			model.id_day_operation_dependent,
 		);
 	}
