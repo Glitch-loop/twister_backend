@@ -16,7 +16,7 @@ export const isWorkDayDto = (value: unknown): value is WorkDayDto => {
     typeof value.id_user === 'string' &&
     Array.isArray(value.notes) &&
     value.notes.every(isWorkDayNoteDto) &&
-    (value.final_petty_cash === undefined || typeof value.final_petty_cash === 'number') &&
-    (value.id_payment_stub === undefined || typeof value.id_payment_stub === 'string')
+    (value.final_petty_cash === null || typeof value.final_petty_cash === 'number') &&
+    (value.id_payment_stub === null || typeof value.id_payment_stub === 'string')
   );
 };

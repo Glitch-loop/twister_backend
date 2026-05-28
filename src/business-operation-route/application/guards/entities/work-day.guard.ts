@@ -9,7 +9,7 @@ export const isWorkDayEntity = (value: unknown): value is WorkDayEntity => {
     typeof value.start_petty_cash === 'number' &&
     typeof value.id_route_day === 'string' &&
     typeof value.id_user === 'string' &&
-    (value.final_petty_cash === undefined || typeof value.final_petty_cash === 'number') &&
-    (value.id_payment_stub === undefined || typeof value.id_payment_stub === 'string')
+    (value.final_petty_cash === null || typeof value.final_petty_cash === 'number') &&
+    (value.id_payment_stub === null || typeof value.id_payment_stub === 'string')
   );
 };
