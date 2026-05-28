@@ -1,4 +1,4 @@
-import type { InventoryOperationDescriptionObjectValue } from '@/src/core/object-values/inventory-operation-description.object-value';
+import { InventoryOperationDescriptionObjectValue } from '@/src/inventory-operations/core/value-objects/inventory-operation-description.object-value';
 import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isInventoryOperationDescriptionObjectValue = (value: unknown): value is InventoryOperationDescriptionObjectValue => {

@@ -1,4 +1,4 @@
-import type { InventoryOperationModel } from '@/src/application/models/inventory-operation.model';
+import type { InventoryOperationModel } from '@/src/inventory-operations/application/models/inventory-operation.model';
 
 import { isRecord } from '@/src/shared/application/guards/utils';
 
