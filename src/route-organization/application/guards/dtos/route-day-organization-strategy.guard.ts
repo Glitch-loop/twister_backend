@@ -1,8 +1,8 @@
-import type { OrganizationStrategyModel } from '@/src/route-organization/application/models/organization-strategy.model';
+import type { OrganizationStrategyDto } from '@/src/route-organization/application/dtos/route-day-organization-strategy.dto';
 
 import { isRecord } from '@/src/shared/application/guards/utils';
 
-export const isOrganizationStrategyModel = (value: unknown): value is OrganizationStrategyModel => {
+export const isOrganizationStrategyDto = (value: unknown): value is OrganizationStrategyDto => {
   if (!isRecord(value)) {
     return false;
   }

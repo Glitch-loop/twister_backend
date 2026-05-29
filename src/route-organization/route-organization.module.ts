@@ -26,6 +26,7 @@ import { UpdateRouteCommand } from '@/src/route-organization/application/command
 import { CreateRouteDayProposalCommand } from '@/src/route-organization/application/commands/create-route-day-proposal.command';
 import { UpdateRouteDayProposalCommand } from '@/src/route-organization/application/commands/update-route-day-proposal.command';
 import { DeleteRouteDayProposalCommand } from '@/src/route-organization/application/commands/delete-route-day-proposal.command';
+import { SelectRouteDayOrganizationStrategyCommand } from '@/src/route-organization/application/commands/select-route-day-organization-strategy.command';
 
 // Queries
 import { ListRouteDaysProposalsQuery } from '@/src/route-organization/application/queries/list-route-days-proposals.query';
@@ -33,6 +34,7 @@ import { ListRouteDaysQuery } from '@/src/route-organization/application/queries
 import { ListRoutesQuery } from '@/src/route-organization/application/queries/list-routes.query';
 import { RetrieveRouteDayByRouteDayIdQuery } from '@/src/route-organization/application/queries/retrieve-route-day-by-route_day-id.query';
 import { RetrieveRouteDaysProposalsByIdProposalQuery } from '@/src/route-organization/application/queries/retrieve-route-days-proposals-by-proposal-id_proposal.query';
+import { ListRouteDaysOrganizationStrategyQuery } from '@/src/route-organization/application/queries/list-route-days-organization-strategy.query';
 
 // Mappers
 import { Mapper as EntityModelMapper } from '@/src/route-organization/application/mappers/entity-model.mapper';
@@ -52,6 +54,7 @@ import { SharedModule } from '@/src/shared/shared.module';
     CreateNewRouteCommand,
     CreateRouteDayProposalCommand,
     DeleteRouteDayProposalCommand,
+    SelectRouteDayOrganizationStrategyCommand,
     DeactivateRouteCommand,
     ListRouteDaysQuery,
     ListRouteDaysProposalsQuery,
@@ -60,6 +63,7 @@ import { SharedModule } from '@/src/shared/shared.module';
     ReactivateRouteCommand,
     RetrieveRouteDayByRouteDayIdQuery,
     RetrieveRouteDaysProposalsByIdProposalQuery,
+    ListRouteDaysOrganizationStrategyQuery,
     SupabaseRouteProposalsRepository,
     UnassignRouteToVendorCommand,
     UpdateRouteDayProposalCommand,

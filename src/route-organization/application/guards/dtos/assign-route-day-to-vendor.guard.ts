@@ -10,7 +10,6 @@ export const isAssignRouteDayToVendorDto = (value: unknown): value is AssignRout
   return (
     (value.id_assigned_route_day === undefined || typeof value.id_assigned_route_day === 'string') &&
     typeof value.id_route_day === 'string' &&
-    typeof value.id_user === 'string' &&
-    (value.expired_at === undefined || value.expired_at instanceof Date)
+    typeof value.id_user === 'string'
   );
 };

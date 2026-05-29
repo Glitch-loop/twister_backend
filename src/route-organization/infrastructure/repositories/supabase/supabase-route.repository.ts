@@ -9,6 +9,7 @@ import { RouteEntity } from '@/src/route-organization/core/entities/route.entity
 import { RouteDayEntity } from '@/src/route-organization/core/entities/route-day.entity';
 import { AssignedRouteDayEntity } from '@/src/route-organization/core/entities/assigned-route-day.entity';
 import { DayEntity } from '@/src/route-organization/core/entities/day.entity';
+import { OrganizationStrategyEntity } from '@/src/route-organization/core/entities/organization-strategy.entity';
 
 // Value Objects
 import { RouteDayLocationObjectValue } from '@/src/route-organization/core/value-objects/route-day-location.object-value';
@@ -20,6 +21,7 @@ import { SupabaseDataSource } from '@/src/shared/infrastructure/datasources/supa
 import { RouteModel } from '@/src/route-organization/application/models/route.model';
 import { DayModel } from '@/src/route-organization/application/models/day.model';
 import { RouteDayModel } from '@/src/route-organization/application/models/route-day.model';
+import { OrganizationStrategyModel } from '@/src/route-organization/application/models/organization-strategy.model';
 
 // Mappers
 import { Mapper } from '@/src/route-organization/application/mappers/entity-model.mapper';
@@ -203,6 +205,64 @@ export class SupabaseRouteRepository implements RouteRepository {
     } catch (error) {
       throw new Error(
         `Failed to create route day: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+  }
+
+  async listOrganizationStrategies(): Promise<OrganizationStrategyEntity[]> {
+    try {
+      const { data, error } = await this.supabase
+        .from('organization_strategies')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        throw new Error(`Failed to list organization strategies: ${error.message}`);
+      }
+
+      return ((data ?? []) as OrganizationStrategyModel[]).map(
+        (strategyModel) => new OrganizationStrategyEntity(
+          strategyModel.id_organization_strategy,
+          strategyModel.organization_strategy_name,
+          strategyModel.is_used,
+          new Date(strategyModel.created_at),
+        ),
+      );
+    } catch (error) {
+      throw new Error(
+        `Failed to list organization strategies: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+  }
+
+  async selectOrganizationStrategy(idOrganizationStratgy: string): Promise<void> {
+    try {
+      const { error: resetError } = await this.supabase
+        .from('organization_strategies')
+        .update({ is_used: 0 })
+        .not('id_organization_strategy', 'is', null);
+
+      if (resetError) {
+        throw new Error(`Failed to reset organization strategy selection: ${resetError.message}`);
+      }
+
+      const { data, error } = await this.supabase
+        .from('organization_strategies')
+        .update({ is_used: 1 })
+        .eq('id_organization_strategy', idOrganizationStratgy)
+        .select('id_organization_strategy')
+        .maybeSingle();
+
+      if (error) {
+        throw new Error(`Failed to select organization strategy: ${error.message}`);
+      }
+
+      if (!data) {
+        throw new Error(`Organization strategy with id ${idOrganizationStratgy} was not found.`);
+      }
+    } catch (error) {
+      throw new Error(
+        `Failed to select organization strategy: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
   }

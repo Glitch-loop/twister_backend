@@ -20,7 +20,7 @@ import { WorkDayOperationHistoricDto } from '@/src/business-operation-route/appl
 import { StartWorkDayCommand } from '@/src/business-operation-route/application/commands/start-work-day.command';
 import { UpdateWorkDayCommand } from '@/src/business-operation-route/application/commands/finish-work-day.command';
 import { CreateWorkDayNoteCommand } from '@/src/business-operation-route/application/commands/create-work-day-note.command';
-import { AddWorkDayCommand } from '@/src/business-operation-route/application/commands/add-work-day.command';
+import { RegisterWorkDayBusinessOperationsCommand } from '@/src/business-operation-route/application/commands/register-work-day-business-operations.command';
 
 // Queries
 import { ListWorkDayQuery } from '@/src/business-operation-route/application/queries/list-work-day.query';
@@ -42,7 +42,7 @@ export class BusinessOperationRouteController {
 		private readonly startWorkDayCommand: StartWorkDayCommand,
 		private readonly updateWorkDayCommand: UpdateWorkDayCommand,
 		private readonly createWorkDayNoteCommand: CreateWorkDayNoteCommand,
-		private readonly addWorkDayCommand: AddWorkDayCommand,
+		private readonly registerWorkDayBusinessOperationsCommand: RegisterWorkDayBusinessOperationsCommand,
 		private readonly listWorkDayQuery: ListWorkDayQuery,
 		private readonly listWorkDayOperationsHistoricQuery: ListWorkDayOperationsHistoricQuery,
 		private readonly retrieveWorkDayByWorkDayIdQuery: RetrieveWorkDayByWorkDayIdQuery,
@@ -167,7 +167,7 @@ date at moment of the creation.`,
 			}>;
 		},
 	): Promise<httpControllerResponse> {
-		await this.addWorkDayCommand.execute(body.id_work_day, body.operations);
+		await this.registerWorkDayBusinessOperationsCommand.execute(body.id_work_day, body.operations);
 
 		const httpResponseFormatter = new httpFormatter();
 		return httpResponseFormatter.createResponse('Work day operations added successfully.');

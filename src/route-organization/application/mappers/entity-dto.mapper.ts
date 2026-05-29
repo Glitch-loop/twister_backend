@@ -11,12 +11,14 @@ import { RouteDayLocationDto } from '@/src/route-organization/application/dtos/r
 import { RouteDayProposalDto } from '@/src/route-organization/application/dtos/route-day-proposal.dto';
 import { RouteDayDto } from '@/src/route-organization/application/dtos/route-day.dto';
 import { RouteDto } from '@/src/route-organization/application/dtos/route.dto';
+import { OrganizationStrategyDto } from '@/src/route-organization/application/dtos/route-day-organization-strategy.dto';
 
 // Entities
 import { AssignedRouteDayEntity } from '@/src/route-organization/core/entities/assigned-route-day.entity';
 import { RouteDayEntity } from '@/src/route-organization/core/entities/route-day.entity';
 import { RouteDayProposalEntity } from '@/src/route-organization/core/entities/route-day-proposal.entity';
 import { RouteEntity } from '@/src/route-organization/core/entities/route.entity';
+import { OrganizationStrategyEntity } from '@/src/route-organization/core/entities/organization-strategy.entity';
 
 // Object values
 import { RouteDayLocationObjectValue } from '@/src/route-organization/core/value-objects/route-day-location.object-value';
@@ -30,12 +32,14 @@ import { isRouteDayLocationProposalDto } from '@/src/route-organization/applicat
 import { isRouteDayProposalDto } from '@/src/route-organization/application/guards/dtos/route-day-proposal.guard';
 import { isRouteDayDto } from '@/src/route-organization/application/guards/dtos/route-day.guard';
 import { isRouteDto } from '@/src/route-organization/application/guards/dtos/route.guard';
+import { isOrganizationStrategyDto } from '@/src/route-organization/application/guards/dtos/route-day-organization-strategy.guard';
 
 // Entities guards
 import { isAssignedRouteDayEntity } from '@/src/route-organization/application/guards/entities/assigned-route-day.guard';
 import { isRouteDayEntity } from '@/src/route-organization/application/guards/entities/route-day.guard';
 import { isRouteDayProposalEntity } from '@/src/route-organization/application/guards/entities/route-day-proposal.guard';
 import { isRouteEntity } from '@/src/route-organization/application/guards/entities/route.guard';
+import { isOrganizationStrategyEntity } from '@/src/route-organization/application/guards/entities/organization-strategy.guard';
 
 @Injectable()
 export class Mapper {
@@ -48,10 +52,11 @@ export class Mapper {
 	toDomainObject(dto: RouteDayProposalDto): RouteDayProposalEntity;
 	toDomainObject(dto: RouteDayDto): RouteDayEntity;
 	toDomainObject(dto: RouteDto): RouteEntity;
+	toDomainObject(dto: OrganizationStrategyDto): OrganizationStrategyEntity;
 	toDomainObject(
-		dto: AssignRouteDayToVendorDto | RouteDayLocationProposalDto | RouteDayProposalDto | RouteDayDto | RouteDto,
+		dto: AssignRouteDayToVendorDto | RouteDayLocationProposalDto | RouteDayProposalDto | RouteDayDto | RouteDto | OrganizationStrategyDto,
 		idOwner?: string,
-	): AssignedRouteDayEntity | RouteDayLocationObjectValue | RouteDayProposalEntity | RouteDayEntity | RouteEntity {
+	): AssignedRouteDayEntity | RouteDayLocationObjectValue | RouteDayProposalEntity | RouteDayEntity | RouteEntity | OrganizationStrategyEntity {
 		if (isAssignRouteDayToVendorDto(dto)) {
 			return this.assignRouteDayToVendorDtoToDomainObject(dto);
 		}
@@ -72,6 +77,10 @@ export class Mapper {
 			return this.routeDtoToDomainObject(dto);
 		}
 
+		if (isOrganizationStrategyDto(dto)) {
+			return this.organizationStrategyDtoToDomainObject(dto);
+		}
+
 		throw new Error('Invalid input for mapping to domain object');
 	}
 
@@ -82,10 +91,11 @@ export class Mapper {
 	toDto(domainObject: RouteDayProposalEntity, proposalLocations: RouteDayLocationObjectValue[]): RouteDayProposalDto;
 	toDto(domainObject: RouteDayEntity): RouteDayDto;
 	toDto(domainObject: RouteEntity): RouteDto;
+	toDto(domainObject: OrganizationStrategyEntity): OrganizationStrategyDto;
 	toDto(
-		domainObject: AssignedRouteDayEntity | RouteDayLocationObjectValue | RouteDayProposalEntity | RouteDayEntity | RouteEntity,
+		domainObject: AssignedRouteDayEntity | RouteDayLocationObjectValue | RouteDayProposalEntity | RouteDayEntity | RouteEntity | OrganizationStrategyEntity,
 		metadata?: boolean | RouteDayLocationObjectValue[],
-	): AssignRouteDayToVendorDto | RouteDayLocationProposalDto | RouteDayLocationDto | RouteDayProposalDto | RouteDayDto | RouteDto {
+	): AssignRouteDayToVendorDto | RouteDayLocationProposalDto | RouteDayLocationDto | RouteDayProposalDto | RouteDayDto | RouteDto | OrganizationStrategyDto {
 		if (isAssignedRouteDayEntity(domainObject)) {
 			return this.assignedRouteDayDomainObjectToDto(domainObject);
 		}
@@ -112,6 +122,10 @@ export class Mapper {
 
 		if (isRouteEntity(domainObject)) {
 			return this.routeDomainObjectToDto(domainObject);
+		}
+
+		if (isOrganizationStrategyEntity(domainObject)) {
+			return this.organizationStrategyDomainObjectToDto(domainObject);
 		}
 
 		throw new Error('Invalid input for mapping to dto');
@@ -159,6 +173,15 @@ export class Mapper {
 			route_name: domainObject.route_name,
 			description: domainObject.description,
 		};
+	}
+
+	private organizationStrategyDomainObjectToDto(domainObject: OrganizationStrategyEntity): OrganizationStrategyDto {
+		return new OrganizationStrategyDto(
+			domainObject.id_organization_strategy,
+			domainObject.organization_strategy_name,
+			domainObject.is_used,
+			domainObject.created_at,
+		);
 	}
 
 	private routeDayProposalDomainObjectToDto(
@@ -211,6 +234,15 @@ export class Mapper {
 			dto.route_name,
 			ROUTE_STATUS_ENUM.ACTIVE,
 			dto.description,
+		);
+	}
+
+	private organizationStrategyDtoToDomainObject(dto: OrganizationStrategyDto): OrganizationStrategyEntity {
+		return new OrganizationStrategyEntity(
+			dto.id_organization_strategy,
+			dto.organization_strategy_name,
+			dto.is_used,
+			dto.created_at,
 		);
 	}
 

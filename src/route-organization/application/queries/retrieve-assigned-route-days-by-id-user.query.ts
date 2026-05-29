@@ -38,7 +38,7 @@ export class RetrieveAssignedRouteDaysByIdUserQuery {
     });
 
     if (expiredAssignations.length > 0) {
-      // await this.routeRepository.removeRouteDayAssignation(expiredAssignations);
+      await this.routeRepository.removeRouteDayAssignation(expiredAssignations);
     }
 
     const activeRouteDayIds = new Set(

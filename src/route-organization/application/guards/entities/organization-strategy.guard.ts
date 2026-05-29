@@ -6,7 +6,6 @@ export const isOrganizationStrategyEntity = (value: unknown): value is Organizat
   return (
     typeof value.id_organization_strategy === 'string' &&
     typeof value.organization_strategy_name === 'string' &&
-    typeof value.is_used === 'number' &&
-    value.created_at instanceof Date
+    typeof value.is_used === 'number'
   );
 };

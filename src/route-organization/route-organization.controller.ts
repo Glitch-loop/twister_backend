@@ -16,6 +16,7 @@ import { RouteDayDto } from '@/src/route-organization/application/dtos/route-day
 import { RouteDayProposalDto } from '@/src/route-organization/application/dtos/route-day-proposal.dto';
 import { RouteDto } from '@/src/route-organization/application/dtos/route.dto';
 import { UpdateRouteDayProposalRequestDto } from '@/src/route-organization/application/dtos/update-route-day-proposal-request.dto';
+import { OrganizationStrategyDto } from '@/src/route-organization/application/dtos/route-day-organization-strategy.dto';
 
 // Presentation
 import { httpControllerResponse } from '@/src/shared/presentation/http/interfaces/controller-response.interface';
@@ -35,6 +36,7 @@ import { UnassignRouteToVendorCommand } from '@/src/route-organization/applicati
 import { CreateRouteDayProposalCommand } from '@/src/route-organization/application/commands/create-route-day-proposal.command';
 import { DeleteRouteDayProposalCommand } from '@/src/route-organization/application/commands/delete-route-day-proposal.command';
 import { UpdateRouteDayProposalCommand } from '@/src/route-organization/application/commands/update-route-day-proposal.command';
+import { SelectRouteDayOrganizationStrategyCommand } from '@/src/route-organization/application/commands/select-route-day-organization-strategy.command';
 
 // Queries
 import { ListRouteDaysQuery } from '@/src/route-organization/application/queries/list-route-days.query';
@@ -43,13 +45,8 @@ import { ListRoutesQuery } from '@/src/route-organization/application/queries/li
 import { RetrieveRouteDaysProposalsByIdProposalQuery } from '@/src/route-organization/application/queries/retrieve-route-days-proposals-by-proposal-id_proposal.query';
 import { RetrieveRouteDayByRouteDayIdQuery } from '@/src/route-organization/application/queries/retrieve-route-day-by-route_day-id.query';
 import { RetrieveAssignedRouteDaysByIdUserQuery } from './application/queries/retrieve-assigned-route-days-by-id-user.query';
+import { ListRouteDaysOrganizationStrategyQuery } from '@/src/route-organization/application/queries/list-route-days-organization-strategy.query';
 
-/*
-TODO:
-	List organization strategies
-	Select organization strategy
-
-*/
 
 @ApiTags('Route Organization')
 @Controller('route-organization')
@@ -66,6 +63,8 @@ export class RouteOrganizationController {
 		private readonly listRouteDaysQuery: ListRouteDaysQuery,
 		private readonly retrieveRouteDayByRouteDayIdQuery: RetrieveRouteDayByRouteDayIdQuery,
 		private readonly retrieveAssignedRouteDaysByIdUserQuery: RetrieveAssignedRouteDaysByIdUserQuery,
+		private readonly selectRouteDayOrganizationStrategyCommand: SelectRouteDayOrganizationStrategyCommand,
+		private readonly listRouteDaysOrganizationStrategyQuery: ListRouteDaysOrganizationStrategyQuery,
 
 		// Related to route proposals
 		private readonly createRouteDayProposalCommand: CreateRouteDayProposalCommand,
@@ -74,6 +73,35 @@ export class RouteOrganizationController {
 		private readonly listRouteDaysProposalsQuery: ListRouteDaysProposalsQuery,
 		private readonly retrieveRouteDaysProposalsByIdProposalQuery: RetrieveRouteDaysProposalsByIdProposalQuery,
 	) {}
+
+	@ApiOperation({
+		summary: 'List organization strategies',
+		description: 'Returns all available organization strategies. This endpoint does not use pagination.',
+	})
+	@ApiOkResponse({ description: 'Standardized response with organization strategy collection.', type: [OrganizationStrategyDto] })
+	@Get('/routes/days/organization-strategies')
+	async listOrganizationStrategies(): Promise<httpControllerResponse> {
+		const strategies: OrganizationStrategyDto[] = await this.listRouteDaysOrganizationStrategyQuery.execute();
+
+		const httpResponseFormatter = new httpFormatter();
+		return httpResponseFormatter.createResponse('Organization strategies listed successfully.', strategies);
+	}
+
+	@ApiOperation({
+		summary: 'Select organization strategy',
+		description: 'Marks one organization strategy as selected.',
+	})
+	@ApiParam({ name: 'id_organization_strategy', description: 'Organization strategy identifier', type: String })
+	@ApiOkResponse({ description: 'Standardized response with operation message.' })
+	@Patch('/routes/days/organization-strategies/:id_organization_strategy/select')
+	async selectOrganizationStrategy(
+		@Param('id_organization_strategy') id_organization_strategy: string,
+	): Promise<httpControllerResponse> {
+		await this.selectRouteDayOrganizationStrategyCommand.execute(id_organization_strategy);
+
+		const httpResponseFormatter = new httpFormatter();
+		return httpResponseFormatter.createResponse('Organization strategy selected successfully.');
+	}
 
 	@ApiOperation({
 		summary: 'Create route',
@@ -197,8 +225,11 @@ this behavior is needed.`,
 	}
 
 	@ApiOperation({
-		summary: 'Retrieve route days by user ids',
-		description: 'Retrieves all route days assigned to the provided user ids. Maximum 100 ids and no pagination.',
+		summary: 'Retrieve route days by user ids (retrieve route days assigned to a vendor). ',
+		description: `Endpoint for retrieving the route days assigned to the user.
+	
+Note:
+- If the request detects there is an expired assignation, this automatically will delete the assignation and this will not be part of the response.`,
 	})
 	@ApiBody({
 		schema: {

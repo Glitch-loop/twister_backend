@@ -18,7 +18,7 @@ import { Mapper as EntityModelMapper } from '@/src/business-operation-route/appl
 import { Mapper as EntityDtoMapper } from '@/src/business-operation-route/application/mappers/entity-dto.mapper';
 
 // Commands
-import { AddWorkDayCommand } from '@/src/business-operation-route/application/commands/add-work-day.command';
+import { RegisterWorkDayBusinessOperationsCommand } from '@/src/business-operation-route/application/commands/register-work-day-business-operations.command';
 import { CreateWorkDayNoteCommand } from '@/src/business-operation-route/application/commands/create-work-day-note.command';
 import { StartWorkDayCommand } from '@/src/business-operation-route/application/commands/start-work-day.command';
 import { UpdateWorkDayCommand } from '@/src/business-operation-route/application/commands/finish-work-day.command';
@@ -37,7 +37,7 @@ import { RouteOrganizationModule } from '@/src/route-organization/route-organiza
   imports: [SharedModule, RouteOrganizationModule],
   controllers: [BusinessOperationRouteController],
   providers: [
-    AddWorkDayCommand,
+    RegisterWorkDayBusinessOperationsCommand,
     CreateWorkDayNoteCommand,
     StartWorkDayCommand,
     UpdateWorkDayCommand,

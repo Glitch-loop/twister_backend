@@ -6,6 +6,7 @@ import { RouteEntity } from '@/src/route-organization/core/entities/route.entity
 import { RouteDayEntity } from '@/src/route-organization/core/entities/route-day.entity';
 import { AssignedRouteDayEntity } from '@/src/route-organization/core/entities/assigned-route-day.entity';
 import { DayEntity } from '@/src/route-organization/core/entities/day.entity';
+import { OrganizationStrategyEntity } from '@/src/route-organization/core/entities/organization-strategy.entity';
 
 export abstract class RouteRepository {
   abstract deleteRouteDayLocations(idRouteDay: string): Promise<void>;
@@ -15,6 +16,8 @@ export abstract class RouteRepository {
   abstract createRouteDayAssignation(assignedRouteDay: AssignedRouteDayEntity): Promise<void>;
   abstract removeRouteDayAssignation(assignedRouteDay: AssignedRouteDayEntity[]): Promise<void>;
   abstract createRouteDay(routeDayEntity: RouteDayEntity): Promise<void>;
+  abstract selectOrganizationStrategy(idOrganizationStratgy: string): Promise<void>;
+  abstract listOrganizationStrategies(): Promise<OrganizationStrategyEntity[]>;
   abstract listDays(): Promise<DayEntity[]>;
   abstract listRoutes(route_name?: string, route_status?: number): Promise<RouteEntity[]>;
   abstract retrieveRoutesByRouteId(idRoutes: string[]): Promise<RouteEntity[]>;
