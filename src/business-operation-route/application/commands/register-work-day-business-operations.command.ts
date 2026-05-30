@@ -12,7 +12,7 @@ import { WorkDayAggregate } from '@/src/business-operation-route/core/aggregates
 // Enums
 import { DAY_OPERATIONS_ENUM } from '@/src/business-operation-route/core/enums/day-operations.enum';
 import { BusinessRuleException } from '@/src/shared/errors/BusinessRuleException';
-import { WorkDayEntity } from '../../core/entities/work-day.entity';
+import { WorkDayEntity } from '@/src/business-operation-route/core/entities/work-day.entity';
 
 @Injectable()
 export class RegisterWorkDayBusinessOperationsCommand {
