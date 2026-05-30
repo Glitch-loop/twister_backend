@@ -8,6 +8,8 @@ type CreateBusinessOperationParams = {
 	id_work_day: string;
 	id_operation_type: DAY_OPERATIONS_ENUM;
 	created_at: Date;
+	latitude?: string;
+	longitude?: string;
 	id_client?: string;
 	id_route_transaction?: string;
 	id_route_day?: string;
@@ -46,6 +48,9 @@ export class BusinessOperationDay {
 				return;
 			case DAY_OPERATIONS_ENUM.attend_client_petition:
 				this.registerAttendClientPetition(params);
+				return;
+			case DAY_OPERATIONS_ENUM.client_visited:
+				this.registerClientVisited(params);
 				return;
 			case DAY_OPERATIONS_ENUM.route_transaction:
 			case DAY_OPERATIONS_ENUM.cancel_route_transaction:
@@ -111,6 +116,8 @@ export class BusinessOperationDay {
 			DAY_OPERATIONS_ENUM.route_client_attention,
 			params.created_at,
 			params.id_work_day,
+			params.latitude ?? '',
+			params.longitude ?? '',
 			params.id_client,
 			undefined,
 			params.id_route_day,
@@ -132,6 +139,8 @@ export class BusinessOperationDay {
 			DAY_OPERATIONS_ENUM.attention_out_of_route,
 			params.created_at,
 			params.id_work_day,
+			params.latitude ?? '',
+			params.longitude ?? '',
 			params.id_client,
 			undefined,
 			params.id_route_day,
@@ -153,6 +162,8 @@ export class BusinessOperationDay {
 			DAY_OPERATIONS_ENUM.new_client_registration,
 			params.created_at,
 			params.id_work_day,
+			params.latitude ?? '',
+			params.longitude ?? '',
 			params.id_client,
 			undefined,
 			params.id_route_day,
@@ -174,6 +185,31 @@ export class BusinessOperationDay {
 			DAY_OPERATIONS_ENUM.attend_client_petition,
 			params.created_at,
 			params.id_work_day,
+			params.latitude ?? '',
+			params.longitude ?? '',
+			params.id_client,
+			undefined,
+			params.id_route_day,
+			params.id_day_operation_dependent,
+		);
+
+		this.insertOperationDayNextToCurrentOperation(newDayOperation);
+	}
+
+	private registerClientVisited(params: CreateBusinessOperationParams): void {
+		if (!params.id_client) {
+			throw new BusinessRuleException('id_client is required for client visited operations.');
+		}
+
+		this.verifyClientIsNotBeingRepeatedForClientOperations(params.id_client);
+
+		const newDayOperation = new WorkDayOperationHistoricEntity(
+			params.id_work_day_operation,
+			DAY_OPERATIONS_ENUM.client_visited,
+			params.created_at,
+			params.id_work_day,
+			params.latitude ?? '',
+			params.longitude ?? '',
 			params.id_client,
 			undefined,
 			params.id_route_day,
@@ -193,6 +229,8 @@ export class BusinessOperationDay {
 			params.id_operation_type,
 			params.created_at,
 			params.id_work_day,
+			params.latitude ?? '',
+			params.longitude ?? '',
 			params.id_client,
 			params.id_route_transaction,
 			params.id_route_day,
@@ -208,6 +246,8 @@ export class BusinessOperationDay {
 			params.id_operation_type,
 			params.created_at,
 			params.id_work_day,
+			params.latitude ?? '',
+			params.longitude ?? '',
 			undefined,
 			undefined,
 			params.id_route_day,
@@ -289,6 +329,7 @@ export class BusinessOperationDay {
 					|| dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.attend_client_petition
 					|| dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.new_client_registration
 					|| dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.attention_out_of_route
+					|| dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.client_visited
 				);
 		});
 

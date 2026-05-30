@@ -63,6 +63,12 @@ export class WorkDayAggregate {
         this._workDayInformation = finishedWorkDay;
     }
 
+    isWorkDayFinished():boolean {
+        if (!this._workDayInformation) throw new Error("Work day information is not set.");
+        if(this._workDayInformation.final_petty_cash !== null || this._workDayInformation.final_petty_cash !== undefined) return true
+        else return false 
+    }
+
     getWorkDayInformation(): WorkDayEntity {
         if (!this._workDayInformation) throw new Error("Work day information is not set.");
         return this._workDayInformation;

@@ -117,7 +117,30 @@ date at moment of the creation.`,
 
 	@ApiOperation({
 		summary: 'Add work day operations',
-		description: 'Adds operation records to a work day and returns a standardized controller response.',
+		description: `Adds operation records to a work day and returns a standardized controller response.
+Supported operations:
+Related to inventory
+- start_shift_inventory: ${DAY_OPERATIONS_ENUM.start_shift_inventory}
+- restock_inventory: ${DAY_OPERATIONS_ENUM.restock_inventory}
+- end_shift_inventory: ${DAY_OPERATIONS_ENUM.end_shift_inventory}
+- product_devolution_inventory: ${DAY_OPERATIONS_ENUM.product_devolution_inventory}
+- consult_inventory: ${DAY_OPERATIONS_ENUM.consult_inventory}
+- cancel_inventory_operation: ${DAY_OPERATIONS_ENUM.cancel_inventory_operation}
+
+Related to route transaction
+- product_devolution: ${DAY_OPERATIONS_ENUM.product_devolution}
+- sales: ${DAY_OPERATIONS_ENUM.sales}
+- product_reposition: ${DAY_OPERATIONS_ENUM.product_reposition}
+- route_transaction: ${DAY_OPERATIONS_ENUM.route_transaction}
+- cancel_route_transaction: ${DAY_OPERATIONS_ENUM.cancel_route_transaction}
+
+Related to client operations
+- attention_out_of_route: ${DAY_OPERATIONS_ENUM.attention_out_of_route}
+- new_client_registration: ${DAY_OPERATIONS_ENUM.new_client_registration}
+- route_client_attention: ${DAY_OPERATIONS_ENUM.route_client_attention}
+- attend_client_petition: ${DAY_OPERATIONS_ENUM.attend_client_petition}
+
+`,
 	})
 	@ApiBody({
 		schema: {
@@ -137,6 +160,8 @@ date at moment of the creation.`,
 								enum: Object.values(DAY_OPERATIONS_ENUM),
 							},
 							created_at: { type: 'string', format: 'date-time' },
+							latitude: { type: 'string', example: '19.45602930548609' },
+							longitude: { type: 'string', example: '-99.13450312485135' },
 							id_client: { type: 'string', format: 'uuid' },
 							id_route_transaction: { type: 'string', format: 'uuid' },
 							id_route_day: { type: 'string', format: 'uuid' },
@@ -159,6 +184,8 @@ date at moment of the creation.`,
 			operations: Array<{
 				id_operation_type: DAY_OPERATIONS_ENUM;
 				created_at?: Date;
+				latitude?: string;
+				longitude?: string;
 				id_client?: string;
 				id_route_transaction?: string;
 				id_route_day?: string;

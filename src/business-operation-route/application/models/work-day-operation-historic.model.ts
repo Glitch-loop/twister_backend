@@ -5,6 +5,8 @@ export interface WorkDayOperationHistoricModel {
   id_client?: string;
   id_route_transaction?: string;
   id_route_day?: string;
+  latitude?: string;
+  longitude?: string;
   id_operation_type: DAY_OPERATIONS_ENUM;
   created_at: Date;
   id_day_operation_dependent?: string;

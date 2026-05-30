@@ -20,6 +20,12 @@ export class WorkDayOperationHistoricDto {
 	@ApiProperty({ type: String, example: '2026-05-27T08:20:00.000Z' })
 	public readonly created_at: Date;
 
+	@ApiPropertyOptional({ type: String, example: '19.45602930548609' })
+	public readonly latitude?: string;
+
+	@ApiPropertyOptional({ type: String, example: '-99.13450312485135' })
+	public readonly longitude?: string;
+
 	@ApiPropertyOptional({ type: String, example: '0e72ec26-0df4-4dc0-a204-b8f3223bb8f8' })
 	public readonly id_day_operation_dependent?: string;
 
@@ -30,19 +36,23 @@ export class WorkDayOperationHistoricDto {
 		_id_work_day_operation: string,
 		_id_operation_type: DAY_OPERATIONS_ENUM,
 		_created_at: Date,
+		_latitude: string,
+		_longitude: string,
 		_id_work_day: string,
 		_id_client?: string,
 		_id_route_transaction?: string,
 		_id_route_day?: string,
 		_id_day_operation_dependent?: string,
 	) {
+		this.id_work_day = _id_work_day;
+		this.id_operation_type = _id_operation_type;
+		this.created_at = _created_at;
+		this.latitude = _latitude;
+		this.longitude = _longitude;
 		this.id_work_day_operation = _id_work_day_operation;
 		this.id_client = _id_client;
 		this.id_route_transaction = _id_route_transaction;
 		this.id_route_day = _id_route_day;
-		this.id_operation_type = _id_operation_type;
-		this.created_at = _created_at;
 		this.id_day_operation_dependent = _id_day_operation_dependent;
-		this.id_work_day = _id_work_day;
 	}
 }

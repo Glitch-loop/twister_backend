@@ -19,4 +19,5 @@ export enum DAY_OPERATIONS_ENUM {
 	new_client_registration = 'a29dccef-d5a0-470d-a353-2f95e1057514',
 	route_client_attention = '39088d69-f29d-4b9b-be59-a3571924cf54',
 	attend_client_petition = '7bfd1aae-b315-4954-a11d-249f413b3d9e',
+	client_visited				 = '45354223-2156-46d0-8aa7-6f178f85671a',
 }
