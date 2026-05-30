@@ -6,7 +6,7 @@ import { WorkDayRepository } from '@/src/business-operation-route/core/interface
 import { IntegrityRepository } from '@/src/shared/core/interfaces/integrity.repository';
 
 // Aggregate
-import { BusinessOperationDay } from '@/src/business-operation-route/core/aggregates/business-operation-day.Aggregate';
+import { BusinessOperationDay } from '@/src/business-operation-route/core/aggregates/business-operation-day.aggregate';
 import { WorkDayAggregate } from '@/src/business-operation-route/core/aggregates/work-day.aggregate';
 
 // Enums
