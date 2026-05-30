@@ -82,6 +82,6 @@ import { SharedModule } from '@/src/shared/shared.module';
     },
     SupabaseDataSource,
   ],
-  exports: [RouteRepository],
+  exports: [RouteRepository, OrganizeRouteDayCommand],
 })
 export class RouteOrganizationModule {}

@@ -10,6 +10,7 @@ import { RouteDayEntity } from '@/src/route-organization/core/entities/route-day
 import { AssignedRouteDayEntity } from '@/src/route-organization/core/entities/assigned-route-day.entity';
 import { DayEntity } from '@/src/route-organization/core/entities/day.entity';
 import { OrganizationStrategyEntity } from '@/src/route-organization/core/entities/organization-strategy.entity';
+import { ROUTE_ORGANIZATION_STRATEGIES_ENUM } from '@/src/route-organization/core/enums/route-organization-strategies.enum';
 
 // Value Objects
 import { RouteDayLocationObjectValue } from '@/src/route-organization/core/value-objects/route-day-location.object-value';
@@ -37,6 +38,14 @@ export class SupabaseRouteRepository implements RouteRepository {
 
   private get supabase() {
     return this.supabaseDataSource.getClient();
+  }
+
+  private toOrganizationStrategyEnum(strategyId: string): ROUTE_ORGANIZATION_STRATEGIES_ENUM {
+    if (Object.values(ROUTE_ORGANIZATION_STRATEGIES_ENUM).includes(strategyId as ROUTE_ORGANIZATION_STRATEGIES_ENUM)) {
+      return strategyId as ROUTE_ORGANIZATION_STRATEGIES_ENUM;
+    }
+
+    throw new Error(`Invalid organization strategy id: ${strategyId}`);
   }
 
   async deleteRouteDayLocations(id_route_day: string): Promise<void> {
@@ -222,7 +231,7 @@ export class SupabaseRouteRepository implements RouteRepository {
 
       return ((data ?? []) as OrganizationStrategyModel[]).map(
         (strategyModel) => new OrganizationStrategyEntity(
-          strategyModel.id_organization_strategy,
+          this.toOrganizationStrategyEnum(strategyModel.id_organization_strategy),
           strategyModel.organization_strategy_name,
           strategyModel.is_used,
           new Date(strategyModel.created_at),

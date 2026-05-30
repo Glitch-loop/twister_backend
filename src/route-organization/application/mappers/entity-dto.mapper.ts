@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 
 // Enums
 import { ROUTE_STATUS_ENUM } from '@/src/route-organization/core/enums/route-status.enum';
+import { ROUTE_ORGANIZATION_STRATEGIES_ENUM } from '@/src/route-organization/core/enums/route-organization-strategies.enum';
 
 // Dtos
 import { AssignRouteDayToVendorDto } from '@/src/route-organization/application/dtos/assign-route-day-to-vendor.dto';
@@ -238,12 +239,24 @@ export class Mapper {
 	}
 
 	private organizationStrategyDtoToDomainObject(dto: OrganizationStrategyDto): OrganizationStrategyEntity {
+		const strategyId = this.toOrganizationStrategyEnum(dto.id_organization_strategy);
+
 		return new OrganizationStrategyEntity(
-			dto.id_organization_strategy,
+			strategyId,
 			dto.organization_strategy_name,
 			dto.is_used,
 			dto.created_at,
 		);
+	}
+
+	private toOrganizationStrategyEnum(
+		strategyId: string,
+	): ROUTE_ORGANIZATION_STRATEGIES_ENUM {
+		if (Object.values(ROUTE_ORGANIZATION_STRATEGIES_ENUM).includes(strategyId as ROUTE_ORGANIZATION_STRATEGIES_ENUM)) {
+			return strategyId as ROUTE_ORGANIZATION_STRATEGIES_ENUM;
+		}
+
+		throw new Error(`Invalid organization strategy id: ${strategyId}`);
 	}
 
 	private routeDayLocationProposalDtoToDomainObject(

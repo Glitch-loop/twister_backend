@@ -16,7 +16,7 @@ type CreateBusinessOperationParams = {
 	id_day_operation_dependent?: string;
 };
 
-export class BusinessOperationDay {
+export class BusinessOperationDayAggregate {
 	private dayOperations: WorkDayOperationHistoricEntity[] | null;
 	private initialDayOperations: WorkDayOperationHistoricEntity[] | null;
 
@@ -100,6 +100,38 @@ export class BusinessOperationDay {
 		}
 
 		return this.dayOperations[indexCurrentOperation];
+	}
+
+	getLastOperationByTypeBeforeCurrentOperation(
+		idCurrentOperation: string,
+		targetOperationType: Set<DAY_OPERATIONS_ENUM>,
+	): WorkDayOperationHistoricEntity | undefined {
+		if (!this.dayOperations || this.dayOperations.length === 0) {
+			return undefined;
+		}
+
+		const orderedOperations = [...this.dayOperations].sort(
+			(a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+		);
+
+		const currentOperationIndex = orderedOperations.findIndex(
+			(operation) => operation.id_work_day_operation === idCurrentOperation,
+		);
+
+		if (currentOperationIndex === -1) {
+			throw new BusinessRuleException(
+				`Current operation with id ${idCurrentOperation} does not exist in this work day flow.`,
+			);
+		}
+
+		for (let index = currentOperationIndex - 1; index >= 0; index -= 1) {
+			const { id_operation_type } = orderedOperations[index];
+			if (targetOperationType.has(id_operation_type)) {
+				return orderedOperations[index];
+			}
+		}
+
+		return undefined;
 	}
 
 	private registerAttendTodaysClient(params: CreateBusinessOperationParams): void {
