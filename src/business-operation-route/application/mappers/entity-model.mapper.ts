@@ -56,6 +56,7 @@ export class Mapper {
 		workDayNoteModels?: WorkDayNoteModel[],
 	): WorkDayOperationHistoricEntity | NoteObjectValue | WorkDayEntity {
 		if (isWorkDayOperationHistoricModel(model)) {
+			console.log("Is historic model")
 			return this.workDayOperationHistoricModelToDomainObject(model);
 		}
 

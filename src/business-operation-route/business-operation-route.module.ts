@@ -32,6 +32,8 @@ import { RetrieveWorkDayOperationsHistoricByWorkDayIdQuery } from '@/src/busines
 // Modules
 import { SharedModule } from '@/src/shared/shared.module';
 import { RouteOrganizationModule } from '@/src/route-organization/route-organization.module';
+import { BusinessOperationBroker } from './Providers/BusinessOperationBroker';
+import { RouteBusinessOperationRegisteredHandler } from './Providers/RouteBusinessOperationRegisteredHandler';
 
 @Module({
   imports: [SharedModule, RouteOrganizationModule],
@@ -52,6 +54,8 @@ import { RouteOrganizationModule } from '@/src/route-organization/route-organiza
       useClass: WorkDaySupabaseRepository,
     },
     SupabaseDataSource,
+    BusinessOperationBroker,
+    RouteBusinessOperationRegisteredHandler,
   ],
 })
 export class BusinessOperationRouteModule {}

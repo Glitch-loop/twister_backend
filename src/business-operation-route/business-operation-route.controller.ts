@@ -1,5 +1,15 @@
 // Libraries
-import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { 
+	Body, 
+	Controller, 
+	Get, 
+	Param, 
+	Patch, 
+	Post, 
+	Query,
+	Sse
+} from '@nestjs/common';
+
 import {
 	ApiBody,
 	ApiOkResponse,
@@ -8,6 +18,10 @@ import {
 	ApiQuery,
 	ApiTags,
 } from '@nestjs/swagger';
+
+// Streams
+import { OnEvent } from '@nestjs/event-emitter';
+import { Subject, interval, map, Observable } from 'rxjs';
 
 // DTOs
 import { StartShiftWorkDayRequestDto } from '@/src/business-operation-route/application/dtos/start-work-day-request.dto';
@@ -34,6 +48,8 @@ import { DAY_OPERATIONS_ENUM } from '@/src/business-operation-route/core/enums/d
 // Presentation
 import { httpControllerResponse } from '@/src/shared/presentation/http/interfaces/controller-response.interface';
 import { httpFormatter } from '@/src/shared/presentation/http/handlers/http-formatter.handler';
+import { BusinessOperationBroker } from './Providers/BusinessOperationBroker';
+
 
 @ApiTags('Business Operation Route')
 @Controller('business-operation-route')
@@ -47,7 +63,31 @@ export class BusinessOperationRouteController {
 		private readonly listWorkDayOperationsHistoricQuery: ListWorkDayOperationsHistoricQuery,
 		private readonly retrieveWorkDayByWorkDayIdQuery: RetrieveWorkDayByWorkDayIdQuery,
 		private readonly retrieveWorkDayOperationsHistoricByWorkDayIdQuery: RetrieveWorkDayOperationsHistoricByWorkDayIdQuery,
+		private readonly businessOperationBroker: BusinessOperationBroker
 	) {}
+
+	// 1. Create an internal RxJS Subject to stream your data
+	private readonly businessOperation$ = new Subject<any>();
+
+	// 2. The SSE Endpoint: Runs ONCE when a client connects
+  @Sse('stream')
+  sse(): Observable<MessageEvent> {
+    // Return the subject as an observable. 
+    // Format the data into the structure SSE expects ({ data: ... })
+    return this.businessOperation$.asObservable().pipe(
+      map((payload) => ({ data: payload } as MessageEvent))
+    );
+  }
+	
+// 3. The Event Listener: Fires every time the domain event is emitted
+  @OnEvent('route-business-operation.register', { async: true })
+  handleOrderCreatedEvent(payload: any) {
+    console.log('From listener, pushing to SSE:', payload);
+    
+    // Push the event payload directly into the RxJS stream
+    this.businessOperation$.next(payload);
+  }
+
 
 	@ApiOperation({
 		summary: 'Start work day',
@@ -194,6 +234,7 @@ Related to client operations
 			}>;
 		},
 	): Promise<httpControllerResponse> {
+		console.log("Insert business operations")
 		await this.registerWorkDayBusinessOperationsCommand.execute(body.id_work_day, body.operations);
 
 		const httpResponseFormatter = new httpFormatter();

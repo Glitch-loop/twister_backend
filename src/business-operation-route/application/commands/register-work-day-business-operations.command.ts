@@ -1,5 +1,6 @@
 // Libraries
 import { Inject, Injectable } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 // Repository
 import { WorkDayRepository } from '@/src/business-operation-route/core/interfaces/work-day.repository';
@@ -25,6 +26,7 @@ import { RouteOrganizationStrategyAggregate } from '@/src/route-organization/cor
 import { ROUTE_ORGANIZATION_STRATEGIES_ENUM } from '@/src/route-organization/core/enums/route-organization-strategies.enum';
 import { RouteDayLocationObjectValue } from '@/src/route-organization/core/value-objects/route-day-location.object-value';
 import { OrganizeRouteDayCommand } from '@/src/route-organization/application/commands/organize-route-day.command';
+import { Mapper } from '../mappers/entity-dto.mapper';
 
 @Injectable()
 export class RegisterWorkDayBusinessOperationsCommand {
@@ -32,7 +34,9 @@ export class RegisterWorkDayBusinessOperationsCommand {
 		@Inject(WorkDayRepository) private readonly workDayRepository: WorkDayRepository,
 		@Inject(IntegrityRepository) private readonly integrityRepository: IntegrityRepository,
 		@Inject(RouteRepository) private readonly routeRepository: RouteRepository,
-		private readonly organizeRouteDayCommand: OrganizeRouteDayCommand
+		private eventEmitter: EventEmitter2,
+		private readonly organizeRouteDayCommand: OrganizeRouteDayCommand,
+		private readonly mapper: Mapper
 	) {}
 
 	async execute(
@@ -48,15 +52,13 @@ export class RegisterWorkDayBusinessOperationsCommand {
 		}>,
 	): Promise<void> {
 		const workDays: WorkDayEntity[] = await this.workDayRepository.retrieveWorkDayByWorkDayId([ id_work_day ])
-
 		if (workDays.length === 0) throw new BusinessRuleException(`Work day with id ${id_work_day} which you are trying to register route business operations doesn't exist.`);
 
 		const { id_route_day } = workDays[0];
-
 		const workDayToAdd:WorkDayAggregate = new WorkDayAggregate(workDays[0]);
-
 		if(!workDayToAdd.isWorkDayFinished()) throw new BusinessRuleException(`Work day with id ${id_work_day} is already finished. You cannot add business operation to a finished work day.`)
-		
+			
+		// Retrieving work day model
 		const currentOperations = await this.workDayRepository.retrieveWorkDayOperationsHistoricByWorkDayId([
 			id_work_day,
 		]);
@@ -83,9 +85,8 @@ export class RegisterWorkDayBusinessOperationsCommand {
 		if (!newOperations || newOperations.length === 0) {
 			return;
 		}
-
+		
 		const newClientLocationOperation = newOperations.filter((operation) => operation.id_operation_type === DAY_OPERATIONS_ENUM.new_client_registration);
-
 		if (newClientLocationOperation.length > 0) {
 			newClientLocationOperation.forEach((newClientRegistry) => {
 				if (newClientRegistry.id_work_day !== id_work_day) throw new BusinessRuleException(`The business operation with id ${newClientRegistry.id_work_day_operation} (type of operation: register new client) is invalid. Work days differ. Work day that belongs the new client record: ${newClientRegistry.id_work_day}. Work day of the request ${id_work_day}`)
@@ -187,6 +188,15 @@ export class RegisterWorkDayBusinessOperationsCommand {
 
 			await this.organizeRouteDayCommand.execute(id_route_day, locations);
 		}
+		
 		await this.workDayRepository.insertWorkDayHistoric(newOperations);
+		// this.eventEmitter.emit(
+		// 	'route-business-operation.register',
+		// 	newOperations
+		// )
+		this.eventEmitter.emit(
+			'route-business-operation.register',
+			newOperations.map((newOperation) => {return this.mapper.toDto(newOperation)})
+		)
 	}
 }

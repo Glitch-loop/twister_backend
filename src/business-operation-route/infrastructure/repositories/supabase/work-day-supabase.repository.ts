@@ -109,6 +109,8 @@ export class WorkDaySupabaseRepository implements WorkDayRepository {
 
 	async insertWorkDayHistoric(work_day_operations_hisotic: WorkDayOperationHistoricEntity[]): Promise<void> {
 		try {
+
+			console.log("Persist layer", work_day_operations_hisotic)
 			if (work_day_operations_hisotic.length === 0) {
 				return;
 			}

@@ -225,7 +225,6 @@ export class Mapper {
 
   // ==================== MAPPER METHODS MODEL to DOMAIN OBJECT ====================
   private clientModelToDomainObject(model: ClientModel): TaxClientInformationEntity {
-    console.log("Mapping client model to domain object: ", model);
     if (typeof model.created_at === 'string' && isNaN(Date.parse(model.created_at))) {
       throw new Error('Invalid created_at format in ClientModel');
     }

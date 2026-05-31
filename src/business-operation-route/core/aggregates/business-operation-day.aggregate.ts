@@ -19,6 +19,7 @@ type CreateBusinessOperationParams = {
 export class BusinessOperationDayAggregate {
 	private dayOperations: WorkDayOperationHistoricEntity[] | null;
 	private initialDayOperations: WorkDayOperationHistoricEntity[] | null;
+	private initialDAyOperationSet: Set<string>;
 
 	constructor(dayOperations: WorkDayOperationHistoricEntity[] | null) {
 		if (dayOperations === null) {
@@ -33,6 +34,9 @@ export class BusinessOperationDayAggregate {
 
 		this.dayOperations = orderedOperations;
 		this.initialDayOperations = [...orderedOperations];
+
+		this.initialDAyOperationSet = new Set<string>(this.initialDayOperations.map((dayOp) => { return dayOp.id_work_day_operation}))
+
 	}
 
 	createBusinessOperation(params: CreateBusinessOperationParams): void {
@@ -82,13 +86,12 @@ export class BusinessOperationDayAggregate {
 		}
 
 		return this.dayOperations!.filter((dayOperation) => {
+			const { id_work_day_operation } = dayOperation;
 			if (this.initialDayOperations === null) {
 				return true;
 			}
 
-			return !this.initialDayOperations.find(
-				(initialOperation) => initialOperation.id_work_day_operation === dayOperation.id_work_day_operation,
-			);
+			return !this.initialDAyOperationSet.has(id_work_day_operation)
 		});
 	}
 
