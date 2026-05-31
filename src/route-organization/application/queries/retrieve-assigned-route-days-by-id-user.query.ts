@@ -27,7 +27,6 @@ export class RetrieveAssignedRouteDaysByIdUserQuery {
 
     const routeDayIds = routeDaysByUser.map((routeDay) => routeDay.id_route_day);
     const assignations: AssignedRouteDayEntity[] = await this.routeRepository.retrieveRouteDayAssignaments(routeDayIds);
-    console.log(assignations)
     const expiredAssignations: AssignedRouteDayEntity[] = assignations.filter((assignation) => {
       if (!idUserToRetrieve.includes(assignation.id_user)) {
         return false;

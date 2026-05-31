@@ -33,7 +33,6 @@ export class ListWorkDayQuery {
 			limit_to_use = limit + 1;
 		}
 
-    console.log(id_vendor)
 		const workDays: WorkDayEntity[] = await this.workDayRepository.listWorkDays(
 			limit_to_use,
 			start_date_start_work_day,

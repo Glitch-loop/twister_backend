@@ -215,7 +215,6 @@ this behavior is needed.`,
 	async retrieveRouteDayByRouteDayId(
 		@Body() body: { id_route_days: string[] },
 	): Promise<httpControllerResponse> {
-		console.log(body)
 		const routeDays: RouteDayDto[] = await this.retrieveRouteDayByRouteDayIdQuery.execute(
 			body.id_route_days ?? [],
 		);

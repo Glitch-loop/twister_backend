@@ -31,7 +31,6 @@ export class Mapper {
 		domainObject: WorkDayEntity | NoteObjectValue | WorkDayOperationHistoricEntity,
 	): WorkDayModel | WorkDayNoteModel | WorkDayOperationHistoricModel {
 
-    console.log(domainObject)
 		if (isWorkDayEntity(domainObject)) {
 			return this.workDayDomainObjectToModel(domainObject);
 		}
@@ -56,7 +55,6 @@ export class Mapper {
 		workDayNoteModels?: WorkDayNoteModel[],
 	): WorkDayOperationHistoricEntity | NoteObjectValue | WorkDayEntity {
 		if (isWorkDayOperationHistoricModel(model)) {
-			console.log("Is historic model")
 			return this.workDayOperationHistoricModelToDomainObject(model);
 		}
 
@@ -136,7 +134,6 @@ export class Mapper {
 	}
 
 	private workDayModelToDomainObject(model: WorkDayModel, workDayNoteModels: WorkDayNoteModel[]): WorkDayEntity {
-		console.log("Work day model mapper")
     return new WorkDayEntity(
 			model.id_work_day,
 			model.start_date instanceof Date ? model.start_date : new Date(model.start_date),

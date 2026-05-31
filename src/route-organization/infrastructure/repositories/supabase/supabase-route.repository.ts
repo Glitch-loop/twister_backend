@@ -354,7 +354,6 @@ export class SupabaseRouteRepository implements RouteRepository {
   }
 
   async retrieveRouteDay(idRetrieveRouteDays: string[]): Promise<RouteDayEntity[]> {
-    console.log("IDS: ", idRetrieveRouteDays)
     if (idRetrieveRouteDays.length === 0) {
       return [];
     }
