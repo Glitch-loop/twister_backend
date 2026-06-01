@@ -77,13 +77,6 @@ export class CreateTransactionRequestDto {
   @ApiPropertyOptional({ type: String, example: 'ABCD010101ABC' })
   public readonly cfdi?: string;
 
-  @ApiProperty({
-    type: Number,
-    enum: Object.values(TRANSACTION_STATUS_ENUM),
-    example: TRANSACTION_STATUS_ENUM.ACTIVE,
-  })
-  public readonly state: number;
-
   @ApiProperty({ type: Number, example: 456.25 })
   public readonly received_amount: number;
 
@@ -174,7 +167,6 @@ export class CreateTransactionRequestDto {
   public readonly transaction_descriptions: CreateTransactionDescriptionRequestDto[];
 
   constructor(
-    state: number,
     received_amount: number,
     id_invoice_concept: string,
     id_client: string,
@@ -191,7 +183,6 @@ export class CreateTransactionRequestDto {
   ) {
     this.id_transaction = id_transaction;
     this.cfdi = cfdi;
-    this.state = state;
     this.received_amount = received_amount;
     this.id_invoice_concept = id_invoice_concept;
     this.created_at = created_at;

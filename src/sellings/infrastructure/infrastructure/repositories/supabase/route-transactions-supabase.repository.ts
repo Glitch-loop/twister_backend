@@ -49,7 +49,8 @@ interface TransactionDescriptionRow {
   id_transaction_description: string;
   price_at_moment: number | string;
   cost_at_moment: number | string;
-  amount: number | string;
+  amount?: number | string;
+  quantity?: number | string;
   created_at: Date | string;
   id_transaction: string;
   id_transaction_operation_type: string;
@@ -118,6 +119,40 @@ export class RouteTransactionsSupabaseRepository implements RouteTransactionRepo
     } catch (error) {
       throw new Error(
         `Failed to create transaction: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+  }
+
+  async updateTransaction(transaction: TransactionEntity): Promise<void> {
+    try {
+      const transactionModel = this.mapper.toModel(transaction);
+
+      const payload = {
+        cfdi: transactionModel.cfdi,
+        state: transactionModel.state,
+        amount: transactionModel.received_amount,
+        id_invoice_concept: transactionModel.id_invoice_concept,
+        longitude: transactionModel.longitude,
+        latitude: transactionModel.latitude,
+        created_at: transactionModel.created_at,
+        id_location: transactionModel.id_location,
+        id_client: transactionModel.id_client,
+        id_work_day: transactionModel.id_work_day,
+        id_payment_method: transactionModel.id_payment_method,
+        id_payment_schema: transactionModel.id_payment_schema,
+      };
+
+      const { error } = await this.supabase
+        .from('transactions')
+        .update(payload)
+        .eq('id_transaction', transactionModel.id_transaction);
+
+      if (error) {
+        throw new Error(`Failed to update transaction: ${error.message}`);
+      }
+    } catch (error) {
+      throw new Error(
+        `Failed to update transaction: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
   }
@@ -252,7 +287,7 @@ export class RouteTransactionsSupabaseRepository implements RouteTransactionRepo
         id_transaction_description: row.id_transaction_description,
         price_at_moment: this.toNumber(row.price_at_moment, 'price_at_moment'),
         cost_at_moment: this.toNumber(row.cost_at_moment, 'cost_at_moment'),
-        amount: this.toNumber(row.amount, 'amount'),
+        quantity: this.toNumber(row.quantity ?? row.amount ?? 0, 'quantity'),
         created_at: this.toDate(row.created_at, 'created_at'),
         id_transaction: row.id_transaction,
         id_transaction_operation_type: row.id_transaction_operation_type,
@@ -406,7 +441,7 @@ export class RouteTransactionsSupabaseRepository implements RouteTransactionRepo
         id_transaction_description: row.id_transaction_description,
         price_at_moment: this.toNumber(row.price_at_moment, 'price_at_moment'),
         cost_at_moment: this.toNumber(row.cost_at_moment, 'cost_at_moment'),
-        amount: this.toNumber(row.amount, 'amount'),
+        quantity: this.toNumber(row.quantity ?? row.amount ?? 0, 'quantity'),
         created_at: this.toDate(row.created_at, 'created_at'),
         id_transaction: row.id_transaction,
         id_transaction_operation_type: row.id_transaction_operation_type,

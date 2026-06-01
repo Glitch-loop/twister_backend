@@ -11,7 +11,7 @@ export class TransactionDescriptionDto {
   public readonly cost_at_moment: number;
 
   @ApiProperty({ type: Number, example: 3 })
-  public readonly amount: number;
+  public readonly quantity: number;
 
   @ApiProperty({ type: String, format: 'date-time', example: '2026-06-01T12:30:00.000Z' })
   public readonly created_at: Date;
@@ -29,7 +29,7 @@ export class TransactionDescriptionDto {
     id_transaction_description: string,
     price_at_moment: number,
     cost_at_moment: number,
-    amount: number,
+    quantity: number,
     created_at: Date,
     id_transaction: string,
     id_transaction_operation_type: string,
@@ -38,7 +38,7 @@ export class TransactionDescriptionDto {
     this.id_transaction_description = id_transaction_description;
     this.price_at_moment = price_at_moment;
     this.cost_at_moment = cost_at_moment;
-    this.amount = amount;
+    this.quantity = quantity;
     this.created_at = created_at;
     this.id_transaction = id_transaction;
     this.id_transaction_operation_type = id_transaction_operation_type;

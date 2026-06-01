@@ -55,14 +55,19 @@ Route transaction operation type IDs
 - PRODUCT_REPOSITION: ${ROUTE_TRANSACTION_OPERATION_TYPE.PRODUCT_REPOSITION}
 - COURTESY: ${ROUTE_TRANSACTION_OPERATION_TYPE.COURTESY}
 
-Unknown IDs can be sent as blank and completed later.`,
+Considerations:
+- If id_transaction is not provided, it is going to be created automatically.
+- If id_transaction_description is not provided, it is going to be created automatically.
+- If created_at from transaction is not provided, it is going to be created automatically.
+- If created_at from transaction description is not provided, it is going to be created automatically.
+
+`,
 	})
 	@ApiBody({ type: CreateTransactionRequestDto })
 	@ApiOkResponse({ description: 'Standardized response with operation message.' })
 	@Post('/transactions')
 	async registerTransaction(@Body() body: CreateTransactionRequestDto): Promise<httpControllerResponse> {
 		await this.registerTransactionCommand.execute(
-			body.state,
 			body.received_amount,
 			body.id_invoice_concept,
 			body.id_client,

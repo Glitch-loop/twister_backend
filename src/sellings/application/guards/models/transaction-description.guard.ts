@@ -11,7 +11,7 @@ export const isTransactionDescriptionModel = (value: unknown): value is Transact
     typeof value.id_transaction_description === 'string' &&
     typeof value.price_at_moment === 'number' &&
     typeof value.cost_at_moment === 'number' &&
-    typeof value.amount === 'number' &&
+    typeof value.quantity === 'number' &&
     typeof value.id_transaction === 'string' &&
     typeof value.id_transaction_operation_type === 'string' &&
     typeof value.id_product === 'string'

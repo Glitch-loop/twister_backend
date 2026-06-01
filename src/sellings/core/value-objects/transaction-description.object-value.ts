@@ -5,7 +5,7 @@ export class TransactionDescriptionObjectValue {
     public readonly id_transaction_description: string,
     public readonly price_at_moment: number,
     public readonly cost_at_moment: number,
-    public readonly amount: number,
+    public readonly quantity: number,
     public readonly created_at: Date,
     public readonly id_transaction: string,
     public readonly id_transaction_operation_type: ROUTE_TRANSACTION_OPERATION_TYPE,

@@ -1,19 +1,24 @@
+// Libraries
 import { Inject, Injectable } from '@nestjs/common';
 
+// Repositories
 import { RouteTransactionRepository } from '@/src/sellings/core/interfaces/route-transactions.repository';
-import { TRANSACTION_STATUS_ENUM } from '@/src/sellings/core/enums/route-status.enum';
+
+// Enum
 import { ROUTE_TRANSACTION_OPERATION_TYPE } from '@/src/sellings/core/enums/route-transaction-operation-type.enum';
-import { TransactionEntity } from '@/src/sellings/core/entities/transaction.entity';
-import { PaymentMethodObjectValue } from '@/src/sellings/core/value-objects/payment-method.object-value';
-import { PaymentSchemaObjectValue } from '@/src/sellings/core/value-objects/payment-schema.object-value';
-import { TransactionDescriptionObjectValue } from '@/src/sellings/core/value-objects/transaction-description.object-value';
+
+// Aggregate
+import { TransactionAggregate } from '@/src/sellings/core/aggregates/transaction.aggregate';
+
+// Shared
 import { IntegrityRepository } from '@/src/shared/core/interfaces/integrity.repository';
 
 interface RegisterTransactionDescriptionInput {
 	id_transaction_description?: string;
 	price_at_moment: number;
 	cost_at_moment: number;
-	amount: number;
+	quantity?: number;
+	amount?: number;
 	created_at?: Date;
 	id_transaction_operation_type: string;
 	id_product: string;
@@ -29,7 +34,6 @@ export class RegisterTransactionCommand {
 	) {}
 
 	async execute(
-		state: number,
 		received_amount: number,
 		id_invoice_concept: string,
 		id_client: string,
@@ -44,43 +48,14 @@ export class RegisterTransactionCommand {
 		id_location?: string,
 		cfdi?: string,
 	): Promise<void> {
-		if (!Object.values(TRANSACTION_STATUS_ENUM).includes(state)) {
-			throw new Error('Invalid transaction status provided.');
-		}
-
 		const idTransactionToUse = id_transaction ?? this.integrityRepository.generateUUIDv4();
 		const createdAtToUse = created_at ?? new Date();
+		const paymentMethods = await this.routeTransactionRepository.listPaymentMethods();
+		const paymentSchema = await this.routeTransactionRepository.listPaymentSchema();
+		const transactionAggregate = new TransactionAggregate(undefined, paymentMethods, paymentSchema);
 
-		const paymentMethod = new PaymentMethodObjectValue(
-			id_payment_method,
-			'',
-		);
-
-		const paymentSchema = new PaymentSchemaObjectValue(
-			id_payment_schema,
-			'',
-		);
-
-		const transactionDescriptions = transaction_descriptions.map((description) => {
-			if (!Object.values(ROUTE_TRANSACTION_OPERATION_TYPE).includes(description.id_transaction_operation_type as ROUTE_TRANSACTION_OPERATION_TYPE)) {
-				throw new Error('Invalid transaction operation type provided.');
-			}
-
-			return new TransactionDescriptionObjectValue(
-				description.id_transaction_description ?? this.integrityRepository.generateUUIDv4(),
-				description.price_at_moment,
-				description.cost_at_moment,
-				description.amount,
-				description.created_at ?? createdAtToUse,
-				idTransactionToUse,
-				description.id_transaction_operation_type as ROUTE_TRANSACTION_OPERATION_TYPE,
-				description.id_product,
-			);
-		});
-
-		const transactionEntity = new TransactionEntity(
+		transactionAggregate.createNewTransaction(
 			idTransactionToUse,
-			state,
 			received_amount,
 			id_invoice_concept,
 			latitude ?? '',
@@ -88,14 +63,35 @@ export class RegisterTransactionCommand {
 			createdAtToUse,
 			id_client,
 			id_work_day,
-			paymentMethod,
-			paymentSchema,
-			transactionDescriptions,
-			cfdi,
-			id_location,
+			id_payment_method,
+			id_payment_schema,
+			cfdi ?? '',
+			id_location ?? '',
 		);
 
-		await this.routeTransactionRepository.createTransaction(transactionEntity);
+		for (const description of transaction_descriptions) {
+			if (!Object.values(ROUTE_TRANSACTION_OPERATION_TYPE).includes(description.id_transaction_operation_type as ROUTE_TRANSACTION_OPERATION_TYPE)) {
+				throw new Error('Invalid transaction operation type provided.');
+			}
+
+			const quantityToUse = description.quantity ?? description.amount;
+			if (quantityToUse === undefined) {
+				throw new Error('Transaction description quantity is required.');
+			}
+
+			transactionAggregate.addRouteDescription(
+				description.id_transaction_description ?? this.integrityRepository.generateUUIDv4(),
+				description.price_at_moment,
+				description.cost_at_moment,
+				quantityToUse,
+				description.created_at ?? createdAtToUse,
+				idTransactionToUse,
+				description.id_transaction_operation_type as ROUTE_TRANSACTION_OPERATION_TYPE,
+				description.id_product,
+			);
+		}
+
+		await this.routeTransactionRepository.createTransaction(transactionAggregate.getTransaction());
 	}
 }
 

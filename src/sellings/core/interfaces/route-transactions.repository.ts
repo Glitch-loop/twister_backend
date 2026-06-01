@@ -7,6 +7,7 @@ import { TransactionEntity } from "@/src/sellings/core/entities/transaction.enti
 
 export abstract class RouteTransactionRepository {
   abstract createTransaction(transaction: TransactionEntity): Promise<void>
+  abstract updateTransaction(transaction: TransactionEntity): Promise<void>
   abstract cancelTransaction(idTransaction: string): Promise<void>
   abstract listPaymentMethods(): Promise<PaymentMethodObjectValue[]>
   abstract listPaymentSchema(): Promise<PaymentSchemaObjectValue[]>
