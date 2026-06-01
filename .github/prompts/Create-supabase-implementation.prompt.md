@@ -195,3 +195,5 @@ export class ClientSupabase implements ClientRepository {
 }
 
 ```
+
+> Notice in all moment it is used the mapper for transform from models to domain objects.
