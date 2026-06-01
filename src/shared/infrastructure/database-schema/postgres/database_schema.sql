@@ -317,7 +317,6 @@ CREATE TABLE public.taxes (
   tax_rate character varying NOT NULL,
   created_at timestamp without time zone NOT NULL,
   CONSTRAINT taxes_pkey PRIMARY KEY (id_tax),
-  CONSTRAINT taxes_id_transaction_fkey FOREIGN KEY (id_transaction) REFERENCES public.transactions(id_transaction)
 );
 
 CREATE TABLE public.taxes_in_transactions (
