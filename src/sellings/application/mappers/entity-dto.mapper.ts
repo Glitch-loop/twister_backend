@@ -1,19 +1,21 @@
 import { Injectable } from '@nestjs/common';
 
-import { PaymentMethodDto } from '@/src/sellings/application/dtos/payment-method.dto';
-import { PaymentSchemaDto } from '@/src/sellings/application/dtos/payment-schema.dto';
-import { RouteTransactionOperationTypeDto } from '@/src/sellings/application/dtos/route-transaction-operation-type.dto';
-import { TaxInTransactionDto } from '@/src/sellings/application/dtos/tax-in-transaction.dto';
-import { TaxDto } from '@/src/sellings/application/dtos/tax.dto';
-import { TransactionDescriptionDto } from '@/src/sellings/application/dtos/transaction-description.dto';
-import { TransactionDto } from '@/src/sellings/application/dtos/transaction.dto';
-import { isPaymentMethodDto } from '@/src/sellings/application/guards/dtos/payment-method.guard';
-import { isPaymentSchemaDto } from '@/src/sellings/application/guards/dtos/payment-schema.guard';
-import { isRouteTransactionOperationTypeDto } from '@/src/sellings/application/guards/dtos/route-transaction-operation-type.guard';
-import { isTaxInTransactionDto } from '@/src/sellings/application/guards/dtos/tax-in-transaction.guard';
-import { isTaxDto } from '@/src/sellings/application/guards/dtos/tax.guard';
-import { isTransactionDescriptionDto } from '@/src/sellings/application/guards/dtos/transaction-description.guard';
-import { isTransactionDto } from '@/src/sellings/application/guards/dtos/transaction.guard';
+// Enums
+import { ROUTE_TRANSACTION_OPERATION_TYPE } from '@/src/sellings/core/enums/route-transaction-operation-type.enum';
+import { TRANSACTION_STATUS_ENUM } from '@/src/sellings/core/enums/route-status.enum';
+
+// Entities
+import { TaxEntity } from '@/src/sellings/core/entities/tax.entity';
+import { TransactionEntity } from '@/src/sellings/core/entities/transaction.entity';
+
+// Object values
+import { PaymentMethodObjectValue } from '@/src/sellings/core/value-objects/payment-method.object-value';
+import { PaymentSchemaObjectValue } from '@/src/sellings/core/value-objects/payment-schema.object-value';
+import { RouteTransactionOperationTypeObjectValue } from '@/src/sellings/core/value-objects/route-transaction-operation-type.object-value';
+import { TaxInTransactionObjectValue } from '@/src/sellings/core/value-objects/tax-in-transaction.object-value';
+import { TransactionDescriptionObjectValue } from '@/src/sellings/core/value-objects/transaction-description.object-value';
+
+// Domain objects guards
 import { isTaxEntity } from '@/src/sellings/application/guards/entities/tax.guard';
 import { isTransactionEntity } from '@/src/sellings/application/guards/entities/transaction.guard';
 import { isPaymentMethodObjectValue } from '@/src/sellings/application/guards/object-values/payment-method.guard';
@@ -21,15 +23,24 @@ import { isPaymentSchemaObjectValue } from '@/src/sellings/application/guards/ob
 import { isRouteTransactionOperationTypeObjectValue } from '@/src/sellings/application/guards/object-values/route-transaction-operation-type.guard';
 import { isTaxInTransactionObjectValue } from '@/src/sellings/application/guards/object-values/tax-in-transaction.guard';
 import { isTransactionDescriptionObjectValue } from '@/src/sellings/application/guards/object-values/transaction-description.guard';
-import { TaxEntity } from '@/src/sellings/core/entities/tax.entity';
-import { TransactionEntity } from '@/src/sellings/core/entities/transaction.entity';
-import { ROUTE_TRANSACTION_OPERATION_TYPE } from '@/src/sellings/core/enums/route-transaction-operation-type.enum';
-import { TRANSACTION_STATUS_ENUM } from '@/src/sellings/core/enums/route-status.enum';
-import { PaymentMethodObjectValue } from '@/src/sellings/core/value-objects/payment-method.object-value';
-import { PaymentSchemaObjectValue } from '@/src/sellings/core/value-objects/payment-schema.object-value';
-import { RouteTransactionOperationTypeObjectValue } from '@/src/sellings/core/value-objects/route-transaction-operation-type.object-value';
-import { TaxInTransactionObjectValue } from '@/src/sellings/core/value-objects/tax-in-transaction.object-value';
-import { TransactionDescriptionObjectValue } from '@/src/sellings/core/value-objects/transaction-description.object-value';
+
+// Dtos
+import { PaymentMethodDto } from '@/src/sellings/application/dtos/payment-method.dto';
+import { PaymentSchemaDto } from '@/src/sellings/application/dtos/payment-schema.dto';
+import { RouteTransactionOperationTypeDto } from '@/src/sellings/application/dtos/route-transaction-operation-type.dto';
+import { TaxInTransactionDto } from '@/src/sellings/application/dtos/tax-in-transaction.dto';
+import { TaxDto } from '@/src/sellings/application/dtos/tax.dto';
+import { TransactionDescriptionDto } from '@/src/sellings/application/dtos/transaction-description.dto';
+import { TransactionDto } from '@/src/sellings/application/dtos/transaction.dto';
+
+// Dtos guards
+import { isPaymentMethodDto } from '@/src/sellings/application/guards/dtos/payment-method.guard';
+import { isPaymentSchemaDto } from '@/src/sellings/application/guards/dtos/payment-schema.guard';
+import { isRouteTransactionOperationTypeDto } from '@/src/sellings/application/guards/dtos/route-transaction-operation-type.guard';
+import { isTaxInTransactionDto } from '@/src/sellings/application/guards/dtos/tax-in-transaction.guard';
+import { isTaxDto } from '@/src/sellings/application/guards/dtos/tax.guard';
+import { isTransactionDescriptionDto } from '@/src/sellings/application/guards/dtos/transaction-description.guard';
+import { isTransactionDto } from '@/src/sellings/application/guards/dtos/transaction.guard';
 
 @Injectable()
 export class EntityDtoMapper {

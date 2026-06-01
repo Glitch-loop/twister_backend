@@ -1,19 +1,30 @@
 import { Injectable } from '@nestjs/common';
 
+// Enums
+import { ROUTE_TRANSACTION_OPERATION_TYPE } from '@/src/sellings/core/enums/route-transaction-operation-type.enum';
+import { TRANSACTION_STATUS_ENUM } from '@/src/sellings/core/enums/route-status.enum';
+
+// Entities
+import { TaxEntity } from '@/src/sellings/core/entities/tax.entity';
+import { TransactionEntity } from '@/src/sellings/core/entities/transaction.entity';
+
+// Object values
+import { PaymentMethodObjectValue } from '@/src/sellings/core/value-objects/payment-method.object-value';
+import { PaymentSchemaObjectValue } from '@/src/sellings/core/value-objects/payment-schema.object-value';
+import { RouteTransactionOperationTypeObjectValue } from '@/src/sellings/core/value-objects/route-transaction-operation-type.object-value';
+import { TaxInTransactionObjectValue } from '@/src/sellings/core/value-objects/tax-in-transaction.object-value';
+import { TransactionDescriptionObjectValue } from '@/src/sellings/core/value-objects/transaction-description.object-value';
+
+// Guards Domain object
 import { isTaxEntity } from '@/src/sellings/application/guards/entities/tax.guard';
 import { isTransactionEntity } from '@/src/sellings/application/guards/entities/transaction.guard';
-import { isPaymentMethodModel } from '@/src/sellings/application/guards/models/payment.method.guard';
-import { isPaymentSchemaModel } from '@/src/sellings/application/guards/models/payment-schema.guard';
-import { isRouteTransactionOperationTypeModel } from '@/src/sellings/application/guards/models/route-transaction-operation-type.guard';
-import { isTaxInTransactionModel } from '@/src/sellings/application/guards/models/tax-in-transaction.guard';
-import { isTaxModel } from '@/src/sellings/application/guards/models/tax.guard';
-import { isTransactionDescriptionModel } from '@/src/sellings/application/guards/models/transaction-description.guard';
-import { isTransactionModel } from '@/src/sellings/application/guards/models/transaction.guard';
 import { isPaymentMethodObjectValue } from '@/src/sellings/application/guards/object-values/payment-method.guard';
 import { isPaymentSchemaObjectValue } from '@/src/sellings/application/guards/object-values/payment-schema.guard';
 import { isRouteTransactionOperationTypeObjectValue } from '@/src/sellings/application/guards/object-values/route-transaction-operation-type.guard';
 import { isTaxInTransactionObjectValue } from '@/src/sellings/application/guards/object-values/tax-in-transaction.guard';
 import { isTransactionDescriptionObjectValue } from '@/src/sellings/application/guards/object-values/transaction-description.guard';
+
+// models
 import type { PaymentMethodModel } from '@/src/sellings/application/models/payment.method.model';
 import type { PaymentSchemaModel } from '@/src/sellings/application/models/payment-schema.model';
 import type { RouteTransactionOperationTypeModel } from '@/src/sellings/application/models/route-transaction-operation-type.model';
@@ -21,15 +32,15 @@ import type { TaxInTransactionModel } from '@/src/sellings/application/models/ta
 import type { TaxModel } from '@/src/sellings/application/models/tax.model';
 import type { TransactionDescriptionModel } from '@/src/sellings/application/models/transaction-description.model';
 import type { TransactionModel } from '@/src/sellings/application/models/transaction.model';
-import { TaxEntity } from '@/src/sellings/core/entities/tax.entity';
-import { TransactionEntity } from '@/src/sellings/core/entities/transaction.entity';
-import { ROUTE_TRANSACTION_OPERATION_TYPE } from '@/src/sellings/core/enums/route-transaction-operation-type.enum';
-import { TRANSACTION_STATUS_ENUM } from '@/src/sellings/core/enums/route-status.enum';
-import { PaymentMethodObjectValue } from '@/src/sellings/core/value-objects/payment-method.object-value';
-import { PaymentSchemaObjectValue } from '@/src/sellings/core/value-objects/payment-schema.object-value';
-import { RouteTransactionOperationTypeObjectValue } from '@/src/sellings/core/value-objects/route-transaction-operation-type.object-value';
-import { TaxInTransactionObjectValue } from '@/src/sellings/core/value-objects/tax-in-transaction.object-value';
-import { TransactionDescriptionObjectValue } from '@/src/sellings/core/value-objects/transaction-description.object-value';
+
+// Guards models
+import { isPaymentMethodModel } from '@/src/sellings/application/guards/models/payment.method.guard';
+import { isPaymentSchemaModel } from '@/src/sellings/application/guards/models/payment-schema.guard';
+import { isRouteTransactionOperationTypeModel } from '@/src/sellings/application/guards/models/route-transaction-operation-type.guard';
+import { isTaxInTransactionModel } from '@/src/sellings/application/guards/models/tax-in-transaction.guard';
+import { isTaxModel } from '@/src/sellings/application/guards/models/tax.guard';
+import { isTransactionDescriptionModel } from '@/src/sellings/application/guards/models/transaction-description.guard';
+import { isTransactionModel } from '@/src/sellings/application/guards/models/transaction.guard';
 
 @Injectable()
 export class EntityModelMapper {
