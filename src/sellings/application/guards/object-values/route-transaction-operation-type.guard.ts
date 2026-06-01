@@ -1,4 +1,4 @@
-import type { RouteTransactionOperationTypeObjectValue } from '@/src/core/object-values/route-transaction-operation-type.object-value';
+import type { RouteTransactionOperationTypeObjectValue } from '@/src/sellings/core/value-objects/route-transaction-operation-type.object-value';
 import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isRouteTransactionOperationTypeObjectValue = (value: unknown): value is RouteTransactionOperationTypeObjectValue => {

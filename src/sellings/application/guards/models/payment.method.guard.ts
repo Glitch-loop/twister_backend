@@ -1,4 +1,4 @@
-import type { PaymentMethodModel } from '@/src/application/models/payment.method.model';
+import type { PaymentMethodModel } from '@/src/sellings/application/models/payment.method.model';
 
 import { isRecord } from '@/src/shared/application/guards/utils';
 

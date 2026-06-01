@@ -1,8 +1,8 @@
-import type { TransactionDescriptionModel } from '@/src/sellings/application/models/transaction-description.model';
+import type { TransactionDescriptionDto } from '@/src/sellings/application/dtos/transaction-description.dto';
 
 import { isRecord } from '@/src/shared/application/guards/utils';
 
-export const isTransactionDescriptionModel = (value: unknown): value is TransactionDescriptionModel => {
+export const isTransactionDescriptionDto = (value: unknown): value is TransactionDescriptionDto => {
   if (!isRecord(value)) {
     return false;
   }

@@ -11,10 +11,7 @@ description: This prompt is used when the user wants to create a new guard in th
 If the user don't provide the schema/idea for generating the entity, ask him to provide the schema or idea. The user might give you an schema, explanation, picture or any other form of information, so be sure to ask for more details if the user don't provide you with enough information to generate the entity.
 
 
-
-
 > Remember the schema will be used in a typescript application. So you have to define the schema in typescript.
-
 
 # Process:
 * Find the domain object/dto/model that the user refers
@@ -34,6 +31,7 @@ identify the fields that compound the schema, if there is not a clear schema the
   - If it's a model `@/src/<module>/application/models`.
   - If it's an object value `@/src/<module>/core/object-values`.
 * By convention we are using kebab-case for file names and we add `.guard` at the end of the file name. i.e. "route day" it would be "route-day.guard.ts". 
+* Avoid to use those fields of type `Date`
 
 For example, if the user provides you with the following information:
 
@@ -79,7 +77,6 @@ export const isTransactionModel = (value: unknown): value is TransactionModel =>
     typeof value.state === 'number' &&
     typeof value.amount === 'number' &&
     typeof value.id_invoice_concept === 'string' &&
-    value.created_at instanceof Date &&
     (value.id_location === undefined || typeof value.id_location === 'string') &&
     typeof value.id_client === 'string' &&
     typeof value.id_work_day === 'string' &&
@@ -90,5 +87,7 @@ export const isTransactionModel = (value: unknown): value is TransactionModel =>
 ```
 
 > Notice I have used "isRecord" from utils.ts located at `src/shared/guards/utils.ts` to validate if the input value is a record, then I validate each field that compound the transaction model.
+
+> Notice I have omitted the `created_at` field, this because it's of type `Date`
 
 4. Since it's a model the file will be located at `src/<module>/application/guards/models` and the name of the file will be `transaction.guard.ts`.

@@ -1,7 +1,8 @@
-import type { PaymentMethodObjectValue } from '@/src/sellings/core/value-objects/payment-method.object-value';
+import type { PaymentMethodDto } from '@/src/sellings/application/dtos/payment-method.dto';
+
 import { isRecord } from '@/src/shared/application/guards/utils';
 
-export const isPaymentMethodObjectValue = (value: unknown): value is PaymentMethodObjectValue => {
+export const isPaymentMethodDto = (value: unknown): value is PaymentMethodDto => {
   if (!isRecord(value)) {
     return false;
   }

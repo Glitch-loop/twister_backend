@@ -1,0 +1,23 @@
+import { TRANSACTION_STATUS_ENUM } from "@/src/sellings/core/enums/route-status.enum";
+import { PaymentMethodObjectValue } from "@/src/sellings/core/value-objects/payment-method.object-value";
+import { PaymentSchemaObjectValue } from "@/src/sellings/core/value-objects/payment-schema.object-value";
+import { TransactionDescriptionObjectValue } from "@/src/sellings/core/value-objects/transaction-description.object-value";
+
+export class TransactionEntity {
+  constructor(
+    public readonly id_transaction: string,
+    public readonly state: TRANSACTION_STATUS_ENUM,
+    public readonly received_amount: number,
+    public readonly id_invoice_concept: string,
+    public readonly latitude: string,
+    public readonly longitude: string,
+    public readonly created_at: Date,
+    public readonly id_client: string,
+    public readonly id_work_day: string,
+    public readonly payment_method: PaymentMethodObjectValue,
+    public readonly payment_schema: PaymentSchemaObjectValue,
+    public readonly transaction_descriptions: TransactionDescriptionObjectValue[],
+    public readonly cfdi?: string,
+    public readonly id_location?: string,
+  ) {}
+}

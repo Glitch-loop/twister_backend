@@ -1,3 +1,5 @@
+import { ROUTE_TRANSACTION_OPERATION_TYPE } from "@/src/sellings/core/enums/route-transaction-operation-type.enum";
+
 export class TransactionDescriptionObjectValue {
   constructor(
     public readonly id_transaction_description: string,
@@ -6,7 +8,7 @@ export class TransactionDescriptionObjectValue {
     public readonly amount: number,
     public readonly created_at: Date,
     public readonly id_transaction: string,
-    public readonly id_transaction_operation_type: string,
+    public readonly id_transaction_operation_type: ROUTE_TRANSACTION_OPERATION_TYPE,
     public readonly id_product: string,
   ) {}
 }

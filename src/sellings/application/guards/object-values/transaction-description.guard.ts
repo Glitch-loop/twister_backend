@@ -1,4 +1,4 @@
-import type { TransactionDescriptionObjectValue } from '@/src/core/object-values/transaction-description.object-value';
+import type { TransactionDescriptionObjectValue } from '@/src/sellings/core/value-objects/transaction-description.object-value';
 import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isTransactionDescriptionObjectValue = (value: unknown): value is TransactionDescriptionObjectValue => {
@@ -11,7 +11,6 @@ export const isTransactionDescriptionObjectValue = (value: unknown): value is Tr
     typeof value.price_at_moment === 'number' &&
     typeof value.cost_at_moment === 'number' &&
     typeof value.amount === 'number' &&
-    value.created_at instanceof Date &&
     typeof value.id_transaction === 'string' &&
     typeof value.id_transaction_operation_type === 'string' &&
     typeof value.id_product === 'string'

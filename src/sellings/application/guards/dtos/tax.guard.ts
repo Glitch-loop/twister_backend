@@ -1,8 +1,8 @@
-import type { TaxModel } from '@/src/sellings/application/models/tax.model';
+import type { TaxDto } from '@/src/sellings/application/dtos/tax.dto';
 
 import { isRecord } from '@/src/shared/application/guards/utils';
 
-export const isTaxModel = (value: unknown): value is TaxModel => {
+export const isTaxDto = (value: unknown): value is TaxDto => {
   if (!isRecord(value)) {
     return false;
   }

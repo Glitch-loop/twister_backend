@@ -279,6 +279,8 @@ CREATE TABLE public.transactions (
   state smallint NOT NULL,
   amount numeric NOT NULL,
   id_invoice_concept uuid NOT NULL,
+  longitude character varying,
+  latitude character varying,
   created_at timestamp without time zone NOT NULL,
   id_location uuid,
   id_client uuid NOT NULL,
@@ -308,15 +310,6 @@ CREATE TABLE public.transaction_descriptions (
   CONSTRAINT transaction_descriptions_id_transaction_operation_type_fkey FOREIGN KEY (id_transaction_operation_type) REFERENCES public.route_transaction_operation_types(id_route_transaction_operation_type)
 );
 
-CREATE TABLE public.transaction_locations (
-  id_invoice_concept uuid NOT NULL DEFAULT gen_random_uuid(),
-  longitude character varying,
-  latitude character varying,
-  id_transaction uuid NOT NULL,
-  created_at timestamp without time zone NOT NULL,
-  CONSTRAINT transaction_locations_pkey PRIMARY KEY (id_invoice_concept),
-  CONSTRAINT transaction_locations_id_transaction_fkey FOREIGN KEY (id_transaction) REFERENCES public.transactions(id_transaction)
-);
 
 CREATE TABLE public.taxes (
   id_tax uuid NOT NULL DEFAULT gen_random_uuid(),

@@ -1,8 +1,8 @@
-import type { RouteTransactionOperationTypeModel } from '@/src/sellings/application/models/route-transaction-operation-type.model';
+import type { RouteTransactionOperationTypeDto } from '@/src/sellings/application/dtos/route-transaction-operation-type.dto';
 
 import { isRecord } from '@/src/shared/application/guards/utils';
 
-export const isRouteTransactionOperationTypeModel = (value: unknown): value is RouteTransactionOperationTypeModel => {
+export const isRouteTransactionOperationTypeDto = (value: unknown): value is RouteTransactionOperationTypeDto => {
   if (!isRecord(value)) {
     return false;
   }

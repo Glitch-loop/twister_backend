@@ -1,8 +1,8 @@
-import type { PaymentSchemaModel } from '@/src/sellings/application/models/payment-schema.model';
+import type { PaymentSchemaDto } from '@/src/sellings/application/dtos/payment-schema.dto';
 
 import { isRecord } from '@/src/shared/application/guards/utils';
 
-export const isPaymentSchemaModel = (value: unknown): value is PaymentSchemaModel => {
+export const isPaymentSchemaDto = (value: unknown): value is PaymentSchemaDto => {
   if (!isRecord(value)) {
     return false;
   }
