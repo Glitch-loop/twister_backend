@@ -75,6 +75,70 @@ export class RouteTransactionsSupabaseRepository implements RouteTransactionRepo
     return this.supabaseDataSource.getClient();
   }
 
+  async createTransaction(transaction: TransactionEntity): Promise<void> {
+    try {
+      const transactionModel = this.mapper.toModel(transaction);
+      const transactionPayload = {
+        id_transaction: transactionModel.id_transaction,
+        cfdi: transactionModel.cfdi,
+        state: transactionModel.state,
+        amount: transactionModel.received_amount,
+        id_invoice_concept: transactionModel.id_invoice_concept,
+        longitude: transactionModel.longitude,
+        latitude: transactionModel.latitude,
+        created_at: transactionModel.created_at,
+        id_location: transactionModel.id_location,
+        id_client: transactionModel.id_client,
+        id_work_day: transactionModel.id_work_day,
+        id_payment_method: transactionModel.id_payment_method,
+        id_payment_schema: transactionModel.id_payment_schema,
+      };
+
+      const { error: transactionError } = await this.supabase
+        .from('transactions')
+        .insert(transactionPayload);
+
+      if (transactionError) {
+        throw new Error(`Failed to create transaction: ${transactionError.message}`);
+      }
+
+      if (transaction.transaction_descriptions.length > 0) {
+        const transactionDescriptionModels = transaction.transaction_descriptions.map((description) =>
+          this.mapper.toModel(description),
+        );
+
+        const { error: descriptionError } = await this.supabase
+          .from('transaction_descriptions')
+          .insert(transactionDescriptionModels);
+
+        if (descriptionError) {
+          throw new Error(`Failed to create transaction descriptions: ${descriptionError.message}`);
+        }
+      }
+    } catch (error) {
+      throw new Error(
+        `Failed to create transaction: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+  }
+
+  async cancelTransaction(idTransaction: string): Promise<void> {
+    try {
+      const { error } = await this.supabase
+        .from('transactions')
+        .update({ state: 0 })
+        .eq('id_transaction', idTransaction);
+
+      if (error) {
+        throw new Error(`Failed to cancel transaction: ${error.message}`);
+      }
+    } catch (error) {
+      throw new Error(
+        `Failed to cancel transaction: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+  }
+
   async listPaymentMethods(): Promise<PaymentMethodObjectValue[]> {
     try {
       const { data, error } = await this.supabase
@@ -160,7 +224,7 @@ export class RouteTransactionsSupabaseRepository implements RouteTransactionRepo
           row.tax_rate_at_moment_of_transaction,
           'tax_rate_at_moment_of_transaction',
         ),
-        created_at: row.created_at,
+        created_at: this.toDate(row.created_at, 'created_at'),
       }));
 
       return models.map((model) => this.mapper.toDomainObject(model));
@@ -189,7 +253,7 @@ export class RouteTransactionsSupabaseRepository implements RouteTransactionRepo
         price_at_moment: this.toNumber(row.price_at_moment, 'price_at_moment'),
         cost_at_moment: this.toNumber(row.cost_at_moment, 'cost_at_moment'),
         amount: this.toNumber(row.amount, 'amount'),
-        created_at: row.created_at,
+        created_at: this.toDate(row.created_at, 'created_at'),
         id_transaction: row.id_transaction,
         id_transaction_operation_type: row.id_transaction_operation_type,
         id_product: row.id_product,
@@ -256,6 +320,33 @@ export class RouteTransactionsSupabaseRepository implements RouteTransactionRepo
     }
   }
 
+  async retrieveTransactionsByIdTransaction(idTransaction: string[]): Promise<TransactionEntity[]> {
+    try {
+      if (idTransaction.length === 0) {
+        return [];
+      }
+
+      const { data, error } = await this.supabase
+        .from('transactions')
+        .select('*')
+        .in('id_transaction', idTransaction);
+
+      if (error) {
+        throw new Error(`Failed to retrieve transactions by ids: ${error.message}`);
+      }
+
+      const transactionModels = ((data ?? []) as TransactionRow[]).map((row) =>
+        this.mapTransactionRowToModel(row),
+      );
+
+      return this.composeTransactions(transactionModels);
+    } catch (error) {
+      throw new Error(
+        `Failed to retrieve transactions by ids: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+  }
+
   private async composeTransactions(
     transactionModels: TransactionModel[],
   ): Promise<TransactionEntity[]> {
@@ -316,7 +407,7 @@ export class RouteTransactionsSupabaseRepository implements RouteTransactionRepo
         price_at_moment: this.toNumber(row.price_at_moment, 'price_at_moment'),
         cost_at_moment: this.toNumber(row.cost_at_moment, 'cost_at_moment'),
         amount: this.toNumber(row.amount, 'amount'),
-        created_at: row.created_at,
+        created_at: this.toDate(row.created_at, 'created_at'),
         id_transaction: row.id_transaction,
         id_transaction_operation_type: row.id_transaction_operation_type,
         id_product: row.id_product,
@@ -356,7 +447,7 @@ export class RouteTransactionsSupabaseRepository implements RouteTransactionRepo
       state: row.state,
       received_amount: this.toNumber(row.amount, 'amount'),
       id_invoice_concept: row.id_invoice_concept,
-      created_at: row.created_at,
+      created_at: this.toDate(row.created_at, 'created_at'),
       latitude: row.latitude ?? undefined,
       longitude: row.longitude ?? undefined,
       id_location: row.id_location ?? undefined,
@@ -383,5 +474,15 @@ export class RouteTransactionsSupabaseRepository implements RouteTransactionRepo
     }
 
     return numericValue;
+  }
+
+  private toDate(value: Date | string, fieldName: string): Date {
+    const parsedDate = value instanceof Date ? value : new Date(value);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+      throw new Error(`Invalid date value in ${fieldName}`);
+    }
+
+    return parsedDate;
   }
 }

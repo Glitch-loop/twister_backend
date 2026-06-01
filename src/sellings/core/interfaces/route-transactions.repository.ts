@@ -6,11 +6,14 @@ import { TransactionDescriptionObjectValue } from "@/src/sellings/core/value-obj
 import { TransactionEntity } from "@/src/sellings/core/entities/transaction.entity";
 
 export abstract class RouteTransactionRepository {
+  abstract createTransaction(transaction: TransactionEntity): Promise<void>
+  abstract cancelTransaction(idTransaction: string): Promise<void>
   abstract listPaymentMethods(): Promise<PaymentMethodObjectValue[]>
   abstract listPaymentSchema(): Promise<PaymentSchemaObjectValue[]>
   abstract listTaxes(taxName?: string): Promise<TaxEntity[]>
   abstract retrieveTaxesInTransactionByIdTransaction(idTransaction: string): Promise<TaxInTransactionObjectValue[]>
   abstract retrieveRouteTransactionDescriptionByIdTransaction(idTransaction: string): Promise<TransactionDescriptionObjectValue[]>
+  abstract retrieveTransactionsByIdTransaction(idTransaction: string[]): Promise<TransactionEntity[]>
   abstract listTransactions(
     limit?: number,
     nextCreatedAt?: string, // Id transaction
