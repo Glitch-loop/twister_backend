@@ -21,7 +21,7 @@ import {
 
 // Streams
 import { OnEvent } from '@nestjs/event-emitter';
-import { Subject, interval, map, Observable } from 'rxjs';
+import { Subject, map, Observable } from 'rxjs';
 
 // DTOs
 import { StartShiftWorkDayRequestDto } from '@/src/business-operation-route/application/dtos/start-work-day-request.dto';

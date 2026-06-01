@@ -19,7 +19,7 @@ type CreateBusinessOperationParams = {
 export class BusinessOperationDayAggregate {
 	private dayOperations: WorkDayOperationHistoricEntity[] | null;
 	private initialDayOperations: WorkDayOperationHistoricEntity[] | null;
-	private initialDAyOperationSet: Set<string>;
+	private initialDAyOperationSet: Set<string> = new Set<string>();
 
 	constructor(dayOperations: WorkDayOperationHistoricEntity[] | null) {
 		if (dayOperations === null) {
