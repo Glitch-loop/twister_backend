@@ -315,7 +315,6 @@ CREATE TABLE public.taxes (
   id_tax uuid NOT NULL DEFAULT gen_random_uuid(),
   tax_name character varying NOT NULL,
   tax_rate character varying NOT NULL,
-  id_transaction uuid NOT NULL,
   created_at timestamp without time zone NOT NULL,
   CONSTRAINT taxes_pkey PRIMARY KEY (id_tax),
   CONSTRAINT taxes_id_transaction_fkey FOREIGN KEY (id_transaction) REFERENCES public.transactions(id_transaction)

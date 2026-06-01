@@ -206,7 +206,6 @@ export class EntityModelMapper {
 			id_tax: domainObject.id_tax,
 			tax_name: domainObject.tax_name,
 			tax_rate: domainObject.tax_rate,
-			id_transaction: domainObject.id_transaction,
 			created_at: domainObject.created_at,
 		};
 	}
@@ -300,7 +299,6 @@ export class EntityModelMapper {
 			model.id_tax,
 			model.tax_name,
 			model.tax_rate,
-			model.id_transaction,
 			createdAt,
 		);
 	}

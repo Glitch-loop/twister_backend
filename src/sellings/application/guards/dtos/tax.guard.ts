@@ -10,7 +10,6 @@ export const isTaxDto = (value: unknown): value is TaxDto => {
   return (
     typeof value.id_tax === 'string' &&
     typeof value.tax_name === 'string' &&
-    typeof value.tax_rate === 'string' &&
-    typeof value.id_transaction === 'string'
+    typeof value.tax_rate === 'string'
   );
 };

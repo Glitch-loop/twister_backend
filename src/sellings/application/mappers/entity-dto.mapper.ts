@@ -185,7 +185,6 @@ export class EntityDtoMapper {
 			domainObject.id_tax,
 			domainObject.tax_name,
 			domainObject.tax_rate,
-			domainObject.id_transaction,
 			domainObject.created_at,
 		);
 	}
@@ -277,7 +276,6 @@ export class EntityDtoMapper {
 			dto.id_tax,
 			dto.tax_name,
 			dto.tax_rate,
-			dto.id_transaction,
 			createdAt,
 		);
 	}

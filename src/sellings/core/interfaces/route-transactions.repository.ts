@@ -2,6 +2,7 @@ import { PaymentMethodObjectValue } from "@/src/sellings/core/value-objects/paym
 import { PaymentSchemaObjectValue } from "@/src/sellings/core/value-objects/payment-schema.object-value";
 import { TaxInTransactionObjectValue } from "@/src/sellings/core/value-objects/tax-in-transaction.object-value";
 import { TransactionDescriptionObjectValue } from "@/src/sellings/core/value-objects/transaction-description.object-value";
+import { TransactionEntity } from "@/src/sellings/core/entities/transaction.entity";
 
 export abstract class RouteTransactionRepository {
   abstract listPaymentMethods(): Promise<PaymentMethodObjectValue>
@@ -21,5 +22,5 @@ export abstract class RouteTransactionRepository {
     id_work_day?: string[],
     id_payment_method?: string[],
     id_payment_schema?: string[],
-  )
+  ): Promise<TransactionEntity[]>
 }

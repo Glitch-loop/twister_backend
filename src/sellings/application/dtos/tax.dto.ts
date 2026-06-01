@@ -10,9 +10,6 @@ export class TaxDto {
   @ApiProperty({ type: String, example: '16' })
   public readonly tax_rate: string;
 
-  @ApiProperty({ type: String, format: 'uuid', example: '3e51b1f8-10f2-4f84-bf0f-e9ea7bb36c98' })
-  public readonly id_transaction: string;
-
   @ApiProperty({ type: String, format: 'date-time', example: '2026-06-01T12:30:00.000Z' })
   public readonly created_at: Date;
 
@@ -20,13 +17,11 @@ export class TaxDto {
     id_tax: string,
     tax_name: string,
     tax_rate: string,
-    id_transaction: string,
     created_at: Date,
   ) {
     this.id_tax = id_tax;
     this.tax_name = tax_name;
     this.tax_rate = tax_rate;
-    this.id_transaction = id_transaction;
     this.created_at = created_at;
   }
 }
