@@ -1,7 +1,9 @@
+// Libraries
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
+// enums
 import { ROUTE_TRANSACTION_OPERATION_TYPE } from '@/src/sellings/core/enums/route-transaction-operation-type.enum';
-import { TRANSACTION_STATUS_ENUM } from '@/src/sellings/core/enums/route-status.enum';
+
 
 export class CreateTransactionDescriptionRequestDto {
   @ApiPropertyOptional({
