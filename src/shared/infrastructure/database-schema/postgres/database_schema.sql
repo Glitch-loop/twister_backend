@@ -361,4 +361,10 @@ INSERT INTO public.payment_method (id_payment_method, payment_method_name) VALUE
 INSERT INTO "public"."clients" ("id_client", "legal_name", "postal_code", "fiscal_regime", "name", "cellphone", "email", "created_at", "updated_at") VALUES 
 ('041c6093-a97b-4f4c-ab8e-6d1e35689555', 'PÚBLICO EN GENERAL', '48327', '616 – Sin obligaciones fiscales', 'PÚBLICO EN GENERAL', '0000000000', 'Ninguno', NOW(), NOW());
 
+INSERT INTO "public"."route_transaction_operation_types" ("id_route_transaction_operation_type", "transcation_operation_type_name") VALUES 
+  ('8ebe4f07-d28e-46f5-988e-3ab3790e612d', 'product devolution'), 
+  ('992f002c-13e2-4fb8-ac20-b7b571b9162a', 'sales'), 
+  ('ec313b8e-ba1d-4a77-bbfb-bb662663720c', 'product reposition'), 
+  ('f77da214-a8e8-480b-ac8d-e41d2ed6c5af', 'courtesy');
+
 -- Dummy insertions
