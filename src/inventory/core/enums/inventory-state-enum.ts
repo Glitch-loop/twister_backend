@@ -1,0 +1,4 @@
+export enum INVENTORY_STATE_ENUM {
+  DEACTIVE = 0,
+  ACTIVE = 1
+}
