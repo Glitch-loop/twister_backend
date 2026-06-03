@@ -1,4 +1,4 @@
-import type { InventoryModel } from '@/src/inventory/application/models/inventory.model';
+import type { InventoryModel } from '@/src/inventories/application/models/inventory.model';
 
 import { isRecord } from '@/src/shared/application/guards/utils';
 
@@ -14,6 +14,6 @@ export const isInventoryModel = (value: unknown): value is InventoryModel => {
     typeof value.is_active === 'number' &&
     typeof value.created_by === 'string' &&
     (value.assigned_facility === undefined || typeof value.assigned_facility === 'string') &&
-    (value.assigned_factory === undefined || typeof value.assigned_factory === 'string')
+    (value.assigned_to === undefined || typeof value.assigned_to === 'string')
   );
 };

@@ -1,8 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-import { InventoryOperationDescriptionDto } from '@/src/inventory/application/dtos/inventory-operation-description.dto';
+import { InventoryOperationDescriptionDto } from '@/src/inventories/application/dtos/inventory-operation-description.dto';
 
-export class InventoryOperationsDto {
+export class InventoryOperationDto {
   @ApiProperty({ type: String, format: 'uuid', example: 'a1b2c3d4-e5f6-4789-abcd-1234567890ab' })
   public readonly id_inventory_operation: string;
 

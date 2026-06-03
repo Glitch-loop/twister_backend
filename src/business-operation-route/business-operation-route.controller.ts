@@ -179,7 +179,6 @@ Related to client operations
 - new_client_registration: ${DAY_OPERATIONS_ENUM.new_client_registration}
 - route_client_attention: ${DAY_OPERATIONS_ENUM.route_client_attention}
 - attend_client_petition: ${DAY_OPERATIONS_ENUM.attend_client_petition}
-
 `,
 	})
 	@ApiBody({

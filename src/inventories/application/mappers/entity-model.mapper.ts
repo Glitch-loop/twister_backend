@@ -1,33 +1,33 @@
 import { Injectable } from '@nestjs/common';
 
 // Enums
-import { INVENTORY_CONTEXT_ENUM } from '@/src/inventory/core/enums/inventory-context.enum';
-import { INVENTORY_STATE_ENUM } from '@/src/inventory/core/enums/inventory-state-enum';
-import { MOVEMENT_TYPE_ENUM } from '@/src/inventory/core/enums/movement-type.enum';
+import { INVENTORY_CONTEXT_ENUM } from '@/src/inventories/core/enums/inventory-context.enum';
+import { INVENTORY_STATE_ENUM } from '@/src/inventories/core/enums/inventory-state-enum';
+import { MOVEMENT_TYPE_ENUM } from '@/src/inventories/core/enums/movement-type.enum';
 
 // Entities
-import { InventoryEntity } from '@/src/inventory/core/entities/inventory.entity';
-import { InventoryOperationsEntity } from '@/src/inventory/core/entities/inventory-operations.entity';
+import { InventoryEntity } from '@/src/inventories/core/entities/inventory.entity';
+import { InventoryOperationEntity } from '@/src/inventories/core/entities/inventory-operation.entity';
 
 // Object values
-import { InventoryBalanceObjectValue } from '@/src/inventory/core/value-objects/inventory-balance.object-value';
-import { InventoryOperationDescriptionObjectValue } from '@/src/inventory/core/value-objects/inventory-operation-description.object-value';
+import { InventoryBalanceObjectValue } from '@/src/inventories/core/value-objects/inventory-balance.object-value';
+import { InventoryOperationDescriptionObjectValue } from '@/src/inventories/core/value-objects/inventory-operation-description.object-value';
 
 // Models
-import type { InventoryModel } from '@/src/inventory/application/models/inventory.model';
-import type { InventoryOperationsModel } from '@/src/inventory/application/models/inventory-operations.model';
-import type { InventoryBalanceModel } from '@/src/inventory/application/models/inventory-balance.model';
-import type { InventoryOperationDescriptionModel } from '@/src/inventory/application/models/inventory-operation-description.model';
+import type { InventoryModel } from '@/src/inventories/application/models/inventory.model';
+import type { InventoryOperationModel } from '@/src/inventories/application/models/inventory-operation.model';
+import type { InventoryBalanceModel } from '@/src/inventories/application/models/inventory-balance.model';
+import type { InventoryOperationDescriptionModel } from '@/src/inventories/application/models/inventory-operation-description.model';
 
 // Entity guards
-import { isInventoryEntity } from '@/src/inventory/application/guards/entities/inventory.guard';
-import { isInventoryOperationsEntity } from '@/src/inventory/application/guards/entities/inventory-operations.guard';
+import { isInventoryEntity } from '@/src/inventories/application/guards/entities/inventory.guard';
+import { isInventoryOperationEntity } from '@/src/inventories/application/guards/entities/inventory-operation.guard';
 
 // Model guards
-import { isInventoryModel } from '@/src/inventory/application/guards/models/inventory.guard';
-import { isInventoryOperationsModel } from '@/src/inventory/application/guards/models/inventory-operations.guard';
-import { isInventoryBalanceModel } from '@/src/inventory/application/guards/object-values/inventory-balance.guard';
-import { isInventoryOperationDescriptionModel } from '@/src/inventory/application/guards/object-values/inventory-operation-description.guard';
+import { isInventoryModel } from '@/src/inventories/application/guards/models/inventory.guard';
+import { isInventoryOperationModel } from '@/src/inventories/application/guards/models/inventory-operation.guard';
+import { isInventoryBalanceModel } from '@/src/inventories/application/guards/object-values/inventory-balance.guard';
+import { isInventoryOperationDescriptionModel } from '@/src/inventories/application/guards/object-values/inventory-operation-description.guard';
 
 @Injectable()
 export class EntityModelMapper {
@@ -37,15 +37,15 @@ export class EntityModelMapper {
 	toDomainObject(model: InventoryOperationDescriptionModel): InventoryOperationDescriptionObjectValue;
 	toDomainObject(model: InventoryModel, inventoryBalanceModels: InventoryBalanceModel[]): InventoryEntity;
 	toDomainObject(
-		model: InventoryOperationsModel,
+		model: InventoryOperationModel,
 		inventoryOperationDescriptionModels: InventoryOperationDescriptionModel[],
-	): InventoryOperationsEntity;
+	): InventoryOperationEntity;
 	toDomainObject(
 		model:
 			| InventoryBalanceModel
 			| InventoryOperationDescriptionModel
 			| InventoryModel
-			| InventoryOperationsModel,
+			| InventoryOperationModel,
 		nestedModels?: InventoryBalanceModel[] | InventoryOperationDescriptionModel[],
 	): any {
 		if (isInventoryBalanceModel(model)) {
@@ -60,12 +60,12 @@ export class EntityModelMapper {
 			}
 			throw new Error('Missing inventory balance models for InventoryModel to domain object conversion');
 		}
-		if (isInventoryOperationsModel(model)) {
+		if (isInventoryOperationModel(model)) {
 			if (Array.isArray(nestedModels) && nestedModels.every(isInventoryOperationDescriptionModel)) {
-				return this.inventoryOperationsModelToDomainObject(model, nestedModels);
+				return this.InventoryOperationModelToDomainObject(model, nestedModels);
 			}
 			throw new Error(
-				'Missing inventory operation description models for InventoryOperationsModel to domain object conversion',
+				'Missing inventory operation description models for InventoryOperationModel to domain object conversion',
 			);
 		}
 
@@ -76,19 +76,19 @@ export class EntityModelMapper {
 	toModel(domainObject: InventoryBalanceObjectValue): InventoryBalanceModel;
 	toModel(domainObject: InventoryOperationDescriptionObjectValue): InventoryOperationDescriptionModel;
 	toModel(domainObject: InventoryEntity): InventoryModel;
-	toModel(domainObject: InventoryOperationsEntity): InventoryOperationsModel;
+	toModel(domainObject: InventoryOperationEntity): InventoryOperationModel;
 	toModel(
 		domainObject:
 			| InventoryBalanceObjectValue
 			| InventoryOperationDescriptionObjectValue
 			| InventoryEntity
-			| InventoryOperationsEntity,
+			| InventoryOperationEntity,
 	): any {
 		if (isInventoryEntity(domainObject)) {
 			return this.inventoryEntityToModel(domainObject);
 		}
-		if (isInventoryOperationsEntity(domainObject)) {
-			return this.inventoryOperationsEntityToModel(domainObject);
+		if (isInventoryOperationEntity(domainObject)) {
+			return this.InventoryOperationEntityToModel(domainObject);
 		}
 		if (isInventoryBalanceModel(domainObject)) {
 			return this.inventoryBalanceObjectValueToModel(domainObject);
@@ -133,15 +133,15 @@ export class EntityModelMapper {
 			inventory_context: domainObject.inventory_context,
 			inventory_name: domainObject.inventory_name,
 			is_active: domainObject.is_active,
-			updated_at: domainObject.updated_at,
 			created_at: domainObject.created_at,
+			updated_at: domainObject.updated_at,
 			created_by: domainObject.created_by,
 			assigned_facility: domainObject.assigned_facility,
-			assigned_factory: domainObject.assigned_factory,
+			assigned_to: domainObject.assigned_to,
 		};
 	}
 
-	private inventoryOperationsEntityToModel(domainObject: InventoryOperationsEntity): InventoryOperationsModel {
+	private InventoryOperationEntityToModel(domainObject: InventoryOperationEntity): InventoryOperationModel {
 		return {
 			id_inventory_operation: domainObject.id_inventory_operation,
 			latitude: domainObject.latitude,
@@ -208,26 +208,26 @@ export class EntityModelMapper {
 			model.inventory_context,
 			model.inventory_name,
 			model.is_active,
-			updatedAt,
 			createdAt,
+			updatedAt,
 			model.created_by,
 			inventoryBalanceModels.map((balance) => this.inventoryBalanceModelToDomainObject(balance)),
 			model.assigned_facility,
-			model.assigned_factory,
+			model.assigned_to,
 		);
 	}
 
-	private inventoryOperationsModelToDomainObject(
-		model: InventoryOperationsModel,
+	private InventoryOperationModelToDomainObject(
+		model: InventoryOperationModel,
 		inventoryOperationDescriptionModels: InventoryOperationDescriptionModel[],
-	): InventoryOperationsEntity {
-		const createdAt = this.toDate(model.created_at, 'InventoryOperationsModel.created_at');
+	): InventoryOperationEntity {
+		const createdAt = this.toDate(model.created_at, 'InventoryOperationModel.created_at');
 
 		if (!Object.values(MOVEMENT_TYPE_ENUM).includes(model.movement_type)) {
-			throw new Error('Invalid movement_type in InventoryOperationsModel');
+			throw new Error('Invalid movement_type in InventoryOperationModel');
 		}
 
-		return new InventoryOperationsEntity(
+		return new InventoryOperationEntity(
 			model.id_inventory_operation,
 			model.latitude,
 			model.longitude,

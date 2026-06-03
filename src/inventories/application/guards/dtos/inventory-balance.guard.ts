@@ -1,4 +1,4 @@
-import type { InventoryBalanceDto } from '@/src/inventory/application/dtos/inventory-balance.dto';
+import type { InventoryBalanceDto } from '@/src/inventories/application/dtos/inventory-balance.dto';
 
 import { isRecord } from '@/src/shared/application/guards/utils';
 

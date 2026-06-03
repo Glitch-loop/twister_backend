@@ -1,37 +1,37 @@
 import { Injectable } from '@nestjs/common';
 
 // Enums
-import { INVENTORY_CONTEXT_ENUM } from '@/src/inventory/core/enums/inventory-context.enum';
-import { INVENTORY_STATE_ENUM } from '@/src/inventory/core/enums/inventory-state-enum';
-import { MOVEMENT_TYPE_ENUM } from '@/src/inventory/core/enums/movement-type.enum';
+import { INVENTORY_CONTEXT_ENUM } from '@/src/inventories/core/enums/inventory-context.enum';
+import { INVENTORY_STATE_ENUM } from '@/src/inventories/core/enums/inventory-state-enum';
+import { MOVEMENT_TYPE_ENUM } from '@/src/inventories/core/enums/movement-type.enum';
 
 // Entities
-import { InventoryEntity } from '@/src/inventory/core/entities/inventory.entity';
-import { InventoryOperationsEntity } from '@/src/inventory/core/entities/inventory-operations.entity';
+import { InventoryEntity } from '@/src/inventories/core/entities/inventory.entity';
+import { InventoryOperationEntity } from '@/src/inventories/core/entities/inventory-operation.entity';
 
 // Object values
-import { InventoryBalanceObjectValue } from '@/src/inventory/core/value-objects/inventory-balance.object-value';
-import { InventoryOperationDescriptionObjectValue } from '@/src/inventory/core/value-objects/inventory-operation-description.object-value';
+import { InventoryBalanceObjectValue } from '@/src/inventories/core/value-objects/inventory-balance.object-value';
+import { InventoryOperationDescriptionObjectValue } from '@/src/inventories/core/value-objects/inventory-operation-description.object-value';
 
 // Dtos
-import { InventoryDto } from '@/src/inventory/application/dtos/inventory.dto';
-import { InventoryOperationsDto } from '@/src/inventory/application/dtos/inventory-operations.dto';
-import { InventoryBalanceDto } from '@/src/inventory/application/dtos/inventory-balance.dto';
-import { InventoryOperationDescriptionDto } from '@/src/inventory/application/dtos/inventory-operation-description.dto';
+import { InventoryDto } from '@/src/inventories/application/dtos/inventory.dto';
+import { InventoryOperationDto } from '@/src/inventories/application/dtos/inventory-operation.dto';
+import { InventoryBalanceDto } from '@/src/inventories/application/dtos/inventory-balance.dto';
+import { InventoryOperationDescriptionDto } from '@/src/inventories/application/dtos/inventory-operation-description.dto';
 
 // Entity guards
-import { isInventoryEntity } from '@/src/inventory/application/guards/entities/inventory.guard';
-import { isInventoryOperationsEntity } from '@/src/inventory/application/guards/entities/inventory-operations.guard';
+import { isInventoryEntity } from '@/src/inventories/application/guards/entities/inventory.guard';
+import { isInventoryOperationEntity } from '@/src/inventories/application/guards/entities/inventory-operation.guard';
 
 // Object-value guards (structurally equivalent to model guards, used for OV dispatch)
-import { isInventoryBalanceModel } from '@/src/inventory/application/guards/object-values/inventory-balance.guard';
-import { isInventoryOperationDescriptionModel } from '@/src/inventory/application/guards/object-values/inventory-operation-description.guard';
+import { isInventoryBalanceModel } from '@/src/inventories/application/guards/object-values/inventory-balance.guard';
+import { isInventoryOperationDescriptionModel } from '@/src/inventories/application/guards/object-values/inventory-operation-description.guard';
 
 // Dto guards
-import { isInventoryDto } from '@/src/inventory/application/guards/dtos/inventory.guard';
-import { isInventoryOperationsDto } from '@/src/inventory/application/guards/dtos/inventory-operations.guard';
-import { isInventoryBalanceDto } from '@/src/inventory/application/guards/dtos/inventory-balance.guard';
-import { isInventoryOperationDescriptionDto } from '@/src/inventory/application/guards/dtos/inventory-operation-description.guard';
+import { isInventoryDto } from '@/src/inventories/application/guards/dtos/inventory.guard';
+import { isInventoryOperationDto } from '@/src/inventories/application/guards/dtos/inventory-operation.guard';
+import { isInventoryBalanceDto } from '@/src/inventories/application/guards/dtos/inventory-balance.guard';
+import { isInventoryOperationDescriptionDto } from '@/src/inventories/application/guards/dtos/inventory-operation-description.guard';
 
 @Injectable()
 export class EntityDtoMapper {
@@ -40,13 +40,13 @@ export class EntityDtoMapper {
 	toDomainObject(dto: InventoryBalanceDto): InventoryBalanceObjectValue;
 	toDomainObject(dto: InventoryOperationDescriptionDto): InventoryOperationDescriptionObjectValue;
 	toDomainObject(dto: InventoryDto): InventoryEntity;
-	toDomainObject(dto: InventoryOperationsDto): InventoryOperationsEntity;
+	toDomainObject(dto: InventoryOperationDto): InventoryOperationEntity;
 	toDomainObject(
 		dto:
 			| InventoryBalanceDto
 			| InventoryOperationDescriptionDto
 			| InventoryDto
-			| InventoryOperationsDto,
+			| InventoryOperationDto,
 	): any {
 		if (isInventoryBalanceDto(dto)) {
 			return this.inventoryBalanceDtoToDomainObject(dto);
@@ -57,8 +57,8 @@ export class EntityDtoMapper {
 		if (isInventoryDto(dto)) {
 			return this.inventoryDtoToDomainObject(dto);
 		}
-		if (isInventoryOperationsDto(dto)) {
-			return this.inventoryOperationsDtoToDomainObject(dto);
+		if (isInventoryOperationDto(dto)) {
+			return this.InventoryOperationDtoToDomainObject(dto);
 		}
 
 		throw new Error('Invalid input for mapping to domain object');
@@ -68,19 +68,19 @@ export class EntityDtoMapper {
 	toDto(domainObject: InventoryBalanceObjectValue): InventoryBalanceDto;
 	toDto(domainObject: InventoryOperationDescriptionObjectValue): InventoryOperationDescriptionDto;
 	toDto(domainObject: InventoryEntity): InventoryDto;
-	toDto(domainObject: InventoryOperationsEntity): InventoryOperationsDto;
+	toDto(domainObject: InventoryOperationEntity): InventoryOperationDto;
 	toDto(
 		domainObject:
 			| InventoryBalanceObjectValue
 			| InventoryOperationDescriptionObjectValue
 			| InventoryEntity
-			| InventoryOperationsEntity,
+			| InventoryOperationEntity,
 	): any {
 		if (isInventoryEntity(domainObject)) {
 			return this.inventoryEntityToDto(domainObject);
 		}
-		if (isInventoryOperationsEntity(domainObject)) {
-			return this.inventoryOperationsEntityToDto(domainObject);
+		if (isInventoryOperationEntity(domainObject)) {
+			return this.InventoryOperationEntityToDto(domainObject);
 		}
 		if (isInventoryBalanceModel(domainObject)) {
 			return this.inventoryBalanceObjectValueToDto(domainObject);
@@ -125,17 +125,17 @@ export class EntityDtoMapper {
 			domainObject.inventory_context,
 			domainObject.inventory_name,
 			domainObject.is_active,
-			domainObject.updated_at,
 			domainObject.created_at,
+			domainObject.updated_at,
 			domainObject.created_by,
 			domainObject.inventory_balance.map((balance) => this.inventoryBalanceObjectValueToDto(balance)),
 			domainObject.assigned_facility,
-			domainObject.assigned_factory,
+			domainObject.assigned_to,
 		);
 	}
 
-	private inventoryOperationsEntityToDto(domainObject: InventoryOperationsEntity): InventoryOperationsDto {
-		return new InventoryOperationsDto(
+	private InventoryOperationEntityToDto(domainObject: InventoryOperationEntity): InventoryOperationDto {
+		return new InventoryOperationDto(
 			domainObject.id_inventory_operation,
 			domainObject.movement_type,
 			domainObject.created_at,
@@ -198,23 +198,23 @@ export class EntityDtoMapper {
 			dto.inventory_context,
 			dto.inventory_name,
 			dto.is_active,
-			updatedAt,
 			createdAt,
+			updatedAt,
 			dto.created_by,
 			dto.inventory_balance.map((balance) => this.inventoryBalanceDtoToDomainObject(balance)),
 			dto.assigned_facility,
-			dto.assigned_factory,
+			dto.assigned_to,
 		);
 	}
 
-	private inventoryOperationsDtoToDomainObject(dto: InventoryOperationsDto): InventoryOperationsEntity {
-		const createdAt = this.toDate(dto.created_at, 'InventoryOperationsDto.created_at');
+	private InventoryOperationDtoToDomainObject(dto: InventoryOperationDto): InventoryOperationEntity {
+		const createdAt = this.toDate(dto.created_at, 'InventoryOperationDto.created_at');
 
 		if (!Object.values(MOVEMENT_TYPE_ENUM).includes(dto.movement_type)) {
-			throw new Error('Invalid movement_type in InventoryOperationsDto');
+			throw new Error('Invalid movement_type in InventoryOperationDto');
 		}
 
-		return new InventoryOperationsEntity(
+		return new InventoryOperationEntity(
 			dto.id_inventory_operation,
 			dto.latitude ?? null,
 			dto.longitude ?? null,

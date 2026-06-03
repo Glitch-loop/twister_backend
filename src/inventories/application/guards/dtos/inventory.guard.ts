@@ -1,8 +1,8 @@
-import type { InventoryDto } from '@/src/inventory/application/dtos/inventory.dto';
+import type { InventoryDto } from '@/src/inventories/application/dtos/inventory.dto';
 
 import { isArray, isRecord } from '@/src/shared/application/guards/utils';
 
-import { isInventoryBalanceDto } from '@/src/inventory/application/guards/dtos/inventory-balance.guard';
+import { isInventoryBalanceDto } from '@/src/inventories/application/guards/dtos/inventory-balance.guard';
 
 export const isInventoryDto = (value: unknown): value is InventoryDto => {
   if (!isRecord(value)) {
@@ -16,7 +16,7 @@ export const isInventoryDto = (value: unknown): value is InventoryDto => {
     typeof value.is_active === 'number' &&
     typeof value.created_by === 'string' &&
     (value.assigned_facility === undefined || typeof value.assigned_facility === 'string') &&
-    (value.assigned_factory === undefined || typeof value.assigned_factory === 'string') &&
+    (value.assigned_to === undefined || typeof value.assigned_to === 'string') &&
     isArray(value.inventory_balance) &&
     value.inventory_balance.every(isInventoryBalanceDto)
   );

@@ -1,10 +1,10 @@
-import type { InventoryOperationDescriptionDto } from '@/src/inventory/application/dtos/inventory-operation-description.dto';
+import type { InventoryOperationDescriptionModel } from '@/src/inventories/application/models/inventory-operation-description.model';
 
 import { isRecord } from '@/src/shared/application/guards/utils';
 
-export const isInventoryOperationDescriptionDto = (
+export const isInventoryOperationDescriptionModel = (
   value: unknown,
-): value is InventoryOperationDescriptionDto => {
+): value is InventoryOperationDescriptionModel => {
   if (!isRecord(value)) {
     return false;
   }

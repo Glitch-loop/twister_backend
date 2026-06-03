@@ -1,7 +1,7 @@
-import { MOVEMENT_TYPE_ENUM } from '@/src/inventory/core/enums/movement-type.enum';
-import { InventoryOperationDescriptionObjectValue } from '@/src/inventory/core/value-objects/inventory-operation-description.object-value';
+import { MOVEMENT_TYPE_ENUM } from '@/src/inventories/core/enums/movement-type.enum';
+import { InventoryOperationDescriptionObjectValue } from '@/src/inventories/core/value-objects/inventory-operation-description.object-value';
 
-export class InventoryOperationsEntity {
+export class InventoryOperationEntity {
 	constructor(
 		public readonly id_inventory_operation: string,
 		public readonly latitude: string | null,

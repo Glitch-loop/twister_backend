@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-import { InventoryBalanceDto } from '@/src/inventory/application/dtos/inventory-balance.dto';
+import { InventoryBalanceDto } from '@/src/inventories/application/dtos/inventory-balance.dto';
 
 export class InventoryDto {
   @ApiProperty({ type: String, format: 'uuid', example: '8d4c3b2a-1f0e-4d9c-8b7a-6e5d4c3b2a10' })
@@ -28,7 +28,7 @@ export class InventoryDto {
   public readonly assigned_facility?: string;
 
   @ApiPropertyOptional({ type: String, format: 'uuid', example: '66666666-7777-8888-9999-000000000000' })
-  public readonly assigned_factory?: string;
+  public readonly assigned_to?: string;
 
   @ApiProperty({ type: [InventoryBalanceDto] })
   public readonly inventory_balance: InventoryBalanceDto[];
@@ -38,22 +38,22 @@ export class InventoryDto {
     inventory_context: number,
     inventory_name: string,
     is_active: number,
-    updated_at: Date,
     created_at: Date,
+    updated_at: Date,
     created_by: string,
     inventory_balance: InventoryBalanceDto[],
     assigned_facility?: string,
-    assigned_factory?: string,
+    assigned_to?: string,
   ) {
     this.id_inventory = id_inventory;
     this.inventory_context = inventory_context;
     this.inventory_name = inventory_name;
     this.is_active = is_active;
-    this.updated_at = updated_at;
     this.created_at = created_at;
+    this.updated_at = updated_at;
     this.created_by = created_by;
     this.assigned_facility = assigned_facility;
-    this.assigned_factory = assigned_factory;
+    this.assigned_to = assigned_to;
     this.inventory_balance = inventory_balance;
   }
 }

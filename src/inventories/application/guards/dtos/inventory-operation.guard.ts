@@ -1,10 +1,10 @@
-import type { InventoryOperationsEntity } from '@/src/inventory/core/entities/inventory-operations.entity';
+import type { InventoryOperationDto } from '@/src/inventories/application/dtos/inventory-operation.dto';
 
 import { isArray, isRecord } from '@/src/shared/application/guards/utils';
 
-import { isInventoryOperationDescriptionModel } from '@/src/inventory/application/guards/object-values/inventory-operation-description.guard';
+import { isInventoryOperationDescriptionDto } from '@/src/inventories/application/guards/dtos/inventory-operation-description.guard';
 
-export const isInventoryOperationsEntity = (value: unknown): value is InventoryOperationsEntity => {
+export const isInventoryOperationDto = (value: unknown): value is InventoryOperationDto => {
   if (!isRecord(value)) {
     return false;
   }
@@ -20,6 +20,6 @@ export const isInventoryOperationsEntity = (value: unknown): value is InventoryO
     typeof value.id_inventory_origin === 'string' &&
     typeof value.id_inventory_destination === 'string' &&
     isArray(value.inventory_operation_descriptions) &&
-    value.inventory_operation_descriptions.every(isInventoryOperationDescriptionModel)
+    value.inventory_operation_descriptions.every(isInventoryOperationDescriptionDto)
   );
 };

@@ -1,6 +1,6 @@
-import { MOVEMENT_TYPE_ENUM } from '@/src/inventory/core/enums/movement-type.enum';
+import { MOVEMENT_TYPE_ENUM } from '@/src/inventories/core/enums/movement-type.enum';
 
-export interface InventoryOperationsModel {
+export interface InventoryOperationModel {
   id_inventory_operation: string;
   latitude: string | null;
   longitude: string | null;
