@@ -10,7 +10,7 @@ export const isInventoryBalanceDto = (value: unknown): value is InventoryBalance
   return (
     typeof value.id_inventory_balance === 'string' &&
     typeof value.quantity === 'number' &&
-    typeof value.id_location_inventory === 'string' &&
+    typeof value.id_inventory === 'string' &&
     typeof value.id_product === 'string'
   );
 };

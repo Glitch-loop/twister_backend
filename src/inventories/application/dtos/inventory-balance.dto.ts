@@ -11,7 +11,7 @@ export class InventoryBalanceDto {
   public readonly created_at: Date;
 
   @ApiProperty({ type: String, format: 'uuid', example: '1b3c5d7e-9f01-4a23-8b45-6c7d8e9f0123' })
-  public readonly id_location_inventory: string;
+  public readonly id_inventory: string;
 
   @ApiProperty({ type: String, format: 'uuid', example: '2c4d6e8f-0123-4b56-9c78-9d0e1f2a3456' })
   public readonly id_product: string;
@@ -20,13 +20,13 @@ export class InventoryBalanceDto {
     id_inventory_balance: string,
     quantity: number,
     created_at: Date,
-    id_location_inventory: string,
+    id_inventory: string,
     id_product: string,
   ) {
     this.id_inventory_balance = id_inventory_balance;
     this.quantity = quantity;
     this.created_at = created_at;
-    this.id_location_inventory = id_location_inventory;
+    this.id_inventory = id_inventory;
     this.id_product = id_product;
   }
 }

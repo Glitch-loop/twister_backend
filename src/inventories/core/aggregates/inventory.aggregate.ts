@@ -18,16 +18,12 @@ export class InventoryAggregate {
     _assigned_to?: string,
     _assigned_facility?: string
   ):InventoryEntity {
-    if (_inventory_context === INVENTORY_CONTEXT_ENUM.CLIENT_VIRTUAL
-    || _inventory_context === INVENTORY_CONTEXT_ENUM.WASTED_VIRTUAL
-    || _inventory_context === INVENTORY_CONTEXT_ENUM.INVENTORY_SUPPLIER_VIRTUAL
-    || _inventory_context === INVENTORY_CONTEXT_ENUM.ADJUSTMENT_VIRTUAL
-    ) {
+    if(this.isForbiddenInventory(_inventory_context)) {
       throw new BusinessRuleException('You are trying to create an inventory of a forbbiden type.');
     }
     
     if (_assigned_to === undefined && _assigned_facility === undefined) {
-      throw new BusinessRuleException('For creating a new inventory, you have to assign at least to an user or to a facility.');
+      throw new BusinessRuleException('For creating a new inventory, you have to assign to the inventory at least an user or a facility.');
     }
     
     // Regex validation
@@ -53,6 +49,10 @@ export class InventoryAggregate {
 
   deactivateInventory(): InventoryEntity {
     if (this.inventory === null) throw new Error('The inventory has not been initialized.');
+    
+    if(this.isForbiddenInventory(this.inventory.inventory_context)) {
+      throw new BusinessRuleException(`You cannot deactivate the inventory with the id: ${this.inventory.id_inventory} because it's an special inventory.`);
+    }
 
     this.inventory = new InventoryEntity(
       this.inventory.id_inventory,
@@ -73,6 +73,10 @@ export class InventoryAggregate {
   reactivateInventory(): InventoryEntity {
     if (this.inventory === null) throw new Error('The inventory has not been initialized.');
 
+    if(this.isForbiddenInventory(this.inventory.inventory_context)) {
+      throw new BusinessRuleException(`You cannot reactivate the inventory with the id: ${this.inventory.id_inventory} because it's an special inventory.`);
+    }
+
     this.inventory = new InventoryEntity(
       this.inventory.id_inventory,
       this.inventory.inventory_context,
@@ -89,14 +93,31 @@ export class InventoryAggregate {
     return this.inventory;
   }
 
-  updateInventory(): InventoryEntity {
+  updateInventory(inventory_name: string): InventoryEntity {
+    /*
+      Business rule (06-03-26)
+      The user can modify only the inventory name from those allowed inventories. 
+    */
+    /*
+      Business rule (06-03-26)
+      Inventory context cannot be updated; If the user could, it will be a source of bugs and it will potentially break the 
+      system. 
+    */
     if (this.inventory === null) throw new Error('The inventory has not been initialized.');
 
+    if(this.isForbiddenInventory(this.inventory.inventory_context)) {
+      throw new BusinessRuleException(`You cannot update the inventory with the id: ${this.inventory.id_inventory} because it's an special inventory.`);
+    }
+
+    if(this.inventory.is_active === INVENTORY_STATE_ENUM.DEACTIVE) {
+      throw new BusinessRuleException(`You cannot perform this operation because the inventory (${this.inventory.id_inventory}) is deactivated.`);
+    }
+
     this.inventory = new InventoryEntity(
       this.inventory.id_inventory,
       this.inventory.inventory_context,
-      this.inventory.inventory_name,
-      INVENTORY_STATE_ENUM.ACTIVE,
+      inventory_name,
+      this.inventory.is_active,
       this.inventory.created_at,
       new Date(),
       this.inventory.created_by,
@@ -108,5 +129,16 @@ export class InventoryAggregate {
     return this.inventory;
   }
 
+  private isForbiddenInventory(_inventory_context):boolean {
+    if (_inventory_context === INVENTORY_CONTEXT_ENUM.CLIENT_VIRTUAL
+    || _inventory_context === INVENTORY_CONTEXT_ENUM.WASTED_VIRTUAL
+    || _inventory_context === INVENTORY_CONTEXT_ENUM.INVENTORY_SUPPLIER_VIRTUAL
+    || _inventory_context === INVENTORY_CONTEXT_ENUM.ADJUSTMENT_VIRTUAL
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
 }

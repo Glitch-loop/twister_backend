@@ -100,7 +100,7 @@ export class EntityDtoMapper {
 			domainObject.id_inventory_balance,
 			domainObject.quantity,
 			domainObject.created_at,
-			domainObject.id_location_inventory,
+			domainObject.id_inventory,
 			domainObject.id_product,
 		);
 	}
@@ -160,7 +160,7 @@ export class EntityDtoMapper {
 			dto.id_inventory_balance,
 			dto.quantity,
 			createdAt,
-			dto.id_location_inventory,
+			dto.id_inventory,
 			dto.id_product,
 		);
 	}

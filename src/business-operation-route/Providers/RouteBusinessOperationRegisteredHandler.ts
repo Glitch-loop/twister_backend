@@ -8,7 +8,6 @@ export class RouteBusinessOperationRegisteredHandler {
 
   @OnEvent('route-business-operation.register', { async: true })
   handle(payload: string | object): void {
-    console.log("Registry")
     this.broker.publish(payload);
   }
 }

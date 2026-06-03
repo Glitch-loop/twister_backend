@@ -15,4 +15,16 @@ export class InventoryEntity {
 		public readonly assigned_facility?: string,
 		public readonly assigned_to?: string,
 	) {}
+
+	public isForbiddenInventory():boolean {
+    if (this.inventory_context === INVENTORY_CONTEXT_ENUM.CLIENT_VIRTUAL
+    || this.inventory_context === INVENTORY_CONTEXT_ENUM.WASTED_VIRTUAL
+    || this.inventory_context === INVENTORY_CONTEXT_ENUM.INVENTORY_SUPPLIER_VIRTUAL
+    || this.inventory_context === INVENTORY_CONTEXT_ENUM.ADJUSTMENT_VIRTUAL
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }

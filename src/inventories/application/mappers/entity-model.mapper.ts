@@ -108,7 +108,7 @@ export class EntityModelMapper {
 			id_inventory_balance: domainObject.id_inventory_balance,
 			quantity: domainObject.quantity,
 			created_at: domainObject.created_at,
-			id_location_inventory: domainObject.id_location_inventory,
+			id_inventory: domainObject.id_inventory,
 			id_product: domainObject.id_product,
 		};
 	}
@@ -164,7 +164,7 @@ export class EntityModelMapper {
 			model.id_inventory_balance,
 			model.quantity,
 			createdAt,
-			model.id_location_inventory,
+			model.id_inventory,
 			model.id_product,
 		);
 	}
