@@ -1,21 +1,31 @@
+// Object values
+import { InventoryBalanceObjectValue } from "@/src/inventories/core/value-objects/inventory-balance.object-value";
+import { InventoryOperationDescriptionObjectValue } from "@/src/inventories/core/value-objects/inventory-operation-description.object-value";
+
+// Entities
+import { InventoryEntity } from "@/src/inventories/core/entities/inventory.entity";
+import { InventoryOperationEntity } from "@/src/inventories/core/entities/inventory-operation.entity";
+
+// Enums
+import { MOVEMENT_TYPE_ENUM } from "@/src/inventories/core/enums/movement-type.enum";
+import { INVENTORY_STATE_ENUM } from "@/src/inventories/core/enums/inventory-state-enum";
+import { INVENTORY_CONTEXT_ENUM } from "@/src/inventories/core/enums/inventory-context.enum";
+
+// Shared
 import { BusinessRuleException } from "@/src/shared/errors/BusinessRuleException";
-import { InventoryEntity } from "../entities/inventory.entity";
-import { MOVEMENT_TYPE_ENUM } from "../enums/movement-type.enum";
-import { InventoryBalanceObjectValue } from "../value-objects/inventory-balance.object-value";
-import { INVENTORY_STATE_ENUM } from "../enums/inventory-state-enum";
-import { InventoryOperationEntity } from "../entities/inventory-operation.entity";
-import { InventoryOperationDescriptionObjectValue } from "../value-objects/inventory-operation-description.object-value";
-import { INVENTORY_CONTEXT_ENUM } from "../enums/inventory-context.enum";
 
 
 export class InventoryOperationAggregate {
+  // About inventories
   private readonly originInventory: InventoryEntity;
   private readonly targetInventory: InventoryEntity;
-  private readonly originInventoryBalance: InventoryBalanceObjectValue[];
-  private readonly targetInventoryBalance: InventoryBalanceObjectValue[];
+  private readonly originInventoryBalance: Map<string, InventoryBalanceObjectValue>; // id product - balance product
+  private readonly targetInventoryBalance: Map<string, InventoryBalanceObjectValue>; // id product - balance product
+  
+  // About inventory operation
   private inventoryOperation: InventoryOperationEntity|null;
-  private productDescriptions: InventoryOperationDescriptionObjectValue[];
-
+  private inventoryOperationDescriptions: InventoryOperationDescriptionObjectValue[];
+  private productInInventoryOperationDescriptionSet: Set<string>;
 
   constructor(
     _originInventory: InventoryEntity,
@@ -29,7 +39,8 @@ export class InventoryOperationAggregate {
     this.targetInventoryBalance = this.cloneBalance(this.targetInventory.inventory_balance)
     
     this.inventoryOperation = null;
-    this.productDescriptions = [];
+    this.inventoryOperationDescriptions = [];
+    this.productInInventoryOperationDescriptionSet = new Set<string>();
   }
 
   private cloneInventory(inventory: InventoryEntity): InventoryEntity {
@@ -41,31 +52,24 @@ export class InventoryOperationAggregate {
       new Date(inventory.created_at),
       new Date(inventory.updated_at),
       inventory.created_by,
-      this.cloneBalance(inventory.inventory_balance),
+      [],
       inventory.assigned_facility,
       inventory.assigned_to,
     );
   }
 
-  private cloneBalance(inventoryItems: InventoryBalanceObjectValue[]): InventoryBalanceObjectValue[] {
-    const productInInventorySet:Set<string> = new Set<string>()
+  private cloneBalance(inventoryItems: InventoryBalanceObjectValue[]): Map<string, InventoryBalanceObjectValue> {
+    const balanceOfProductMap: Map<string, InventoryBalanceObjectValue> = new Map<string, InventoryBalanceObjectValue>();
     for (const item of inventoryItems) {
       const { id_product, id_inventory } = item;
-      if(productInInventorySet.has(id_product)) 
-        throw new BusinessRuleException(`The product with id ${id_product} appears twice in inventory with if ${id_inventory}`);
-      productInInventorySet.add(id_product)
+      
+      if(balanceOfProductMap.has(id_product)) 
+        throw new BusinessRuleException(`The product with id ${id_product} appears twice in inventory with id ${id_inventory}`);
+
+      balanceOfProductMap.set(id_product, item);
     }
 
-    return inventoryItems.map((balance) => {
-      return new InventoryBalanceObjectValue(
-        balance.id_inventory_balance,
-        balance.quantity,
-        new Date(balance.created_at),
-        balance.id_inventory,
-        balance.id_product,
-      );
-    })    
-
+    return balanceOfProductMap;
   }
 
   createInventoryOperationForTransaction (
@@ -327,15 +331,201 @@ export class InventoryOperationAggregate {
 
   addInventoryOperationDescription(
     _idProductOperationDescription: string,
-    _priceAtMoment: string,
-    _costAtMoment: string,
-    _quantity: string,
+    _priceAtMoment: number,
+    _costAtMoment: number,
+    _quantity: number,
     _idProduct: string,
+    _idNewProductInOriginInventory: string,
+    _idNewProductInTargetInventory: string,
+    _created_at?: Date,
   ) {
-    this.isInventoryOperationInitialized();
+    /*
+      Business rule (06-04-26)
+      A product can only appear once in an inventory operation.
+    */
 
-    InventoryOperationDescriptionObjectValue()
+    // Validating an inventory operation exists.
+    this.isInventoryOperationInitialized();
+    const { id_inventory_operation, movement_type } = this.inventoryOperation!
     
+    if (!(movement_type === MOVEMENT_TYPE_ENUM.REVERSED || movement_type === MOVEMENT_TYPE_ENUM.ADJUSTMENT) && _quantity < 0) 
+      throw new BusinessRuleException(`Negative inventory operation description is not allowed (id product: ${_idProduct}, quantity: ${_quantity}). The unique contexts on which this operation is allowed are: ADJUSTMENTS or REVERSED (CANCEL) operation.`)
+
+    // Validating an inventory operation with a product don't appear twice.
+    if (this.productInInventoryOperationDescriptionSet.has(_idProduct)) throw new BusinessRuleException(`You have added an operation description with the same id product (${_idProduct}) in the inventory operation.`);
+    this.productInInventoryOperationDescriptionSet.add(_idProduct);
+
+    // Validating the inventories has enough product
+    /*
+      Note about inventory descriptions (06-05-26):
+      Inventory operations was designed in such way that it is taking into account both inventories:
+      - The inventory which the product is outflowing (origin).
+      - The inventory which the product is inflowing (target).
+
+      This design brings the following scenarios:
+      1. When _quantity is positive.
+        - It's a negative movement (product is taken) for origin inventory.
+        - It's a positive movement (product is placed) for target inventory.
+    
+      2. When _quantity is negative.
+          - It's a positive movement (product is placed) for origin inventory.
+          - It's a negative movement (product is taken) for target inventory.
+      
+      Notes about when _quantity is negative:
+      This case is only allowed when:
+       1. Inventory operation is reversed. The user wants to undo an operation.
+       2. When there is an adjustment. The user saw a discrepancy that might imply a decrease the amount of a quantity.
+    */
+    /*
+      Note about special inventories (06-05-26):
+      Special inventories doesn't have an inventory balance since they are abstractions of entities or concepts, so it isn't
+      necessary to validate if an special inventory has enough product.
+    */
+    if(!this.isSpecialInventory(this.originInventory)) {
+      const { id_inventory } = this.originInventory
+      const productBalance = this.originInventoryBalance.get(_idProduct);
+      
+      if (productBalance) { // This particular product has appeared previoulsy in this inventory balance.
+        const { 
+          id_inventory_balance, 
+          quantity,
+          id_inventory,
+          created_at,
+          id_product
+        } = productBalance;
+        if (productBalance.quantity - _quantity < 0) throw new BusinessRuleException(`The inventory balance with id ${id_inventory_balance} (representing the product ${_idProduct}) of the origin inventory with id ${id_inventory} doesn't have enough product to complete the operation. Current balance: ${quantity}. Items to take from the balance: ${_quantity}`);
+        this.originInventoryBalance.set(_idProduct, new InventoryBalanceObjectValue(
+          id_inventory_balance,
+          quantity - _quantity,
+          created_at,
+          id_inventory,
+          id_product
+        ));
+      } else { // This particular particular has not been appeard in this inventory balance (First time it appears).
+        if (_quantity * -1 < 0)  throw new BusinessRuleException(`You are trying to take product that doesn't exist. The inventory origin with id ${id_inventory} doesn't have product with id ${_idProduct}. Firstly, you have to add balance of this product before taking it.`);
+        this.originInventoryBalance.set(
+          _idProduct,
+          new InventoryBalanceObjectValue(
+            _idNewProductInOriginInventory,
+            _quantity * -1,
+            new Date(),
+            id_inventory,
+            _idProduct
+          )
+        )
+      }
+    }
+
+    if(!this.isSpecialInventory(this.targetInventory)) {
+      const { id_inventory } = this.targetInventory
+      const productBalance = this.targetInventoryBalance.get(_idProduct);
+      
+      if (productBalance) { // This particular product has appeared previoulsy in this inventory balance.
+        const { 
+          id_inventory_balance, 
+          quantity,
+          id_inventory,
+          created_at,
+          id_product
+        } = productBalance;
+        if (productBalance.quantity + _quantity < 0) throw new BusinessRuleException(`The inventory balance with id ${id_inventory_balance} (representing the product ${_idProduct}) of the target inventory with id ${id_inventory} doesn't have enough product to complete the operation. Current balance: ${quantity}. Items to take from the balance: ${_quantity}`);
+        this.targetInventoryBalance.set(_idProduct, new InventoryBalanceObjectValue(
+          id_inventory_balance,
+          quantity + _quantity,
+          created_at,
+          id_inventory,
+          id_product
+        ));
+      } else { // This particular particular has not been appeard in this inventory balance (First time it appears).
+        if (_quantity < 0) throw new BusinessRuleException(`You are trying to take product that doesn't exist. The target inventory with id ${id_inventory} doesn't have product with id ${_idProduct}. Firstly, you have to add balance of this product before taking it.`);
+        this.targetInventoryBalance.set(
+          _idProduct,
+          new InventoryBalanceObjectValue(
+            _idNewProductInTargetInventory,
+            _quantity,
+            new Date(),
+            id_inventory,
+            _idProduct
+          )
+        ) 
+      }
+    }
+    
+    // Adding inventory operation description.
+    this.inventoryOperationDescriptions.push(
+      new InventoryOperationDescriptionObjectValue(
+        _idProductOperationDescription,
+        _priceAtMoment,
+        _costAtMoment,
+        _quantity,
+        _created_at ? _created_at : new Date(),
+        id_inventory_operation,
+        _idProduct
+      )
+    );
+  }
+
+  getInventoryOperation(): InventoryOperationEntity {
+    this.isInventoryOperationInitialized();
+    
+    const { 
+      id_inventory_operation,
+      latitude,
+      longitude,
+      movement_type,
+      created_at,
+      created_by,
+      id_inventory_origin,
+      id_inventory_destination,
+      document_reference,
+    } = this.inventoryOperation!;
+
+    return new InventoryOperationEntity(
+      id_inventory_operation,
+      latitude,
+      longitude,
+      movement_type,
+      created_at,
+      created_by,
+      id_inventory_origin,
+      id_inventory_destination,
+      this.inventoryOperationDescriptions.map((inventoryOperationDescription: InventoryOperationDescriptionObjectValue) => {
+        const {
+          id_product_operation_description,
+          price_at_moment,
+          cost_at_moment,
+          quantity,
+          created_at,
+          id_inventory_operation,
+          id_product,
+        } = inventoryOperationDescription;
+        return new InventoryOperationDescriptionObjectValue(
+          id_product_operation_description,
+          price_at_moment,
+          cost_at_moment,
+          quantity,
+          created_at,
+          id_inventory_operation,
+          id_product,
+        );
+      }),
+      document_reference,
+    );
+  }
+
+  getAffectedInventoryBalanceRecords(): InventoryBalanceObjectValue[] {
+    const affecetInventoryBalanceRecord: InventoryBalanceObjectValue[] = [];
+    affecetInventoryBalanceRecord.push(...this.getAffectedInventoryBalanceRecordsFromInventoryBalance(this.originInventoryBalance));
+    affecetInventoryBalanceRecord.push(...this.getAffectedInventoryBalanceRecordsFromInventoryBalance(this.targetInventoryBalance));
+    return affecetInventoryBalanceRecord;
+  }
+
+  private getAffectedInventoryBalanceRecordsFromInventoryBalance(_inventoryBalanceMap: Map<string, InventoryBalanceObjectValue>): InventoryBalanceObjectValue[] {
+    const affectedInventoryBalance: InventoryBalanceObjectValue[] = [];
+    for (const idProductWithMovement of this.productInInventoryOperationDescriptionSet) {
+      affectedInventoryBalance.push(_inventoryBalanceMap.get(idProductWithMovement)!);
+    }
+    return affectedInventoryBalance;
   }
 
   private assertionInventoryInvolvedActive(): void {
@@ -354,5 +544,32 @@ export class InventoryOperationAggregate {
 
   private isInventoryOperationInitialized(): void {
     if (this.inventoryOperation === null) throw new BusinessRuleException(`You cannot use an inventory operation if it has not been initialized.`)
+  }
+
+  private isSpecialInventory(inventory: InventoryEntity): boolean {
+    /*
+      These are special inventories because they are used as entities or inventories that might have 
+      product movement but without necessarily have an inventory balance; they are used as pools.
+
+      Particularity of these inventories:
+      - They are unique across the system.
+      - They are abstractions of more complex processes that are not practical to represent.
+        Example: 
+        * Inventory supplier can be represented as an inventory with raw materials as input and 
+        prodcuts as products (input for other inventories) but this will imply in create a module or submodel for 
+        manufacturing
+        * Client virtual can be replaced creating an inventory for each client, but this will become impractical since we 
+        are going to need to maintain each inventory (and there is not extra benefit that we can get maintaing this instead 
+        of just calculating using the inventory descriptions).
+      - By default, this inventory are infinite.
+    */
+    const { inventory_context } = inventory;
+
+    return (
+       inventory_context === INVENTORY_CONTEXT_ENUM.ADJUSTMENT_VIRTUAL
+    || inventory_context === INVENTORY_CONTEXT_ENUM.CLIENT_VIRTUAL
+    || inventory_context === INVENTORY_CONTEXT_ENUM.WASTED_VIRTUAL
+    || inventory_context === INVENTORY_CONTEXT_ENUM.INVENTORY_SUPPLIER_VIRTUAL
+    )
   }
 }
