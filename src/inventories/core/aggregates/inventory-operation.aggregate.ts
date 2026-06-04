@@ -157,7 +157,7 @@ export class InventoryOperationAggregate {
     if (movement_type === MOVEMENT_TYPE_ENUM.REVERSED) 
       throw new BusinessRuleException(`REVERSE (CANCEL) operation cannot be reversed (cancelled).`);
 
-    if (_inventoryOperation === undefined) 
+    if (_inventoryOperation === undefined || _inventoryOperation === null) 
       throw new BusinessRuleException(`For creating a REVERSE inventory operation, you have to provide the id of the inventory operation to be reversed.`);
 
     this.inventoryOperation = new InventoryOperationEntity(
@@ -515,8 +515,8 @@ export class InventoryOperationAggregate {
 
   getAffectedInventoryBalanceRecords(): InventoryBalanceObjectValue[] {
     const affecetInventoryBalanceRecord: InventoryBalanceObjectValue[] = [];
-    affecetInventoryBalanceRecord.push(...this.getAffectedInventoryBalanceRecordsFromInventoryBalance(this.originInventoryBalance));
-    affecetInventoryBalanceRecord.push(...this.getAffectedInventoryBalanceRecordsFromInventoryBalance(this.targetInventoryBalance));
+    if(!this.isSpecialInventory(this.originInventory)) affecetInventoryBalanceRecord.push(...this.getAffectedInventoryBalanceRecordsFromInventoryBalance(this.originInventoryBalance));
+    if(!this.isSpecialInventory(this.targetInventory)) affecetInventoryBalanceRecord.push(...this.getAffectedInventoryBalanceRecordsFromInventoryBalance(this.targetInventoryBalance));
     return affecetInventoryBalanceRecord;
   }
 
