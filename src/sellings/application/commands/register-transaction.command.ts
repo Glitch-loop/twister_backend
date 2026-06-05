@@ -1,6 +1,9 @@
 // Libraries
 import { Inject, Injectable } from '@nestjs/common';
 
+// Constant
+import { GENERAL_PUBLIC_CLIENT } from '@/src/sellings/core/constants/general_public_client.constant'
+ 
 // Repositories
 import { RouteTransactionRepository } from '@/src/sellings/core/interfaces/route-transactions.repository';
 
@@ -35,16 +38,16 @@ export class RegisterTransactionCommand {
 
 	async execute(
 		received_amount: number,
-		id_invoice_concept: string,
-		id_client: string,
 		id_work_day: string,
 		id_payment_method: string,
 		id_payment_schema: string,
 		transaction_descriptions: RegisterTransactionDescriptionInput[],
-		id_transaction?: string,
-		created_at?: Date,
+		id_invoice_concept?: string,
 		latitude?: string,
 		longitude?: string,
+		id_client?: string,
+		id_transaction?: string,
+		created_at?: Date,
 		id_location?: string,
 		cfdi?: string,
 	): Promise<void> {
@@ -53,20 +56,21 @@ export class RegisterTransactionCommand {
 		const paymentMethods = await this.routeTransactionRepository.listPaymentMethods();
 		const paymentSchema = await this.routeTransactionRepository.listPaymentSchema();
 		const transactionAggregate = new TransactionAggregate(undefined, paymentMethods, paymentSchema);
+		const idClient:string = id_client ? id_client : GENERAL_PUBLIC_CLIENT.id_client
 
 		transactionAggregate.createNewTransaction(
 			idTransactionToUse,
 			received_amount,
-			id_invoice_concept,
-			latitude ?? '',
-			longitude ?? '',
 			createdAtToUse,
-			id_client,
+			idClient,
 			id_work_day,
 			id_payment_method,
 			id_payment_schema,
-			cfdi ?? '',
-			id_location ?? '',
+			id_invoice_concept ? id_invoice_concept : null,
+			latitude ? latitude : null,
+			longitude ? longitude : null,
+			cfdi ? cfdi : null,
+			id_location ? id_location : null,
 		);
 
 		for (const description of transaction_descriptions) {

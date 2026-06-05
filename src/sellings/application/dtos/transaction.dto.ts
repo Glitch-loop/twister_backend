@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { PaymentMethodDto } from '@/src/sellings/application/dtos/payment-method.dto';
 import { PaymentSchemaDto } from '@/src/sellings/application/dtos/payment-schema.dto';
 import { TransactionDescriptionDto } from '@/src/sellings/application/dtos/transaction-description.dto';
@@ -7,8 +7,8 @@ export class TransactionDto {
   @ApiProperty({ type: String, format: 'uuid', example: '3e51b1f8-10f2-4f84-bf0f-e9ea7bb36c98' })
   public readonly id_transaction: string;
 
-  @ApiPropertyOptional({ type: String, example: 'ABCD010101ABC' })
-  public readonly cfdi?: string;
+  @ApiProperty({ type: String, example: 'ABCD010101ABC' })
+  public readonly cfdi: string | null;
 
   @ApiProperty({ type: Number, example: 1 })
   public readonly state: number;
@@ -17,22 +17,22 @@ export class TransactionDto {
   public readonly received_amount: number;
 
   @ApiProperty({ type: String, format: 'uuid', example: '60f6edb4-2bc3-4f35-8d88-48701ae0e247' })
-  public readonly id_invoice_concept: string;
+  public readonly id_invoice_concept: string | null;
 
   @ApiProperty({ type: String, format: 'date-time', example: '2026-06-01T12:30:00.000Z' })
   public readonly created_at: Date;
 
   @ApiProperty({ type: String, example: '19.432608' })
-  public readonly latitude?: string;
+  public readonly latitude: string | null;
 
   @ApiProperty({ type: String, example: '-99.133209' })
-  public readonly longitude?: string;
+  public readonly longitude: string | null;
 
-  @ApiPropertyOptional({ type: String, format: 'uuid', example: 'ab935e3c-f0c8-4adf-9eb4-8ffb96a450f7' })
-  public readonly id_location?: string;
+  @ApiProperty({ type: String, format: 'uuid', example: 'ab935e3c-f0c8-4adf-9eb4-8ffb96a450f7' })
+  public readonly id_location: string | null;
 
-  @ApiPropertyOptional({ type: String, format: 'uuid', example: '4d095283-d8c0-4ad9-b67e-09e2ea9c08be' })
-  public readonly id_client?: string;
+  @ApiProperty({ type: String, format: 'uuid', example: '4d095283-d8c0-4ad9-b67e-09e2ea9c08be' })
+  public readonly id_client: string | null;
 
   @ApiProperty({ type: String, format: 'uuid', example: '5e8e8ad0-8a84-4326-95d5-84f4f2c13711' })
   public readonly id_work_day: string;
@@ -76,17 +76,17 @@ export class TransactionDto {
     id_transaction: string,
     state: number,
     received_amount: number,
-    id_invoice_concept: string,
+    id_invoice_concept: string | null,
     created_at: Date,
     id_work_day: string,
     payment_method: PaymentMethodDto,
     payment_schema: PaymentSchemaDto,
     transaction_descriptions: TransactionDescriptionDto[],
-    id_client?: string,
-    id_location?: string,
-    latitude?: string,
-    longitude?: string,
-    cfdi?: string,
+    id_client: string | null,
+    id_location: string | null,
+    latitude: string | null,
+    longitude: string | null,
+    cfdi: string | null,
   ) {
     this.id_transaction = id_transaction;
     this.cfdi = cfdi;

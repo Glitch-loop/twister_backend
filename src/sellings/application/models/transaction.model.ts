@@ -1,13 +1,13 @@
 export interface TransactionModel {
   id_transaction: string;
-  cfdi?: string;
+  cfdi: string | null;
   state: number;
   received_amount: number;
-  id_invoice_concept: string;
+  id_invoice_concept: string | null;
   created_at: Date;
-  latitude?: string;
-  longitude?: string;
-  id_location?: string,
+  latitude: string | null;
+  longitude: string | null;
+  id_location: string | null,
   id_client: string;
   id_work_day: string;
   id_payment_method: string;

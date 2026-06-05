@@ -27,44 +27,6 @@ import type { TransactionModel } from '@/src/sellings/application/models/transac
 // Mappers
 import { EntityModelMapper } from '@/src/sellings/application/mappers/entity-model.mapper';
 
-
-
-interface TransactionRow {
-  id_transaction: string;
-  cfdi?: string | null;
-  state: number;
-  amount: number | string;
-  id_invoice_concept: string;
-  created_at: Date | string;
-  latitude?: string | null;
-  longitude?: string | null;
-  id_location?: string | null;
-  id_client: string;
-  id_work_day: string;
-  id_payment_method: string;
-  id_payment_schema: string;
-}
-
-interface TransactionDescriptionRow {
-  id_transaction_description: string;
-  price_at_moment: number | string;
-  cost_at_moment: number | string;
-  amount?: number | string;
-  quantity?: number | string;
-  created_at: Date | string;
-  id_transaction: string;
-  id_transaction_operation_type: string;
-  id_product: string;
-}
-
-interface TaxInTransactionRow {
-  id_tax_in_transaction: string;
-  id_transaction: string;
-  id_tax: string;
-  tax_rate_at_moment_of_transaction: number | string;
-  created_at: Date | string;
-}
-
 @Injectable()
 export class RouteTransactionsSupabaseRepository implements RouteTransactionRepository {
   constructor(
@@ -78,26 +40,11 @@ export class RouteTransactionsSupabaseRepository implements RouteTransactionRepo
 
   async createTransaction(transaction: TransactionEntity): Promise<void> {
     try {
+      console.log("Transaction to insert: ", transaction)
       const transactionModel = this.mapper.toModel(transaction);
-      const transactionPayload = {
-        id_transaction: transactionModel.id_transaction,
-        cfdi: transactionModel.cfdi,
-        state: transactionModel.state,
-        amount: transactionModel.received_amount,
-        id_invoice_concept: transactionModel.id_invoice_concept,
-        longitude: transactionModel.longitude,
-        latitude: transactionModel.latitude,
-        created_at: transactionModel.created_at,
-        id_location: transactionModel.id_location,
-        id_client: transactionModel.id_client,
-        id_work_day: transactionModel.id_work_day,
-        id_payment_method: transactionModel.id_payment_method,
-        id_payment_schema: transactionModel.id_payment_schema,
-      };
-
       const { error: transactionError } = await this.supabase
         .from('transactions')
-        .insert(transactionPayload);
+        .insert(transactionModel);
 
       if (transactionError) {
         throw new Error(`Failed to create transaction: ${transactionError.message}`);
@@ -130,7 +77,7 @@ export class RouteTransactionsSupabaseRepository implements RouteTransactionRepo
       const payload = {
         cfdi: transactionModel.cfdi,
         state: transactionModel.state,
-        amount: transactionModel.received_amount,
+        received_amount: transactionModel.received_amount,
         id_invoice_concept: transactionModel.id_invoice_concept,
         longitude: transactionModel.longitude,
         latitude: transactionModel.latitude,
@@ -251,16 +198,7 @@ export class RouteTransactionsSupabaseRepository implements RouteTransactionRepo
         throw new Error(`Failed to retrieve taxes in transaction: ${error.message}`);
       }
 
-      const models: TaxInTransactionModel[] = ((data ?? []) as TaxInTransactionRow[]).map((row) => ({
-        id_tax_in_transaction: row.id_tax_in_transaction,
-        id_transaction: row.id_transaction,
-        id_tax: row.id_tax,
-        tax_rate_at_moment_of_transaction: this.toNumber(
-          row.tax_rate_at_moment_of_transaction,
-          'tax_rate_at_moment_of_transaction',
-        ),
-        created_at: this.toDate(row.created_at, 'created_at'),
-      }));
+      const models: TaxInTransactionModel[] = data as TaxInTransactionModel[];
 
       return models.map((model) => this.mapper.toDomainObject(model));
     } catch (error) {
@@ -283,17 +221,8 @@ export class RouteTransactionsSupabaseRepository implements RouteTransactionRepo
         throw new Error(`Failed to retrieve transaction descriptions: ${error.message}`);
       }
 
-      const models: TransactionDescriptionModel[] = ((data ?? []) as TransactionDescriptionRow[]).map((row) => ({
-        id_transaction_description: row.id_transaction_description,
-        price_at_moment: this.toNumber(row.price_at_moment, 'price_at_moment'),
-        cost_at_moment: this.toNumber(row.cost_at_moment, 'cost_at_moment'),
-        quantity: this.toNumber(row.quantity ?? row.amount ?? 0, 'quantity'),
-        created_at: this.toDate(row.created_at, 'created_at'),
-        id_transaction: row.id_transaction,
-        id_transaction_operation_type: row.id_transaction_operation_type,
-        id_product: row.id_product,
-      }));
-
+      const models: TransactionDescriptionModel[] = data as TransactionDescriptionModel[];
+      
       return models.map((model) => this.mapper.toDomainObject(model));
     } catch (error) {
       throw new Error(
@@ -319,7 +248,7 @@ export class RouteTransactionsSupabaseRepository implements RouteTransactionRepo
       const query = this.supabase.from('transactions').select('*');
 
       if (cfdi) query.ilike('cfdi', `%${cfdi}%`);
-      if (received_amount !== undefined) query.eq('amount', received_amount);
+      if (received_amount !== undefined) query.eq('received_amount', received_amount);
       if (transaction_status && transaction_status.length > 0) query.in('state', transaction_status);
       if (id_location && id_location.length > 0) query.in('id_location', id_location);
       if (id_client && id_client.length > 0) query.in('id_client', id_client);
@@ -343,11 +272,7 @@ export class RouteTransactionsSupabaseRepository implements RouteTransactionRepo
         throw new Error(`Failed to list transactions: ${error.message}`);
       }
 
-      const transactionModels = ((data ?? []) as TransactionRow[]).map((row) =>
-        this.mapTransactionRowToModel(row),
-      );
-
-      return this.composeTransactions(transactionModels);
+      return this.composeTransactions(data as TransactionModel[]);
     } catch (error) {
       throw new Error(
         `Failed to list transactions: ${error instanceof Error ? error.message : String(error)}`,
@@ -370,11 +295,7 @@ export class RouteTransactionsSupabaseRepository implements RouteTransactionRepo
         throw new Error(`Failed to retrieve transactions by ids: ${error.message}`);
       }
 
-      const transactionModels = ((data ?? []) as TransactionRow[]).map((row) =>
-        this.mapTransactionRowToModel(row),
-      );
-
-      return this.composeTransactions(transactionModels);
+      return this.composeTransactions(data as TransactionModel[]);
     } catch (error) {
       throw new Error(
         `Failed to retrieve transactions by ids: ${error instanceof Error ? error.message : String(error)}`,
@@ -436,21 +357,10 @@ export class RouteTransactionsSupabaseRepository implements RouteTransactionRepo
 
     const descriptionsByTransactionId = new Map<string, TransactionDescriptionModel[]>();
 
-    for (const row of (descriptionsResult.data ?? []) as TransactionDescriptionRow[]) {
-      const model: TransactionDescriptionModel = {
-        id_transaction_description: row.id_transaction_description,
-        price_at_moment: this.toNumber(row.price_at_moment, 'price_at_moment'),
-        cost_at_moment: this.toNumber(row.cost_at_moment, 'cost_at_moment'),
-        quantity: this.toNumber(row.quantity ?? row.amount ?? 0, 'quantity'),
-        created_at: this.toDate(row.created_at, 'created_at'),
-        id_transaction: row.id_transaction,
-        id_transaction_operation_type: row.id_transaction_operation_type,
-        id_product: row.id_product,
-      };
-
-      const current = descriptionsByTransactionId.get(model.id_transaction) ?? [];
-      current.push(model);
-      descriptionsByTransactionId.set(model.id_transaction, current);
+    for (const transactionDescription of (descriptionsResult.data ?? []) as TransactionDescriptionModel[]) {
+      const current = descriptionsByTransactionId.get(transactionDescription.id_transaction) ?? [];
+      current.push(transactionDescription);
+      descriptionsByTransactionId.set(transactionDescription.id_transaction, current);
     }
 
     return transactionModels.map((transactionModel) => {
@@ -475,23 +385,6 @@ export class RouteTransactionsSupabaseRepository implements RouteTransactionRepo
     });
   }
 
-  private mapTransactionRowToModel(row: TransactionRow): TransactionModel {
-    return {
-      id_transaction: row.id_transaction,
-      cfdi: row.cfdi ?? undefined,
-      state: row.state,
-      received_amount: this.toNumber(row.amount, 'amount'),
-      id_invoice_concept: row.id_invoice_concept,
-      created_at: this.toDate(row.created_at, 'created_at'),
-      latitude: row.latitude ?? undefined,
-      longitude: row.longitude ?? undefined,
-      id_location: row.id_location ?? undefined,
-      id_client: row.id_client,
-      id_work_day: row.id_work_day,
-      id_payment_method: row.id_payment_method,
-      id_payment_schema: row.id_payment_schema,
-    };
-  }
 
   private normalizeLimit(limit?: number): number {
     if (limit === undefined || limit <= 0) {

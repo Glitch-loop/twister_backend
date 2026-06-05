@@ -306,7 +306,7 @@ export class InventoryOperationAggregate {
     this.assertionInventoryInvolvedActive();
     this.assertionOriginInventoryAndTargetInventoryAreNotTheSame();
 
-    if (!(this.originInventory.inventory_context === INVENTORY_CONTEXT_ENUM.WAREHOUSE
+    if (!(this.originInventory.inventory_context ===  INVENTORY_CONTEXT_ENUM.WAREHOUSE
       || this.originInventory.inventory_context === INVENTORY_CONTEXT_ENUM.PRODUCT_RESERVATION
       || this.originInventory.inventory_context === INVENTORY_CONTEXT_ENUM.AVAILABLE_FOR_SALE
       || this.originInventory.inventory_context === INVENTORY_CONTEXT_ENUM.SHRINKAGE)) {

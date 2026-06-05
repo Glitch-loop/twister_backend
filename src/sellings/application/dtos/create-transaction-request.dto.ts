@@ -82,13 +82,13 @@ export class CreateTransactionRequestDto {
   @ApiProperty({ type: Number, example: 456.25 })
   public readonly received_amount: number;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     type: String,
     format: 'uuid',
     example: '',
     description: 'Invoice concept ID. Leave blank if unknown and complete later.',
   })
-  public readonly id_invoice_concept: string;
+  public readonly id_invoice_concept?: string;
 
   @ApiPropertyOptional({
     type: String,
@@ -120,13 +120,13 @@ export class CreateTransactionRequestDto {
   })
   public readonly id_location?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     type: String,
     format: 'uuid',
     example: '',
     description: 'Client ID.',
   })
-  public readonly id_client: string;
+  public readonly id_client?: string;
 
   @ApiProperty({
     type: String,
@@ -170,16 +170,16 @@ export class CreateTransactionRequestDto {
 
   constructor(
     received_amount: number,
-    id_invoice_concept: string,
-    id_client: string,
     id_work_day: string,
     id_payment_method: string,
     id_payment_schema: string,
     transaction_descriptions: CreateTransactionDescriptionRequestDto[],
-    id_transaction?: string,
-    created_at?: Date,
+    id_invoice_concept?: string,
     latitude?: string,
     longitude?: string,
+    id_client?: string,
+    id_transaction?: string,
+    created_at?: Date,
     id_location?: string,
     cfdi?: string,
   ) {

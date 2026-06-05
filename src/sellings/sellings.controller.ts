@@ -69,8 +69,6 @@ Considerations:
 	async registerTransaction(@Body() body: CreateTransactionRequestDto): Promise<httpControllerResponse> {
 		await this.registerTransactionCommand.execute(
 			body.received_amount,
-			body.id_invoice_concept,
-			body.id_client,
 			body.id_work_day,
 			body.id_payment_method,
 			body.id_payment_schema,
@@ -83,10 +81,13 @@ Considerations:
 				id_transaction_operation_type: description.id_transaction_operation_type,
 				id_product: description.id_product,
 			})),
-			body.id_transaction,
-			body.created_at,
+			body.id_invoice_concept,
 			body.latitude,
 			body.longitude,
+			body.id_client,
+			body.id_transaction,
+			body.created_at,
+
 			body.id_location,
 			body.cfdi,
 		);
