@@ -11,7 +11,7 @@ export const isWorkDayOperationHistoricEntity = (value: unknown): value is WorkD
     typeof value.id_work_day === 'string' &&
     typeof value.latitude === 'string' &&
     typeof value.longitude === 'string' &&
-    (value.id_client === null || typeof value.id_client === 'string') &&
+    (value.id_location === null || typeof value.id_location === 'string') &&
     (value.id_route_transaction === null || typeof value.id_route_transaction === 'string') &&
     (value.id_inventory_operation === null || typeof value.id_inventory_operation === 'string') &&
     typeof value.id_route_day === 'string' &&

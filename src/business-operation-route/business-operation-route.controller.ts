@@ -201,8 +201,9 @@ Related to client operations
 							created_at: { type: 'string', format: 'date-time' },
 							latitude: { type: 'string', example: '19.45602930548609' },
 							longitude: { type: 'string', example: '-99.13450312485135' },
-							id_client: { type: 'string', format: 'uuid' },
+							id_location: { type: 'string', format: 'uuid' },
 							id_route_transaction: { type: 'string', format: 'uuid' },
+							id_inventory_operation: { type: 'string', format: 'uuid' },
 							id_route_day: { type: 'string', format: 'uuid' },
 							id_day_operation_dependent: { type: 'string', format: 'uuid' },
 							id_work_day_operation: { type: 'string', format: 'uuid' },
@@ -223,11 +224,12 @@ Related to client operations
 			operations: Array<{
 				id_operation_type: DAY_OPERATIONS_ENUM;
 				created_at?: Date;
-				latitude?: string;
-				longitude?: string;
-				id_client?: string;
+				latitude: string;
+				longitude: string;
+				id_location?: string;
 				id_route_transaction?: string;
-				id_route_day?: string;
+				id_inventory_operation?: string;
+				id_route_day: string;
 				id_day_operation_dependent?: string;
 				id_work_day_operation?: string;
 			}>;

@@ -283,6 +283,9 @@ export class BusinessOperationDayAggregate {
 	}
 
 	private registerInventoryOperation(params: CreateBusinessOperationParams): void {
+		if (!params.id_inventory_operation) {
+			throw new BusinessRuleException('id_inventory_operation is required for an inventory movement.');
+		}
 		const newDayOperation = new WorkDayOperationHistoricEntity(
 			params.id_work_day_operation,
 			params.id_operation_type,
