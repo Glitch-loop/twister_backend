@@ -8,12 +8,13 @@ type CreateBusinessOperationParams = {
 	id_work_day: string;
 	id_operation_type: DAY_OPERATIONS_ENUM;
 	created_at: Date;
-	latitude?: string;
-	longitude?: string;
-	id_client?: string;
-	id_route_transaction?: string;
-	id_route_day?: string;
-	id_day_operation_dependent?: string;
+	latitude: string;
+	longitude: string;
+	id_location: string | null;
+	id_route_transaction: string | null;
+	id_inventory_operation: string | null;
+	id_route_day: string;
+	id_day_operation_dependent: string | null;
 };
 
 export class BusinessOperationDayAggregate {
@@ -138,8 +139,8 @@ export class BusinessOperationDayAggregate {
 	}
 
 	private registerAttendTodaysClient(params: CreateBusinessOperationParams): void {
-		if (!params.id_client) {
-			throw new BusinessRuleException('id_client is required for route client attention operations.');
+		if (!params.id_location) {
+			throw new BusinessRuleException('id_location is required for route client attention operations.');
 		}
 
 		if (!this.dayOperations) {
@@ -151,33 +152,35 @@ export class BusinessOperationDayAggregate {
 			DAY_OPERATIONS_ENUM.route_client_attention,
 			params.created_at,
 			params.id_work_day,
-			params.latitude ?? '',
-			params.longitude ?? '',
-			params.id_client,
-			undefined,
+			params.latitude,
+			params.longitude,
+			params.id_location,
+			null,
+			null,
 			params.id_route_day,
-			undefined,
+			null,
 		);
 
 		this.dayOperations.push(newDayOperation);
 	}
 
 	private registerClientAttentionOutOfRoute(params: CreateBusinessOperationParams): void {
-		if (!params.id_client) {
-			throw new BusinessRuleException('id_client is required for attention out of route operations.');
+		if (!params.id_location) {
+			throw new BusinessRuleException('id_location is required for attention out of route operations.');
 		}
 
-		this.verifyClientIsNotBeingRepeatedForClientOperations(params.id_client);
+		this.verifyClientIsNotBeingRepeatedForClientOperations(params.id_location);
 
 		const newDayOperation = new WorkDayOperationHistoricEntity(
 			params.id_work_day_operation,
 			DAY_OPERATIONS_ENUM.attention_out_of_route,
 			params.created_at,
 			params.id_work_day,
-			params.latitude ?? '',
-			params.longitude ?? '',
-			params.id_client,
-			undefined,
+			params.latitude,
+			params.longitude,
+			params.id_location,
+			null,
+			null,
 			params.id_route_day,
 			params.id_day_operation_dependent,
 		);
@@ -186,21 +189,22 @@ export class BusinessOperationDayAggregate {
 	}
 
 	private registerCreateNewClient(params: CreateBusinessOperationParams): void {
-		if (!params.id_client) {
-			throw new BusinessRuleException('id_client is required for new client registration operations.');
+		if (!params.id_location) {
+			throw new BusinessRuleException('id_location is required for new client registration operations.');
 		}
 
-		this.verifyClientIsNotBeingRepeatedForClientOperations(params.id_client);
+		this.verifyClientIsNotBeingRepeatedForClientOperations(params.id_location);
 
 		const newDayOperation = new WorkDayOperationHistoricEntity(
 			params.id_work_day_operation,
 			DAY_OPERATIONS_ENUM.new_client_registration,
 			params.created_at,
 			params.id_work_day,
-			params.latitude ?? '',
-			params.longitude ?? '',
-			params.id_client,
-			undefined,
+			params.latitude,
+			params.longitude,
+			params.id_location,
+			null,
+			null,
 			params.id_route_day,
 			params.id_day_operation_dependent,
 		);
@@ -209,21 +213,22 @@ export class BusinessOperationDayAggregate {
 	}
 
 	private registerAttendClientPetition(params: CreateBusinessOperationParams): void {
-		if (!params.id_client) {
-			throw new BusinessRuleException('id_client is required for attend client petition operations.');
+		if (!params.id_location) {
+			throw new BusinessRuleException('id_location is required for attend client petition operations.');
 		}
 
-		this.verifyClientIsNotBeingRepeatedForClientOperations(params.id_client);
+		this.verifyClientIsNotBeingRepeatedForClientOperations(params.id_location);
 
 		const newDayOperation = new WorkDayOperationHistoricEntity(
 			params.id_work_day_operation,
 			DAY_OPERATIONS_ENUM.attend_client_petition,
 			params.created_at,
 			params.id_work_day,
-			params.latitude ?? '',
-			params.longitude ?? '',
-			params.id_client,
-			undefined,
+			params.latitude,
+			params.longitude,
+			params.id_location,
+			null,
+			null,
 			params.id_route_day,
 			params.id_day_operation_dependent,
 		);
@@ -232,21 +237,22 @@ export class BusinessOperationDayAggregate {
 	}
 
 	private registerClientVisited(params: CreateBusinessOperationParams): void {
-		if (!params.id_client) {
-			throw new BusinessRuleException('id_client is required for client visited operations.');
+		if (!params.id_location) {
+			throw new BusinessRuleException('id_location is required for client visited operations.');
 		}
 
-		this.verifyClientIsNotBeingRepeatedForClientOperations(params.id_client);
+		this.verifyClientIsNotBeingRepeatedForClientOperations(params.id_location);
 
 		const newDayOperation = new WorkDayOperationHistoricEntity(
 			params.id_work_day_operation,
 			DAY_OPERATIONS_ENUM.client_visited,
 			params.created_at,
 			params.id_work_day,
-			params.latitude ?? '',
-			params.longitude ?? '',
-			params.id_client,
-			undefined,
+			params.latitude,
+			params.longitude,
+			params.id_location,
+			null,
+			null,
 			params.id_route_day,
 			params.id_day_operation_dependent,
 		);
@@ -264,10 +270,11 @@ export class BusinessOperationDayAggregate {
 			params.id_operation_type,
 			params.created_at,
 			params.id_work_day,
-			params.latitude ?? '',
-			params.longitude ?? '',
-			params.id_client,
+			params.latitude,
+			params.longitude,
+			params.id_location,
 			params.id_route_transaction,
+			null,
 			params.id_route_day,
 			params.id_day_operation_dependent,
 		);
@@ -281,10 +288,11 @@ export class BusinessOperationDayAggregate {
 			params.id_operation_type,
 			params.created_at,
 			params.id_work_day,
-			params.latitude ?? '',
-			params.longitude ?? '',
-			undefined,
-			undefined,
+			params.latitude,
+			params.longitude,
+			null,
+			params.id_inventory_operation,
+			null,
 			params.id_route_day,
 			params.id_day_operation_dependent,
 		);
@@ -323,7 +331,7 @@ export class BusinessOperationDayAggregate {
 
 		for (const dayOperation of dayOperationOrdered) {
 			if (
-				dayOperation.id_day_operation_dependent !== undefined
+				dayOperation.id_day_operation_dependent !== null
 				&& dayOperation.id_day_operation_dependent !== ''
 			) {
 				const dependents = dependentOperations.get(dayOperation.id_day_operation_dependent) ?? [];
@@ -358,7 +366,7 @@ export class BusinessOperationDayAggregate {
 		}
 
 		const isClientAlreadyRegistered = this.dayOperations.some((dayOperation) => {
-			return dayOperation.id_client === idClient
+			return dayOperation.id_location === idClient
 				&& (
 					dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.route_client_attention
 					|| dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.attend_client_petition

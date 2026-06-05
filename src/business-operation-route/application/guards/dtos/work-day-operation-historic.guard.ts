@@ -10,11 +10,12 @@ export const isWorkDayOperationHistoricDto = (value: unknown): value is WorkDayO
 
   return (
     typeof value.id_work_day_operation === 'string' &&
-    (value.id_client === undefined || value.id_client === null || typeof value.id_client === 'string') &&
-    (value.id_route_transaction === undefined || value.id_route_transaction === null || typeof value.id_route_transaction === 'string') &&
-    (value.id_route_day === undefined || value.id_route_day === null || typeof value.id_route_day === 'string') &&
-    (value.latitude === undefined || value.latitude === null || typeof value.latitude === 'string') &&
-    (value.longitude === undefined || value.longitude === null || typeof value.longitude === 'string') &&
+    (value.id_location === null || typeof value.id_client === 'string') &&
+    (value.id_route_transaction === null || typeof value.id_route_transaction === 'string') &&
+    (value.id_inventory_operation === null || typeof value.id_inventory_operation === 'string') &&
+    (value.id_route_day === null || typeof value.id_route_day === 'string') &&
+    typeof value.latitude === 'string' &&
+    typeof value.longitude === 'string' &&
     typeof value.id_operation_type === 'string' &&
     Object.values(DAY_OPERATIONS_ENUM).includes(value.id_operation_type as DAY_OPERATIONS_ENUM) &&
     (value.id_day_operation_dependent === undefined || value.id_day_operation_dependent === null || typeof value.id_day_operation_dependent === 'string') &&

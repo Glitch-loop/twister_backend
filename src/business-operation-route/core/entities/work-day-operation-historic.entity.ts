@@ -8,9 +8,10 @@ export class WorkDayOperationHistoricEntity {
     public readonly id_work_day: string,
     public readonly latitude: string,
     public readonly longitude: string,
-    public readonly id_client?: string,
-    public readonly id_route_transaction?: string,
-    public readonly id_route_day?: string,
-    public readonly id_day_operation_dependent?: string,
+    public readonly id_location: string|null,
+    public readonly id_route_transaction: string|null,
+    public readonly id_inventory_operation: string|null,
+    public readonly id_route_day: string,
+    public readonly id_day_operation_dependent: string|null,
   ) {}
 }

@@ -44,9 +44,12 @@ export class RegisterWorkDayBusinessOperationsCommand {
 		operations: Array<{
 			id_operation_type: DAY_OPERATIONS_ENUM;
 			created_at?: Date;
-			id_client?: string;
+			latitude: string;
+			longitude: string;
+			id_location?: string;
 			id_route_transaction?: string;
-			id_route_day?: string;
+			id_inventory_operation?: string;
+			id_route_day: string;
 			id_day_operation_dependent?: string;
 			id_work_day_operation?: string;
 		}>,
@@ -73,10 +76,13 @@ export class RegisterWorkDayBusinessOperationsCommand {
 				id_work_day,
 				id_operation_type: operation.id_operation_type,
 				created_at: operation.created_at ?? new Date(),
-				id_client: operation.id_client,
-				id_route_transaction: operation.id_route_transaction,
+				latitude: operation.latitude,
+				longitude: operation.longitude,
+				id_location: operation.id_location ? operation.id_location : null,
+				id_route_transaction: operation.id_route_transaction ? operation.id_route_transaction : null,
+				id_inventory_operation: operation.id_inventory_operation ? operation.id_inventory_operation : null,
 				id_route_day: operation.id_route_day,
-				id_day_operation_dependent: operation.id_day_operation_dependent,
+				id_day_operation_dependent: operation.id_day_operation_dependent ? operation.id_day_operation_dependent : null,
 			});
 		}
 
@@ -112,28 +118,28 @@ export class RegisterWorkDayBusinessOperationsCommand {
 
 			newClientLocationOperation.forEach((newclientOp) => {
 				const { id_work_day_operation } = newclientOp;
-				if (newclientOp.id_client === undefined || newclientOp.id_client === null) throw new BusinessRuleException(`The new 'client business operation' with the id: ${id_work_day_operation} doesn't have it's id client.`);
-				if (currentLocationsInRouteSet.has(newclientOp.id_client)) throw new BusinessRuleException(`The location (store) that is trying to add to the route has been added previously to the route day.`);
+				if (newclientOp.id_location === undefined || newclientOp.id_location === null) throw new BusinessRuleException(`The new 'client business operation' with the id: ${id_work_day_operation} doesn't have it's id client.`);
+				if (currentLocationsInRouteSet.has(newclientOp.id_location)) throw new BusinessRuleException(`The location (store) that is trying to add to the route has been added previously to the route day.`);
 			});
 
 			if (id_organization_strategy === ROUTE_ORGANIZATION_STRATEGIES_ENUM.AFTER_LAST_VISIT_OPERATION) {
 				const operationDays = new Set<DAY_OPERATIONS_ENUM>([DAY_OPERATIONS_ENUM.client_visited, DAY_OPERATIONS_ENUM.new_client_registration]);
 
 				for (const newClientOp of newClientLocationOperation) { 
-					const { id_client, id_work_day_operation  } = newClientOp;
+					const { id_location, id_work_day_operation  } = newClientOp;
 					const lastOperation:WorkDayOperationHistoricEntity | undefined = businessOperationDay.getLastOperationByTypeBeforeCurrentOperation(id_work_day_operation, operationDays)
 					
 					if (lastOperation) {
-						if (!lastOperation.id_client) {
+						if (!lastOperation.id_location) {
 							throw new BusinessRuleException(
-								`Last operation with id ${lastOperation.id_work_day_operation} does not have an id_client to locate insertion point.`,
+								`Last operation with id ${lastOperation.id_work_day_operation} does not have an id_location to locate insertion point.`,
 							);
 						}
 
-						const lastLocationIndex = locations.findIndex((loc) => loc.id_location === lastOperation.id_client);
+						const lastLocationIndex = locations.findIndex((loc) => loc.id_location === lastOperation.id_location);
 						if (lastLocationIndex === -1) {
 							throw new BusinessRuleException(
-								`Location with id ${lastOperation.id_client} was not found in route day ${id_route_day}.`,
+								`Location with id ${lastOperation.id_location} was not found in route day ${id_route_day}.`,
 							);
 						}
 
@@ -143,7 +149,7 @@ export class RegisterWorkDayBusinessOperationsCommand {
 							0,
 							new RouteDayLocationObjectValue(
 								insertIndex + 1,
-								id_client!,
+								id_location!,
 								id_route_day,
 								this.integrityRepository.generateUUIDv4(),
 							),
@@ -163,7 +169,7 @@ export class RegisterWorkDayBusinessOperationsCommand {
 						locations.push(
 							new RouteDayLocationObjectValue(
 								currentPosition,
-								id_client!,
+								id_location!,
 								id_route_day,
 								this.integrityRepository.generateUUIDv4(),
 							),
@@ -173,11 +179,11 @@ export class RegisterWorkDayBusinessOperationsCommand {
 			} else { // Default route organization: Place new clients at the end of the day.
 				let currentPosition = locations.length + 1; // From 0-base index to 1-base index.
 				for (const newClientOp of newClientLocationOperation) { 
-					const { id_client  } = newClientOp;
+					const { id_location  } = newClientOp;
 					locations.push(
 						new RouteDayLocationObjectValue(
 							currentPosition,
-							id_client!,
+							id_location!,
 							id_route_day,
 							this.integrityRepository.generateUUIDv4()
 						)

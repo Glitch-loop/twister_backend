@@ -96,7 +96,8 @@ export class Mapper {
 	private workDayOperationHistoricDomainObjectToModel(domainObject: WorkDayOperationHistoricEntity): WorkDayOperationHistoricModel {
 		return {
 			id_work_day_operation: domainObject.id_work_day_operation,
-			id_client: domainObject.id_client,
+			id_location: domainObject.id_location,
+			id_inventory_operation: domainObject.id_inventory_operation,
 			id_route_transaction: domainObject.id_route_transaction,
 			id_route_day: domainObject.id_route_day,
 			latitude: domainObject.latitude,
@@ -115,10 +116,11 @@ export class Mapper {
 			model.id_operation_type,
 			model.created_at instanceof Date ? model.created_at : new Date(model.created_at),
 			model.id_work_day,
-			model.latitude ?? '',
-			model.longitude ?? '',
-			model.id_client,
+			model.latitude,
+			model.longitude,
+			model.id_location,
 			model.id_route_transaction,
+			model.id_inventory_operation,
 			model.id_route_day,
 			model.id_day_operation_dependent,
 		);
