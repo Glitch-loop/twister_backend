@@ -76,6 +76,7 @@ export class InventoryOperationAggregate {
     _idInventoryOperation: string,
     _movementType: MOVEMENT_TYPE_ENUM,
     _CreatedBy: string,
+    _createdAt: Date,
     _documentReference?: string,
     _latitude?: string, 
     _longitude?: string
@@ -99,7 +100,7 @@ export class InventoryOperationAggregate {
       _latitude ? _latitude : null,
       _longitude ? _longitude : null,
       _movementType,
-      new Date(),
+      _createdAt,
       _CreatedBy,
       this.originInventory.id_inventory,
       this.targetInventory.id_inventory,
@@ -112,6 +113,7 @@ export class InventoryOperationAggregate {
   createProductDevolutionForTransaction (
     _idInventoryOperation: string,
     _CreatedBy: string,
+    _createdAt: Date,
     _latitude?: string, 
     _longitude?: string,
     _documentReference?: string,
@@ -133,7 +135,7 @@ export class InventoryOperationAggregate {
       _latitude ? _latitude : null,
       _longitude ? _longitude : null,
       MOVEMENT_TYPE_ENUM.PRODUCT_DEVOLUTUION,
-      new Date(),
+      _createdAt,
       _CreatedBy,
       this.originInventory.id_inventory,
       this.targetInventory.id_inventory,
@@ -147,6 +149,7 @@ export class InventoryOperationAggregate {
   reverseInventoryOperation (
     _idInventoryOperation: string,
     _createdBy: string,
+    _createdAt: Date,
     _inventoryOperation: InventoryOperationEntity
   ) {
     this.assertionOriginInventoryAndTargetInventoryAreNotTheSame();
@@ -165,7 +168,7 @@ export class InventoryOperationAggregate {
       _inventoryOperation.latitude,
       _inventoryOperation.longitude,
       MOVEMENT_TYPE_ENUM.REVERSED,
-      new Date(),
+      _createdAt,
       _createdBy,
       this.originInventory.id_inventory,
       this.targetInventory.id_inventory,
@@ -180,6 +183,7 @@ export class InventoryOperationAggregate {
   createInternalInventoryOperation (
     _idInventoryOperation: string,
     _createdBy: string,
+    _createdAt: Date,
     _latitude?: string, 
     _longitude?: string,
   ) {
@@ -203,7 +207,7 @@ export class InventoryOperationAggregate {
       _latitude ? _latitude : null,
       _longitude ? _longitude : null,
       MOVEMENT_TYPE_ENUM.INTERNAL_MOVEMENT,
-      new Date(),
+      _createdAt,
       _createdBy,
       this.originInventory.id_inventory,
       this.targetInventory.id_inventory,
@@ -216,6 +220,7 @@ export class InventoryOperationAggregate {
   createAdjustmentOperation (
     _idInventoryOperation: string,
     _createdBy: string,
+    _createdAt: Date,
     _latitude?: string,
     _longitude?: string,
   ) {
@@ -242,7 +247,7 @@ export class InventoryOperationAggregate {
       _latitude ? _latitude : null,
       _longitude ? _longitude : null,
       MOVEMENT_TYPE_ENUM.ADJUSTMENT,
-      new Date(),
+      _createdAt,
       _createdBy,
       this.originInventory.id_inventory,
       this.targetInventory.id_inventory,
@@ -255,6 +260,7 @@ export class InventoryOperationAggregate {
   createSupplierRecipt(
     _idInventoryOperation: string,
     _createdBy: string,
+    _createdAt: Date,
     _latitude?: string, 
     _longitude?: string,    
   ) {
@@ -280,7 +286,7 @@ export class InventoryOperationAggregate {
       _latitude ? _latitude : null,
       _longitude ? _longitude : null,
       MOVEMENT_TYPE_ENUM.SUPPLIER_RECIPT,
-      new Date(),
+      _createdAt,
       _createdBy,
       this.originInventory.id_inventory,
       this.targetInventory.id_inventory,
@@ -293,6 +299,7 @@ export class InventoryOperationAggregate {
   createInventoryScrap(
     _idInventoryOperation: string,
     _createdBy: string,
+    _createdAt: Date,
     _latitude?: string,
     _longitude?: string,
   ) {
@@ -319,7 +326,7 @@ export class InventoryOperationAggregate {
       _latitude ? _latitude : null,
       _longitude ? _longitude : null,
       MOVEMENT_TYPE_ENUM.INVENTORY_SCRAP,
-      new Date(),
+      _createdAt,
       _createdBy,
       this.originInventory.id_inventory,
       this.targetInventory.id_inventory,
@@ -337,7 +344,7 @@ export class InventoryOperationAggregate {
     _idProduct: string,
     _idNewProductInOriginInventory: string,
     _idNewProductInTargetInventory: string,
-    _created_at?: Date,
+    _createdAt: Date,
   ) {
     /*
       Business rule (06-04-26)
@@ -458,7 +465,7 @@ export class InventoryOperationAggregate {
         _priceAtMoment,
         _costAtMoment,
         _quantity,
-        _created_at ? _created_at : new Date(),
+        _createdAt,
         id_inventory_operation,
         _idProduct
       )

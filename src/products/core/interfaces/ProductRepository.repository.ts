@@ -1,5 +1,5 @@
-import { ProductEntity } from "../entities/product.entity";
-import { ProductPriceObjectValue } from "../value-objects/product-price.object-value";
+import { ProductEntity } from "@/src/products/core/entities/product.entity";
+import { ProductPriceObjectValue } from "@/src/products/core/value-objects/product-price.object-value";
 
 
 export abstract class ProductRepository {

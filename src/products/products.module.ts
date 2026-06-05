@@ -50,6 +50,7 @@ import { SharedModule } from '@/src/shared/shared.module';
     },
     SupabaseDataSource,
   ],
+  exports: [ProductRepository],
 })
 export class ProductsModule {}
 

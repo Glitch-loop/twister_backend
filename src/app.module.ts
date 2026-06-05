@@ -17,6 +17,8 @@ import { RouteOrganizationModule } from '@/src/route-organization/route-organiza
 import { BusinessOperationRouteModule } from '@/src/business-operation-route/business-operation-route.module';
 import { ProductsModule } from '@/src/products/products.module';
 import { SellingsModule } from '@/src/sellings/sellings.module';
+import { InventoriesModule } from '@/src/inventories/inventories.module';
+import { SecurityModule } from '@/src/security/security.module';
 
 // Interceptor
 import { HttpInterceptor } from '@/src/http.interceptor';
@@ -34,6 +36,8 @@ import { HttpInterceptor } from '@/src/http.interceptor';
     BusinessOperationRouteModule,
     ProductsModule,
     SellingsModule,
+    InventoriesModule,
+    SecurityModule,
   ],
   controllers: [AppController],
   providers: [
