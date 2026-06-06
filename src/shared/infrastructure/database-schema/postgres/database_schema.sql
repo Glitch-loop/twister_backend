@@ -225,36 +225,80 @@ CREATE TABLE public.product_prices (
 );
 
 -- About inventory -------------------------------------------------------------------------
-CREATE TABLE public.inventory_operation_types (
-  inventory_operation_type_name character varying NOT NULL UNIQUE,
-  id_inventory_operation_type uuid NOT NULL DEFAULT gen_random_uuid(),
-  CONSTRAINT inventory_operation_types_pkey PRIMARY KEY (id_inventory_operation_type)
+CREATE TABLE public.facility_types (
+  id_facility_type uuid NOT NULL DEFAULT gen_random_uuid(),
+  created_at timestamp without time zone NOT NULL DEFAULT now(),
+  facility_type_name character varying NOT NULL,
+  CONSTRAINT facility_types_pkey PRIMARY KEY (id_facility_type)
 );
-CREATE TABLE public.inventory_operations (
-  sign_confirmation character varying NOT NULL,
-  date timestamp without time zone NOT NULL,
-  audit smallint NOT NULL,
-  id_inventory_operation uuid NOT NULL DEFAULT gen_random_uuid(),
-  id_inventory_operation_type uuid NOT NULL,
-  id_work_day uuid NOT NULL,
-  state smallint NOT NULL,
-  CONSTRAINT inventory_operations_pkey PRIMARY KEY (id_inventory_operation),
-  CONSTRAINT inventory_opertions_id_inventory_operation_type_fkey FOREIGN KEY (id_inventory_operation_type) REFERENCES public.inventory_operation_types(id_inventory_operation_type),
-  CONSTRAINT inventory_opertions_id_work_day_fkey FOREIGN KEY (id_work_day) REFERENCES public.work_days(id_work_day)
+CREATE TABLE public.facilities (
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  ext_number character varying NOT NULL,
+  colony character varying NOT NULL,
+  postal_code character varying NOT NULL,
+  facility_name character varying NOT NULL,
+  latitude character varying NOT NULL,
+  longitude character varying NOT NULL,
+  is_active smallint NOT NULL,
+  id_facility_type uuid NOT NULL,
+  street character varying NOT NULL,
+  id_facility uuid NOT NULL DEFAULT gen_random_uuid(),
+  CONSTRAINT facilities_pkey PRIMARY KEY (id_facility),
+  CONSTRAINT facility_id_facility_type_fkey FOREIGN KEY (id_facility_type) REFERENCES public.facility_types(id_facility_type)
 );
-
+CREATE TABLE public.inventories_balance (
+  id_inventory_balance uuid NOT NULL DEFAULT gen_random_uuid(),
+  quantity numeric NOT NULL,
+  created_at timestamp without time zone NOT NULL DEFAULT now(),
+  updated_at timestamp without time zone,
+  id_inventory uuid NOT NULL,
+  id_product uuid NOT NULL,
+  CONSTRAINT inventories_balance_pkey PRIMARY KEY (id_inventory_balance),
+  CONSTRAINT inventories_balance_id_inventory_fkey FOREIGN KEY (id_inventory) REFERENCES public.inventories(id_inventory),
+  CONSTRAINT inventories_balance_id_product_fkey FOREIGN KEY (id_product) REFERENCES public.products(id_product)
+);
+CREATE TABLE public.inventories (
+  id_inventory uuid NOT NULL DEFAULT gen_random_uuid(),
+  inventory_context smallint NOT NULL,
+  is_active smallint NOT NULL,
+  updated_at timestamp without time zone NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  assigned_to uuid,
+  assigned_facility uuid,
+  CONSTRAINT inventories_pkey PRIMARY KEY (id_inventory),
+  CONSTRAINT inventories_assigned_to_fkey FOREIGN KEY (assigned_to) REFERENCES public.users(id_user),
+  CONSTRAINT inventories_assigned_facility_fkey FOREIGN KEY (assigned_facility) REFERENCES public.facilities(id_facility)
+);
 CREATE TABLE public.inventory_operation_descriptions (
-  amount numeric NOT NULL,
+  quantity numeric NOT NULL,
   price_at_moment numeric NOT NULL,
   id_inventory_operation uuid NOT NULL,
   id_product uuid NOT NULL,
   created_at timestamp without time zone NOT NULL,
   id_inventory_operation_description uuid NOT NULL DEFAULT gen_random_uuid(),
+  cost_at_moment numeric NOT NULL,
   CONSTRAINT inventory_operation_descriptions_pkey PRIMARY KEY (id_inventory_operation_description),
   CONSTRAINT inventory_operation_descriptions_id_inventory_operation_fkey FOREIGN KEY (id_inventory_operation) REFERENCES public.inventory_operations(id_inventory_operation),
   CONSTRAINT inventory_operation_descriptions_id_product_fkey FOREIGN KEY (id_product) REFERENCES public.products(id_product)
 );
-
+CREATE TABLE public.inventory_operations (
+  document_reference uuid,
+  created_at timestamp without time zone NOT NULL,
+  movement_type smallint NOT NULL,
+  id_inventory_operation uuid NOT NULL DEFAULT gen_random_uuid(),
+  state smallint NOT NULL,
+  latitude character varying,
+  longitude character varying,
+  inventoy_operation_referenced uuid,
+  created_by uuid NOT NULL,
+  id_inventory_origin uuid NOT NULL,
+  id_inventory_target uuid NOT NULL,
+  CONSTRAINT inventory_operations_pkey PRIMARY KEY (id_inventory_operation),
+  CONSTRAINT inventory_operations_inventoy_operation_referenced_fkey FOREIGN KEY (inventoy_operation_referenced) REFERENCES public.inventory_operations(id_inventory_operation),
+  CONSTRAINT inventory_operations_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.users(id_user),
+  CONSTRAINT inventory_operations_id_inventory_origin_fkey FOREIGN KEY (id_inventory_origin) REFERENCES public.inventories(id_inventory),
+  CONSTRAINT inventory_operations_id_inventory_target_fkey FOREIGN KEY (id_inventory_target) REFERENCES public.inventories(id_inventory)
+);
 
 -- About accountability ----------------------------------------------------------------------
 -- About transactions ----------------------------------------------------------------------

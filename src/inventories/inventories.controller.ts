@@ -1,3 +1,4 @@
+// Libraries
 import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import {
   ApiBody,
@@ -8,6 +9,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+
+// Commands
 import { CreateInventoryCommand } from '@/src/inventories/application/commands/create-inventory.command';
 import { DeactiveInventoryCommand } from '@/src/inventories/application/commands/deactive-inventory.command';
 import { RegisterInventoryAdjustmentCommand } from '@/src/inventories/application/commands/register-inventory-adjustment.command';
@@ -18,6 +21,8 @@ import { RegisterSupplierReciptCommand } from '@/src/inventories/application/com
 import { RegisterWasteInventoryOperationCommand } from '@/src/inventories/application/commands/register-waste-inventory-operation.command';
 import { ReverseInventoryMovementCommand } from '@/src/inventories/application/commands/reverse-inventory-movement.command';
 import { UpdateInventoryCommand } from '@/src/inventories/application/commands/update-inventory.command';
+
+// Dtos
 import { CreateInventoryRequestDto } from '@/src/inventories/application/dtos/create-inventory-request.dto';
 import { InventoryDto } from '@/src/inventories/application/dtos/inventory.dto';
 import { InventoryOperationDto } from '@/src/inventories/application/dtos/inventory-operation.dto';
@@ -31,10 +36,14 @@ import { RetrieveInventoriesByIdRequestDto } from '@/src/inventories/application
 import { RetrieveInventoryOperationsByIdRequestDto } from '@/src/inventories/application/dtos/retrieve-inventory-operations-by-id-request.dto';
 import { ReverseInventoryMovementRequestDto } from '@/src/inventories/application/dtos/reverse-inventory-movement-request.dto';
 import { UpdateInventoryRequestDto } from '@/src/inventories/application/dtos/update-inventory-request.dto';
+
+// Query
 import { ListInventoriesQuery } from '@/src/inventories/application/queries/list-inventories.query';
 import { ListInventoryOperationsQuery } from '@/src/inventories/application/queries/list-inventory-operations.query';
 import { RetrieveInventoriesByIdInventoryQuery } from '@/src/inventories/application/queries/retrieve-inventories-by-id-inventory.query';
 import { RetrieveInventoryOperationsByIdInventoryOperationQuery } from '@/src/inventories/application/queries/retrieve-inventory-operations-by-id-inventory-operation.query';
+
+// Shared
 import { httpFormatter } from '@/src/shared/presentation/http/handlers/http-formatter.handler';
 import { httpControllerResponse } from '@/src/shared/presentation/http/interfaces/controller-response.interface';
 
@@ -60,7 +69,14 @@ export class InventoriesController {
 
   @ApiOperation({
     summary: 'Create inventory',
-    description: 'Creates an inventory and returns a standardized controller response.',
+    description: `Creates an inventory and returns a standardized controller response.
+
+Note: You can create an inventory of one of the following listed inventories:
+- WAREHOUSE: 1
+- PRODUCT_RESERVATION: 2
+- AVAILABLE_FOR_SALE: 3
+- SHRINKAGE: 4  
+`,
   })
   @ApiBody({ type: CreateInventoryRequestDto })
   @ApiOkResponse({ description: 'Standardized response with operation message.' })

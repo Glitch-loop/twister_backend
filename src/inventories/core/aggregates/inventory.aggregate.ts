@@ -6,6 +6,17 @@ import { INVENTORY_STATE_ENUM } from "../enums/inventory-state-enum";
 export class InventoryAggregate {
   private inventory: InventoryEntity|null;
 
+  private readonly validInventoryContexts = new Set<number>([
+    INVENTORY_CONTEXT_ENUM.WAREHOUSE,
+    INVENTORY_CONTEXT_ENUM.PRODUCT_RESERVATION,
+    INVENTORY_CONTEXT_ENUM.AVAILABLE_FOR_SALE,
+    INVENTORY_CONTEXT_ENUM.SHRINKAGE,
+    INVENTORY_CONTEXT_ENUM.CLIENT_VIRTUAL,
+    INVENTORY_CONTEXT_ENUM.WASTED_VIRTUAL,
+    INVENTORY_CONTEXT_ENUM.INVENTORY_SUPPLIER_VIRTUAL,
+    INVENTORY_CONTEXT_ENUM.ADJUSTMENT_VIRTUAL,
+  ]);
+
   constructor(_invnetory: InventoryEntity|null) {
     this.inventory = _invnetory;
   }
@@ -18,6 +29,14 @@ export class InventoryAggregate {
     _assigned_to?: string,
     _assigned_facility?: string
   ):InventoryEntity {
+    if (!this.isValidInventoryContext(_inventory_context)) {
+      throw new BusinessRuleException('You are trying to create an inventory in a context that does not exist.');
+    }
+
+    if (!this.isValidInventoryContext(_inventory_context)) {
+      throw new BusinessRuleException('You are trying to create an inventory with an invalid context.');
+    }
+
     if(this.isForbiddenInventory(_inventory_context)) {
       throw new BusinessRuleException('You are trying to create an inventory of a forbbiden type.');
     }
@@ -139,6 +158,10 @@ export class InventoryAggregate {
     } else {
       return false;
     }
+  }
+
+  private isValidInventoryContext(_inventory_context: unknown): boolean {
+    return typeof _inventory_context === 'number' && this.validInventoryContexts.has(_inventory_context);
   }
 
 }
