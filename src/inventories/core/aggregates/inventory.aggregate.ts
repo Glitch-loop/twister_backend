@@ -59,8 +59,8 @@ export class InventoryAggregate {
       new Date(),
       _created_by,
       [],
-      _assigned_facility,
-      _assigned_to
+      _assigned_facility ? _assigned_facility : null,
+      _assigned_to ? _assigned_to : null
     );
 
     return this.inventory;

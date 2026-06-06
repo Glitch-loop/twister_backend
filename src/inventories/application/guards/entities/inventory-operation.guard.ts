@@ -18,7 +18,7 @@ export const isInventoryOperationEntity = (value: unknown): value is InventoryOp
     (value.document_reference === undefined || typeof value.document_reference === 'string') &&
     typeof value.created_by === 'string' &&
     typeof value.id_inventory_origin === 'string' &&
-    typeof value.id_inventory_destination === 'string' &&
+    typeof value.id_inventory_target === 'string' &&
     isArray(value.inventory_operation_descriptions) &&
     value.inventory_operation_descriptions.every(isInventoryOperationDescriptionModel)
   );

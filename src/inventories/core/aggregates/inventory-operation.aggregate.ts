@@ -52,7 +52,15 @@ export class InventoryOperationAggregate {
       new Date(inventory.created_at),
       new Date(inventory.updated_at),
       inventory.created_by,
-      [],
+      inventory.inventory_balance.map((item) => {
+        return new InventoryBalanceObjectValue(
+          item.id_inventory_balance,
+          item.quantity,
+          item.created_at,
+          item.id_inventory,
+          item.id_product,
+        )
+      }),
       inventory.assigned_facility,
       inventory.assigned_to,
     );
@@ -150,7 +158,9 @@ export class InventoryOperationAggregate {
     _idInventoryOperation: string,
     _createdBy: string,
     _createdAt: Date,
-    _inventoryOperation: InventoryOperationEntity
+    _inventoryOperation: InventoryOperationEntity,
+    _latitude?: string,
+    _longitude?: string,
   ) {
     this.assertionOriginInventoryAndTargetInventoryAreNotTheSame();
     this.assertionInventoryInvolvedActive();
@@ -165,8 +175,8 @@ export class InventoryOperationAggregate {
 
     this.inventoryOperation = new InventoryOperationEntity(
       _idInventoryOperation,
-      _inventoryOperation.latitude,
-      _inventoryOperation.longitude,
+      _latitude ? _latitude : _inventoryOperation.latitude,
+      _longitude ? _longitude : _inventoryOperation.longitude,
       MOVEMENT_TYPE_ENUM.REVERSED,
       _createdAt,
       _createdBy,
@@ -425,6 +435,7 @@ export class InventoryOperationAggregate {
 
     if(!this.isSpecialInventory(this.targetInventory)) {
       const { id_inventory } = this.targetInventory
+      console.log("Target inventory balance: ", this.targetInventoryBalance)
       const productBalance = this.targetInventoryBalance.get(_idProduct);
       
       if (productBalance) { // This particular product has appeared previoulsy in this inventory balance.
@@ -483,7 +494,7 @@ export class InventoryOperationAggregate {
       created_at,
       created_by,
       id_inventory_origin,
-      id_inventory_destination,
+      id_inventory_target,
       document_reference,
     } = this.inventoryOperation!;
 
@@ -495,10 +506,10 @@ export class InventoryOperationAggregate {
       created_at,
       created_by,
       id_inventory_origin,
-      id_inventory_destination,
+      id_inventory_target,
       this.inventoryOperationDescriptions.map((inventoryOperationDescription: InventoryOperationDescriptionObjectValue) => {
         const {
-          id_product_operation_description,
+          id_inventory_operation_description,
           price_at_moment,
           cost_at_moment,
           quantity,
@@ -507,7 +518,7 @@ export class InventoryOperationAggregate {
           id_product,
         } = inventoryOperationDescription;
         return new InventoryOperationDescriptionObjectValue(
-          id_product_operation_description,
+          id_inventory_operation_description,
           price_at_moment,
           cost_at_moment,
           quantity,

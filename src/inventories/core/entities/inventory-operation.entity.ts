@@ -10,7 +10,7 @@ export class InventoryOperationEntity {
 		public readonly created_at: Date,
 		public readonly created_by: string,
 		public readonly id_inventory_origin: string,
-		public readonly id_inventory_destination: string,
+		public readonly id_inventory_target: string,
 		public readonly inventory_operation_descriptions: InventoryOperationDescriptionObjectValue[],
 		public readonly inventory_operation_reference?: string,
 		public readonly document_reference?: string,

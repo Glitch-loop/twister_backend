@@ -190,7 +190,7 @@ Note: You can create an inventory of one of the following listed inventories:
   ): Promise<httpControllerResponse> {
     await this.registerInventoryOperatonBetweenInventoriesCommand.execute(
       body.id_inventory_origin,
-      body.id_inventory_destination,
+      body.id_inventory_target,
       body.created_by,
       body.inventory_operation_descriptions,
       body.id_inventory_operation,
@@ -238,7 +238,7 @@ Note: You can create an inventory of one of the following listed inventories:
     @Body() body: RegisterSupplierReciptRequestDto,
   ): Promise<httpControllerResponse> {
     await this.registerSupplierReciptCommand.execute(
-      body.id_inventory_destination,
+      body.id_inventory_target,
       body.created_by,
       body.inventory_operation_descriptions,
       body.id_inventory_operation,
@@ -287,7 +287,7 @@ Note: You can create an inventory of one of the following listed inventories:
   ): Promise<httpControllerResponse> {
     await this.reverseInventoryMovementCommand.execute(
       body.id_inventory_origin,
-      body.id_inventory_destination,
+      body.id_inventory_target,
       body.id_inventory_operation_to_reverse,
       body.created_by,
       body.inventory_operation_descriptions,
@@ -406,7 +406,7 @@ Note: You can create an inventory of one of the following listed inventories:
   @ApiQuery({ name: 'document_reference', required: false, type: String, isArray: true })
   @ApiQuery({ name: 'created_by', required: false, type: String, isArray: true })
   @ApiQuery({ name: 'id_inventory_origin', required: false, type: String, isArray: true })
-  @ApiQuery({ name: 'id_inventory_destination', required: false, type: String, isArray: true })
+  @ApiQuery({ name: 'id_inventory_target', required: false, type: String, isArray: true })
   @ApiOkResponse({ description: 'Standardized paginated response with inventory operations collection.', type: [InventoryOperationDto] })
   @Get('/operations')
   async listInventoryOperations(
@@ -417,7 +417,7 @@ Note: You can create an inventory of one of the following listed inventories:
     @Query('document_reference') document_reference?: string | string[],
     @Query('created_by') created_by?: string | string[],
     @Query('id_inventory_origin') id_inventory_origin?: string | string[],
-    @Query('id_inventory_destination') id_inventory_destination?: string | string[],
+    @Query('id_inventory_target') id_inventory_target?: string | string[],
   ): Promise<httpControllerResponse> {
     const toArray = (value?: string | string[]): string[] | undefined => {
       if (!value) return undefined;
@@ -455,7 +455,7 @@ Note: You can create an inventory of one of the following listed inventories:
       toArray(document_reference),
       toArray(created_by),
       toArray(id_inventory_origin),
-      toArray(id_inventory_destination),
+      toArray(id_inventory_target),
       nextId,
       nextDate,
     );

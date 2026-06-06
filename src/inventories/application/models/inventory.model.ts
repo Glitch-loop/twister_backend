@@ -9,6 +9,6 @@ export interface InventoryModel {
   created_at: Date;
   updated_at: Date;
   created_by: string;
-  assigned_facility?: string;
-  assigned_to?: string;
+  assigned_facility: string|null;
+  assigned_to: string|null;
 }

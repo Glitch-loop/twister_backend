@@ -10,5 +10,5 @@ export interface InventoryOperationModel {
   created_at: Date;
   created_by: string;
   id_inventory_origin: string;
-  id_inventory_destination: string;
+  id_inventory_target: string;
 }

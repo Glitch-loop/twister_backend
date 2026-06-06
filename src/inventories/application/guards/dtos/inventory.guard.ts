@@ -15,8 +15,8 @@ export const isInventoryDto = (value: unknown): value is InventoryDto => {
     typeof value.inventory_name === 'string' &&
     typeof value.is_active === 'number' &&
     typeof value.created_by === 'string' &&
-    (value.assigned_facility === undefined || typeof value.assigned_facility === 'string') &&
-    (value.assigned_to === undefined || typeof value.assigned_to === 'string') &&
+    (value.assigned_facility === null || typeof value.assigned_facility === 'string') &&
+    (value.assigned_to === null || typeof value.assigned_to === 'string') &&
     isArray(value.inventory_balance) &&
     value.inventory_balance.every(isInventoryBalanceDto)
   );

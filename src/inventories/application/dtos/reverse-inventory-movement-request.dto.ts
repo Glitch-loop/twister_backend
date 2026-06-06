@@ -7,7 +7,7 @@ export class ReverseInventoryMovementRequestDto {
   public readonly id_inventory_origin: string;
 
   @ApiProperty({ type: String, format: 'uuid' })
-  public readonly id_inventory_destination: string;
+  public readonly id_inventory_target: string;
 
   @ApiProperty({ type: String, format: 'uuid' })
   public readonly id_inventory_operation_to_reverse: string;

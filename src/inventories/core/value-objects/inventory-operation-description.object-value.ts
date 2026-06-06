@@ -1,6 +1,6 @@
 export class InventoryOperationDescriptionObjectValue {
 	constructor(
-		public readonly id_product_operation_description: string,
+		public readonly id_inventory_operation_description: string,
 		public readonly price_at_moment: number,
 		public readonly cost_at_moment: number,
 		public readonly quantity: number,

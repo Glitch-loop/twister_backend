@@ -17,7 +17,7 @@ export abstract class Inventory {
     document_reference?: string[],
     created_by?: string[],
     id_inventory_origin?: string[],
-    id_inventory_destination?: string[],
+    id_inventory_target?: string[],
   ): Promise<InventoryOperationEntity[]>;
   abstract retrieveInventoryOperations(idInventoryOperations: string[]): Promise<InventoryOperationEntity[]>;
   abstract listInventories(

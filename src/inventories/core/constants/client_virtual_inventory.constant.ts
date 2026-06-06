@@ -11,6 +11,6 @@ export const CLIENT_VIRTUAL_INVENTORY = new InventoryEntity(
 	new Date(),
 	'f228a6e5-b427-4c0e-91d8-f4bebed80469',
 	[],
-	'',
-	'',
+	null,
+	null,
 )

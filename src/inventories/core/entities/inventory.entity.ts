@@ -12,11 +12,11 @@ export class InventoryEntity {
 		public readonly updated_at: Date,
 		public readonly created_by: string,
 		public readonly inventory_balance: InventoryBalanceObjectValue[],
-		public readonly assigned_facility?: string,
-		public readonly assigned_to?: string,
+		public readonly assigned_facility: string | null,
+		public readonly assigned_to: string | null,
 	) {}
 
-	public isForbiddenInventory():boolean {
+	public isForbiddenInventory():boolean { 
     if (this.inventory_context === INVENTORY_CONTEXT_ENUM.CLIENT_VIRTUAL
     || this.inventory_context === INVENTORY_CONTEXT_ENUM.WASTED_VIRTUAL
     || this.inventory_context === INVENTORY_CONTEXT_ENUM.INVENTORY_SUPPLIER_VIRTUAL

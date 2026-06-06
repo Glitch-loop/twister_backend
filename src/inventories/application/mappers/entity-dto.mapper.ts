@@ -109,7 +109,7 @@ export class EntityDtoMapper {
 		domainObject: InventoryOperationDescriptionObjectValue,
 	): InventoryOperationDescriptionDto {
 		return new InventoryOperationDescriptionDto(
-			domainObject.id_product_operation_description,
+			domainObject.id_inventory_operation_description,
 			domainObject.price_at_moment,
 			domainObject.cost_at_moment,
 			domainObject.quantity,
@@ -141,7 +141,7 @@ export class EntityDtoMapper {
 			domainObject.created_at,
 			domainObject.created_by,
 			domainObject.id_inventory_origin,
-			domainObject.id_inventory_destination,
+			domainObject.id_inventory_target,
 			domainObject.inventory_operation_descriptions.map((desc) =>
 				this.inventoryOperationDescriptionObjectValueToDto(desc),
 			),
@@ -171,7 +171,7 @@ export class EntityDtoMapper {
 		const createdAt = this.toDate(dto.created_at, 'InventoryOperationDescriptionDto.created_at');
 
 		return new InventoryOperationDescriptionObjectValue(
-			dto.id_product_operation_description,
+			dto.id_inventory_operation_description,
 			dto.price_at_moment,
 			dto.cost_at_moment,
 			dto.quantity,
@@ -222,7 +222,7 @@ export class EntityDtoMapper {
 			createdAt,
 			dto.created_by,
 			dto.id_inventory_origin,
-			dto.id_inventory_destination,
+			dto.id_inventory_target,
 			dto.inventory_operation_descriptions.map((desc) =>
 				this.inventoryOperationDescriptionDtoToDomainObject(desc),
 			),

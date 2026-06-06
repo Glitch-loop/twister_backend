@@ -4,7 +4,7 @@ import { InventoryOperationDescriptionRequestDto } from '@/src/inventories/appli
 
 export class RegisterSupplierReciptRequestDto {
   @ApiProperty({ type: String, format: 'uuid' })
-  public readonly id_inventory_destination: string;
+  public readonly id_inventory_target: string;
 
   @ApiProperty({ type: String, format: 'uuid' })
   public readonly created_by: string;

@@ -16,6 +16,6 @@ export const isInventoryOperationModel = (value: unknown): value is InventoryOpe
     (value.document_reference === undefined || typeof value.document_reference === 'string') &&
     typeof value.created_by === 'string' &&
     typeof value.id_inventory_origin === 'string' &&
-    typeof value.id_inventory_destination === 'string'
+    typeof value.id_inventory_target === 'string'
   );
 };

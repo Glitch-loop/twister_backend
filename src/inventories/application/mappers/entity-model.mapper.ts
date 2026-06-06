@@ -117,7 +117,7 @@ export class EntityModelMapper {
 		domainObject: InventoryOperationDescriptionObjectValue,
 	): InventoryOperationDescriptionModel {
 		return {
-			id_product_operation_description: domainObject.id_product_operation_description,
+			id_inventory_operation_description: domainObject.id_inventory_operation_description,
 			price_at_moment: domainObject.price_at_moment,
 			cost_at_moment: domainObject.cost_at_moment,
 			quantity: domainObject.quantity,
@@ -152,7 +152,7 @@ export class EntityModelMapper {
 			created_at: domainObject.created_at,
 			created_by: domainObject.created_by,
 			id_inventory_origin: domainObject.id_inventory_origin,
-			id_inventory_destination: domainObject.id_inventory_destination,
+			id_inventory_target: domainObject.id_inventory_target,
 		};
 	}
 
@@ -178,7 +178,7 @@ export class EntityModelMapper {
 		);
 
 		return new InventoryOperationDescriptionObjectValue(
-			model.id_product_operation_description,
+			model.id_inventory_operation_description,
 			model.price_at_moment,
 			model.cost_at_moment,
 			model.quantity,
@@ -235,7 +235,7 @@ export class EntityModelMapper {
 			createdAt,
 			model.created_by,
 			model.id_inventory_origin,
-			model.id_inventory_destination,
+			model.id_inventory_target,
 			inventoryOperationDescriptionModels.map((desc) =>
 				this.inventoryOperationDescriptionModelToDomainObject(desc),
 			),

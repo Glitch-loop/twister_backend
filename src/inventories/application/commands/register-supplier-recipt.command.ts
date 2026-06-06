@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 
 import { InventoryOperationAggregate } from '@/src/inventories/core/aggregates/inventory-operation.aggregate';
+import { INVENTORY_SUPPLIER_VIRTUAL_INVENTORY } from '@/src/inventories/core/constants/inventory_supplier_virtual_inventory';
 import { InventoryEntity } from '@/src/inventories/core/entities/inventory.entity';
 import { INVENTORY_CONTEXT_ENUM } from '@/src/inventories/core/enums/inventory-context.enum';
 import { Inventory } from '@/src/inventories/core/interfaces/Inventory.repository';
@@ -11,7 +12,7 @@ import { IntegrityRepository } from '@/src/shared/core/interfaces/integrity.repo
 import { BusinessRuleException } from '@/src/shared/errors/BusinessRuleException';
 
 interface InventoryOperationDescriptionInput {
-	id_product_operation_description?: string;
+	id_inventory_operation_description?: string;
 	price_at_moment: number;
 	cost_at_moment: number;
 	quantity: number;
@@ -28,7 +29,7 @@ export class RegisterSupplierReciptCommand {
 	) {}
 
 	async execute(
-		id_inventory_destination: string,
+		id_inventory_target: string,
 		created_by: string,
 		inventory_operation_descriptions: InventoryOperationDescriptionInput[],
 		id_inventory_operation?: string,
@@ -43,7 +44,7 @@ export class RegisterSupplierReciptCommand {
 		const supplierVirtualInventory = await this.retrieveUniqueInventoryByContext(
 			INVENTORY_CONTEXT_ENUM.INVENTORY_SUPPLIER_VIRTUAL,
 		);
-		const destinationInventory = await this.retrieveInventoryById(id_inventory_destination);
+		const destinationInventory = await this.retrieveInventoryById(id_inventory_target);
 
 		await this.assertProductsValid(inventory_operation_descriptions);
 
@@ -62,7 +63,7 @@ export class RegisterSupplierReciptCommand {
 
 		for (const description of inventory_operation_descriptions) {
 			aggregate.addInventoryOperationDescription(
-				description.id_product_operation_description ?? this.integrityRepository.generateUUIDv4(),
+				description.id_inventory_operation_description ?? this.integrityRepository.generateUUIDv4(),
 				description.price_at_moment,
 				description.cost_at_moment,
 				description.quantity,
@@ -73,6 +74,8 @@ export class RegisterSupplierReciptCommand {
 			);
 		}
 
+		// Persist changes
+		console.log("Inventory operation to register: ", aggregate.getInventoryOperation())
 		await this.inventoryRepository.CreateInventoryOperation(aggregate.getInventoryOperation());
 
 		const affectedBalanceRecords = aggregate.getAffectedInventoryBalanceRecords();
@@ -102,12 +105,43 @@ export class RegisterSupplierReciptCommand {
 		);
 
 		if (inventories.length === 0) {
+			const specialInventory = this.getSpecialInventoryConstantByContext(inventory_context);
+
+			if (!specialInventory.isForbiddenInventory()) {
+				throw new BusinessRuleException(
+					`Inventory context ${inventory_context} is not a special inventory context.`,
+				);
+			}
+
+			await this.inventoryRepository.CreateInventory(specialInventory);
+			return specialInventory;
+		}
+
+		if (inventories.length > 1) {
 			throw new BusinessRuleException(
-				`Expected one inventory with context ${inventory_context}, but none was found.`,
+				`Expected one inventory with context ${inventory_context}, but found ${inventories.length}.`,
+			);
+		}
+
+		if (!inventories[0].isForbiddenInventory()) {
+			throw new BusinessRuleException(
+				`Inventory with context ${inventory_context} must be a special inventory.`,
 			);
 		}
 
 		return inventories[0];
+	}
+
+	private getSpecialInventoryConstantByContext(
+		inventory_context: INVENTORY_CONTEXT_ENUM,
+	): InventoryEntity {
+		if (inventory_context === INVENTORY_CONTEXT_ENUM.INVENTORY_SUPPLIER_VIRTUAL) {
+			return INVENTORY_SUPPLIER_VIRTUAL_INVENTORY;
+		}
+
+		throw new BusinessRuleException(
+			`There is not a configured special inventory constant for context ${inventory_context}.`,
+		);
 	}
 
 	private async assertProductsValid(

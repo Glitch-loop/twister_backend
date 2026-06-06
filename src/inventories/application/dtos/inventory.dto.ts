@@ -25,10 +25,10 @@ export class InventoryDto {
   public readonly created_by: string;
 
   @ApiPropertyOptional({ type: String, format: 'uuid', example: '11111111-2222-3333-4444-555555555555' })
-  public readonly assigned_facility?: string;
+  public readonly assigned_facility: string|null;
 
   @ApiPropertyOptional({ type: String, format: 'uuid', example: '66666666-7777-8888-9999-000000000000' })
-  public readonly assigned_to?: string;
+  public readonly assigned_to: string|null;
 
   @ApiProperty({ type: [InventoryBalanceDto] })
   public readonly inventory_balance: InventoryBalanceDto[];
@@ -42,8 +42,8 @@ export class InventoryDto {
     updated_at: Date,
     created_by: string,
     inventory_balance: InventoryBalanceDto[],
-    assigned_facility?: string,
-    assigned_to?: string,
+    assigned_facility: string | null,
+    assigned_to: string | null,
   ) {
     this.id_inventory = id_inventory;
     this.inventory_context = inventory_context;

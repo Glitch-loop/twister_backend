@@ -31,7 +31,7 @@ export class InventoryOperationDto {
   public readonly id_inventory_origin: string;
 
   @ApiProperty({ type: String, format: 'uuid', example: '8d4c3b2a-1f0e-4d9c-8b7a-6e5d4c3b2a11' })
-  public readonly id_inventory_destination: string;
+  public readonly id_inventory_target: string;
 
   @ApiProperty({ type: [InventoryOperationDescriptionDto] })
   public readonly inventory_operation_descriptions: InventoryOperationDescriptionDto[];
@@ -42,7 +42,7 @@ export class InventoryOperationDto {
     created_at: Date,
     created_by: string,
     id_inventory_origin: string,
-    id_inventory_destination: string,
+    id_inventory_target: string,
     inventory_operation_descriptions: InventoryOperationDescriptionDto[],
     latitude?: string | null,
     longitude?: string | null,
@@ -58,7 +58,7 @@ export class InventoryOperationDto {
     this.created_at = created_at;
     this.created_by = created_by;
     this.id_inventory_origin = id_inventory_origin;
-    this.id_inventory_destination = id_inventory_destination;
+    this.id_inventory_target = id_inventory_target;
     this.inventory_operation_descriptions = inventory_operation_descriptions;
   }
 }

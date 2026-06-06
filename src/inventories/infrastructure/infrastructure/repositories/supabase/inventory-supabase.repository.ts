@@ -33,7 +33,7 @@ interface InventoryOperationRow {
   created_at: Date | string;
   created_by: string;
   id_inventory_origin: string;
-  id_inventory_destination: string;
+  id_inventory_target: string;
 }
 
 interface InventoryBalanceRow {
@@ -45,7 +45,7 @@ interface InventoryBalanceRow {
 }
 
 interface InventoryOperationDescriptionRow {
-  id_product_operation_description: string;
+  id_inventory_operation_description: string;
   price_at_moment: number | string;
   cost_at_moment: number | string;
   quantity: number | string;
@@ -142,7 +142,7 @@ export class InventorySupabaseRepository implements Inventory {
     try {
       const inventoryBalanceModel = this.mapper.toModel(inventoryBalance);
       const { error } = await this.supabase
-        .from('inventory_balance')
+        .from('inventories_balance')
         .upsert(inventoryBalanceModel, { onConflict: 'id_inventory_balance' });
 
       if (error) {
@@ -164,7 +164,7 @@ export class InventorySupabaseRepository implements Inventory {
     document_reference?: string[],
     created_by?: string[],
     id_inventory_origin?: string[],
-    id_inventory_destination?: string[],
+    id_inventory_target?: string[],
   ): Promise<InventoryOperationEntity[]> {
     try {
       const query = this.supabase.from('inventory_operations').select('*');
@@ -184,8 +184,8 @@ export class InventorySupabaseRepository implements Inventory {
       if (id_inventory_origin && id_inventory_origin.length > 0) {
         query.in('id_inventory_origin', id_inventory_origin);
       }
-      if (id_inventory_destination && id_inventory_destination.length > 0) {
-        query.in('id_inventory_destination', id_inventory_destination);
+      if (id_inventory_target && id_inventory_target.length > 0) {
+        query.in('id_inventory_target', id_inventory_target);
       }
 
       if (lastCreatedAt && lastIdInventoryOperation) {
@@ -292,11 +292,7 @@ export class InventorySupabaseRepository implements Inventory {
         throw new Error(`Failed to list inventories: ${error.message}`);
       }
 
-      const inventoryModels = ((data ?? []) as InventoryRow[]).map((row) =>
-        this.mapInventoryRowToModel(row),
-      );
-
-      return this.composeInventories(inventoryModels);
+      return this.composeInventories(data as InventoryModel[]);
     } catch (error) {
       throw new Error(
         `Failed to list inventories: ${error instanceof Error ? error.message : String(error)}`,
@@ -319,11 +315,7 @@ export class InventorySupabaseRepository implements Inventory {
         throw new Error(`Failed to retrieve inventories: ${error.message}`);
       }
 
-      const inventoryModels = ((data ?? []) as InventoryRow[]).map((row) =>
-        this.mapInventoryRowToModel(row),
-      );
-
-      return this.composeInventories(inventoryModels);
+      return this.composeInventories(data as InventoryModel[]);
     } catch (error) {
       throw new Error(
         `Failed to retrieve inventories: ${error instanceof Error ? error.message : String(error)}`,
@@ -378,7 +370,7 @@ export class InventorySupabaseRepository implements Inventory {
     }
 
     const { data, error } = await this.supabase
-      .from('inventory_balance')
+      .from('inventories_balance')
       .select('*')
       .in('id_inventory', idInventories);
 
@@ -428,20 +420,6 @@ export class InventorySupabaseRepository implements Inventory {
     return map;
   }
 
-  private mapInventoryRowToModel(row: InventoryRow): InventoryModel {
-    return {
-      id_inventory: row.id_inventory,
-      inventory_context: this.toNumber(row.inventory_context, 'inventory_context'),
-      inventory_name: row.inventory_name,
-      is_active: this.toNumber(row.is_active, 'is_active'),
-      created_at: this.toDate(row.created_at, 'created_at'),
-      updated_at: this.toDate(row.updated_at, 'updated_at'),
-      created_by: row.created_by,
-      assigned_facility: row.assigned_facility ?? undefined,
-      assigned_to: row.assigned_to ?? undefined,
-    };
-  }
-
   private mapInventoryOperationRowToModel(row: InventoryOperationRow): InventoryOperationModel {
     return {
       id_inventory_operation: row.id_inventory_operation,
@@ -453,7 +431,7 @@ export class InventorySupabaseRepository implements Inventory {
       created_at: this.toDate(row.created_at, 'created_at'),
       created_by: row.created_by,
       id_inventory_origin: row.id_inventory_origin,
-      id_inventory_destination: row.id_inventory_destination,
+      id_inventory_target: row.id_inventory_target,
     };
   }
 
@@ -471,7 +449,7 @@ export class InventorySupabaseRepository implements Inventory {
     row: InventoryOperationDescriptionRow,
   ): InventoryOperationDescriptionModel {
     return {
-      id_product_operation_description: row.id_product_operation_description,
+      id_inventory_operation_description: row.id_inventory_operation_description,
       price_at_moment: this.toNumber(row.price_at_moment, 'price_at_moment'),
       cost_at_moment: this.toNumber(row.cost_at_moment, 'cost_at_moment'),
       quantity: this.toNumber(row.quantity, 'quantity'),

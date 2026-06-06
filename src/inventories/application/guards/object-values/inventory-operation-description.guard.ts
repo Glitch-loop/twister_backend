@@ -10,7 +10,7 @@ export const isInventoryOperationDescriptionModel = (
   }
 
   return (
-    typeof value.id_product_operation_description === 'string' &&
+    typeof value.id_inventory_operation_description === 'string' &&
     typeof value.price_at_moment === 'number' &&
     typeof value.cost_at_moment === 'number' &&
     typeof value.quantity === 'number' &&

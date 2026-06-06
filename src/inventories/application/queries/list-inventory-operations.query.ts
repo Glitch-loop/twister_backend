@@ -20,7 +20,7 @@ export class ListInventoryOperationsQuery {
     document_reference?: string[],
     created_by?: string[],
     id_inventory_origin?: string[],
-    id_inventory_destination?: string[],
+    id_inventory_target?: string[],
     lastIdInventoryOperation?: string,
     lastCreatedAt?: string,
   ): Promise<InventoryOperationDto[]> {
@@ -49,7 +49,7 @@ export class ListInventoryOperationsQuery {
         document_reference,
         created_by,
         id_inventory_origin,
-        id_inventory_destination,
+        id_inventory_target,
       );
 
     return inventoryOperations.map((inventoryOperation) => this.mapper.toDto(inventoryOperation));

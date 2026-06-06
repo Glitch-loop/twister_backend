@@ -11,7 +11,7 @@ import { IntegrityRepository } from '@/src/shared/core/interfaces/integrity.repo
 import { BusinessRuleException } from '@/src/shared/errors/BusinessRuleException';
 
 interface InventoryOperationDescriptionInput {
-	id_product_operation_description?: string;
+	id_inventory_operation_description?: string;
 	price_at_moment: number;
 	cost_at_moment: number;
 	quantity: number;
@@ -29,7 +29,7 @@ export class ReverseInventoryMovementCommand {
 
 	async execute(
 		id_inventory_origin: string,
-		id_inventory_destination: string,
+		id_inventory_target: string,
 		id_inventory_operation_to_reverse: string,
 		created_by: string,
 		inventory_operation_descriptions: InventoryOperationDescriptionInput[],
@@ -44,7 +44,7 @@ export class ReverseInventoryMovementCommand {
 
 		const [originInventory, destinationInventory, inventoryOperationToReverse] = await Promise.all([
 			this.retrieveInventoryById(id_inventory_origin),
-			this.retrieveInventoryById(id_inventory_destination),
+			this.retrieveInventoryById(id_inventory_target),
 			this.retrieveInventoryOperationById(id_inventory_operation_to_reverse),
 		]);
 
@@ -61,11 +61,13 @@ export class ReverseInventoryMovementCommand {
 			created_by,
 			createdAtToUse,
 			inventoryOperationToReverse,
+			latitude,
+			longitude,
 		);
 
 		for (const description of inventory_operation_descriptions) {
 			aggregate.addInventoryOperationDescription(
-				description.id_product_operation_description ?? this.integrityRepository.generateUUIDv4(),
+				description.id_inventory_operation_description ?? this.integrityRepository.generateUUIDv4(),
 				description.price_at_moment,
 				description.cost_at_moment,
 				description.quantity,
@@ -103,7 +105,7 @@ export class ReverseInventoryMovementCommand {
 
 		if (inventoryOperations.length === 0) {
 			throw new BusinessRuleException(
-				`Inventory operation with id ${id_inventory_operation} does not exist.`,
+				`Inventory operation with id ${id_inventory_operation} does not exist and cannot be reversed.`,
 			);
 		}
 

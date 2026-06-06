@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class InventoryOperationDescriptionRequestDto {
   @ApiProperty({ type: String, format: 'uuid', example: '6e47b7d0-7ed2-4c7b-9a3a-0f4e8f9b2c11' })
-  public readonly id_product_operation_description?: string;
+  public readonly id_inventory_operation_description?: string;
 
   @ApiProperty({ type: Number, example: 52.25 })
   public readonly price_at_moment: number;
@@ -29,9 +29,9 @@ export class InventoryOperationDescriptionRequestDto {
     id_product: string,
     id_inventory_operation?: string,
     created_at?: Date,
-    id_product_operation_description?: string,
+    id_inventory_operation_description?: string,
   ) {
-    this.id_product_operation_description = id_product_operation_description;
+    this.id_inventory_operation_description = id_inventory_operation_description;
     this.price_at_moment = price_at_moment;
     this.cost_at_moment = cost_at_moment;
     this.quantity = quantity;
