@@ -379,6 +379,8 @@ CREATE TABLE public.taxes_in_transactions (
 
 --- Database initialization ---------------------------------------------------------------------
 
+INSERT INTO "public"."users" ("id_user", "cellphone", "name", "password", "status", "address", "rfc", "imss", "salary", "created_at", "updated_at") VALUES ('f228a6e5-b427-4c0e-91d8-f4bebed80469', '0000000000', 'SYSTEM', '123456789', 1, null, null, null, '0', '2026-06-06 01:20:47+00', '2026-06-06 01:20:55+00');
+
 INSERT INTO public.days (id_day, day_name, order_to_show) VALUES
   ('b1bb1619-392c-4f7e-b615-f8b3da7223b4', 'lunes', 1),
   ('81d535dc-defb-448b-b0e3-83816925765d', 'martes', 2),
