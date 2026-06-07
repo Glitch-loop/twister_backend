@@ -3,6 +3,9 @@ import { INVENTORY_CONTEXT_ENUM } from "@/src/inventories/core/enums/inventory-c
 import { INVENTORY_STATE_ENUM } from "@/src/inventories/core/enums/inventory-state-enum";
 import { STOCK_VALIDATION_ENUM } from "@/src/inventories/core/enums/stock-validation.enum";
 
+// Object values
+import { InventoryBalanceObjectValue } from "@/src/inventories/core/value-objects/inventory-balance.object-value";
+
 // Entities
 import { InventoryEntity } from "@/src/inventories/core/entities/inventory.entity";
 
@@ -11,6 +14,8 @@ import { BusinessRuleException } from "@/src/shared/errors/BusinessRuleException
 
 export class InventoryAggregate {
   private inventory: InventoryEntity|null;
+  private inventoryBalance: Map<string, InventoryBalanceObjectValue>; // id product - balance product
+  private productInOperation: Set<string>;
 
   private readonly validInventoryContexts = new Set<number>([
     INVENTORY_CONTEXT_ENUM.WAREHOUSE,
@@ -24,8 +29,57 @@ export class InventoryAggregate {
   ]);
 
   constructor(_invnetory: InventoryEntity|null) {
-    this.inventory = _invnetory;
+    if(_invnetory !== null) {
+      this.inventory = this.cloneInventory(_invnetory);
+      this.inventoryBalance = this.cloneBalance(_invnetory.inventory_balance);
+    } else {
+      this.inventory = null;
+      this.inventoryBalance = new Map<string, InventoryBalanceObjectValue>();
+    }
+
+    this.productInOperation = new Set<string>();
   }
+
+    private cloneInventory(inventory: InventoryEntity): InventoryEntity {
+    return new InventoryEntity(
+      inventory.id_inventory,
+      inventory.inventory_context,
+      inventory.inventory_name,
+      inventory.is_active,
+      inventory.stock_validation,
+      new Date(inventory.created_at),
+      new Date(inventory.updated_at),
+      inventory.created_by,
+      inventory.inventory_balance.map((item) => {
+        return new InventoryBalanceObjectValue(
+          item.id_inventory_balance,
+          item.quantity,
+          item.min_quantity,
+          item.max_quantity,
+          item.created_at,
+          item.id_inventory,
+          item.id_product,
+        )
+      }),
+      inventory.assigned_facility,
+      inventory.assigned_to,
+    );
+  }
+
+  private cloneBalance(inventoryItems: InventoryBalanceObjectValue[]): Map<string, InventoryBalanceObjectValue> {
+    const balanceOfProductMap: Map<string, InventoryBalanceObjectValue> = new Map<string, InventoryBalanceObjectValue>();
+    for (const item of inventoryItems) {
+      const { id_product, id_inventory } = item;
+      
+      if(balanceOfProductMap.has(id_product)) 
+        throw new BusinessRuleException(`The product with id ${id_product} appears twice in inventory with id ${id_inventory}`);
+
+      balanceOfProductMap.set(id_product, item);
+    }
+
+    return balanceOfProductMap;
+  }
+
 
   createNewInventory(
     _id_inventory: string,
@@ -157,6 +211,63 @@ export class InventoryAggregate {
     );
 
     return this.inventory;
+  }
+
+  establishLimitsForInventoryBalance(
+    _idProduct: string, 
+    _minQuantity: number|null, 
+    _maxQuantity: number|null,
+    _idNewProductInInventory: string) {
+    if (this.inventory === null) throw new Error('The inventory has not been initialized.');
+
+    if(this.isForbiddenInventory(this.inventory.inventory_context)) {
+      throw new BusinessRuleException(`You cannot update the inventory with the id: ${this.inventory.id_inventory} because it's an special inventory.`);
+    }
+
+    const { id_inventory } = this.inventory;
+    
+    if(this.inventoryBalance.has(_idProduct)) { // This product is already considered in the controller.
+      const { id_inventory_balance, quantity, created_at, id_inventory, id_product } = this.inventoryBalance.get(_idProduct)!;
+      this.inventoryBalance.set(
+        id_product,
+        new InventoryBalanceObjectValue(
+          id_inventory_balance,
+          quantity,
+          _minQuantity,
+          _maxQuantity,
+          created_at,
+          id_inventory,
+          id_product
+        )
+      );
+    } else { // New product in the inventory
+      this.inventoryBalance.set(
+        _idProduct,
+        new InventoryBalanceObjectValue(
+          _idNewProductInInventory,
+          0,
+          _minQuantity,
+          _maxQuantity,
+          new Date(),
+          id_inventory,
+          _idProduct
+        )
+      );
+    }
+
+    this.productInOperation.add(_idProduct);
+  }
+
+  getAffectedInventoryBalance() {
+    return this.getAffectedInventoryBalanceRecordsFromInventoryBalance(this.inventoryBalance);
+  }
+
+  private getAffectedInventoryBalanceRecordsFromInventoryBalance(_inventoryBalanceMap: Map<string, InventoryBalanceObjectValue>): InventoryBalanceObjectValue[] {
+    const affectedInventoryBalance: InventoryBalanceObjectValue[] = [];
+    for (const idProductWithMovement of this.productInOperation) {
+      affectedInventoryBalance.push(_inventoryBalanceMap.get(idProductWithMovement)!);
+    }
+    return affectedInventoryBalance;
   }
 
   private isForbiddenInventory(_inventory_context):boolean {

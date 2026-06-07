@@ -124,7 +124,11 @@ ENABLE stock validation.`,
     @Param('id_inventory') id_inventory: string,
     @Body() body: UpdateInventoryRequestDto,
   ): Promise<httpControllerResponse> {
-    await this.updateInventoryCommand.execute(id_inventory, body.inventory_name);
+    await this.updateInventoryCommand.execute(id_inventory, 
+      body.inventory_name,
+      body.stock_validation,
+      body.products_limits,
+    );
 
     const httpResponseFormatter = new httpFormatter();
     return httpResponseFormatter.createResponse('Inventory updated successfully.');
