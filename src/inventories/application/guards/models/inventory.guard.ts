@@ -12,6 +12,7 @@ export const isInventoryModel = (value: unknown): value is InventoryModel => {
     typeof value.inventory_context === 'number' &&
     typeof value.inventory_name === 'string' &&
     typeof value.is_active === 'number' &&
+    typeof value.stock_validation === 'number' &&
     typeof value.created_by === 'string' &&
     (value.assigned_facility === null || typeof value.assigned_facility === 'string') &&
     (value.assigned_to === null || typeof value.assigned_to === 'string')

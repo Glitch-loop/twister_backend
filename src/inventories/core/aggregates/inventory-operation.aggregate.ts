@@ -13,6 +13,7 @@ import { INVENTORY_CONTEXT_ENUM } from "@/src/inventories/core/enums/inventory-c
 
 // Shared
 import { BusinessRuleException } from "@/src/shared/errors/BusinessRuleException";
+import { STOCK_VALIDATION_ENUM } from "../enums/stock-validation.enum";
 
 
 export class InventoryOperationAggregate {
@@ -49,6 +50,7 @@ export class InventoryOperationAggregate {
       inventory.inventory_context,
       inventory.inventory_name,
       inventory.is_active,
+      inventory.stock_validation,
       new Date(inventory.created_at),
       new Date(inventory.updated_at),
       inventory.created_by,
@@ -91,7 +93,9 @@ export class InventoryOperationAggregate {
   ) {
     this.assertionInventoryInvolvedActive();
 
-    if (!(_movementType === MOVEMENT_TYPE_ENUM.SELLING || _movementType === MOVEMENT_TYPE_ENUM.PRODUCT_REPOSITION)) 
+    if (!(_movementType === MOVEMENT_TYPE_ENUM.SELLING 
+      || _movementType === MOVEMENT_TYPE_ENUM.PRODUCT_REPOSITION 
+      || _movementType === MOVEMENT_TYPE_ENUM.COURTESY)) 
       throw new BusinessRuleException(`You are trying to create an invalid movement type (selling or product reposition) in an inventory operation for transaction.`)
 
     if (_documentReference === undefined) 
@@ -378,6 +382,8 @@ export class InventoryOperationAggregate {
       Inventory operations was designed in such way that it is taking into account both inventories:
       - The inventory which the product is outflowing (origin).
       - The inventory which the product is inflowing (target).
+      
+      This implies that the quantity of the inventory operation has "direction".
 
       This design brings the following scenarios:
       1. When _quantity is positive.
@@ -394,12 +400,26 @@ export class InventoryOperationAggregate {
        2. When there is an adjustment. The user saw a discrepancy that might imply a decrease the amount of a quantity.
     */
     /*
-      Note about special inventories (06-05-26):
+      Note about special inventories (06-05-26)
       Special inventories doesn't have an inventory balance since they are abstractions of entities or concepts, so it isn't
       necessary to validate if an special inventory has enough product.
     */
+
+    /*
+      Note about stock validation for inventories (06-07-26)
+      stock_validation (or conceptually stock validation) was implemented attending the case
+      on which the business doesn't have control because the complexity of the day-to-day business 
+      operation.
+
+      For instance we have those inventories of type "AVAILABLE_FOR_SELLING", these type of inventory
+      is used for vendors for declaring their inventory during a work day, since this is a complex
+      scenario where data replication process are made (because vendor's app are offline-first) having
+      a strict scenario for all cases can be a source of problems hindering day-to-day business operations.
+      
+    */
+
     if(!this.isSpecialInventory(this.originInventory)) {
-      const { id_inventory } = this.originInventory
+      const { id_inventory, stock_validation } = this.originInventory
       const productBalance = this.originInventoryBalance.get(_idProduct);
       
       if (productBalance) { // This particular product has appeared previoulsy in this inventory balance.
@@ -410,7 +430,7 @@ export class InventoryOperationAggregate {
           created_at,
           id_product
         } = productBalance;
-        if (productBalance.quantity - _quantity < 0) throw new BusinessRuleException(`The inventory balance with id ${id_inventory_balance} (representing the product ${_idProduct}) of the origin inventory with id ${id_inventory} doesn't have enough product to complete the operation. Current balance: ${quantity}. Items to take from the balance: ${_quantity}`);
+        if (productBalance.quantity - _quantity < 0 && stock_validation === STOCK_VALIDATION_ENUM.ENABLE) throw new BusinessRuleException(`The inventory balance with id ${id_inventory_balance} (representing the product ${_idProduct}) of the origin inventory with id ${id_inventory} doesn't have enough product to complete the operation. Current balance: ${quantity}. Items to take from the balance: ${_quantity}`);
         this.originInventoryBalance.set(_idProduct, new InventoryBalanceObjectValue(
           id_inventory_balance,
           quantity - _quantity,
@@ -419,7 +439,7 @@ export class InventoryOperationAggregate {
           id_product
         ));
       } else { // This particular particular has not been appeard in this inventory balance (First time it appears).
-        if (_quantity * -1 < 0)  throw new BusinessRuleException(`You are trying to take product that doesn't exist. The inventory origin with id ${id_inventory} doesn't have product with id ${_idProduct}. Firstly, you have to add balance of this product before taking it.`);
+        if (_quantity * -1 < 0 && stock_validation === STOCK_VALIDATION_ENUM.ENABLE)  throw new BusinessRuleException(`You are trying to take product that doesn't exist. The inventory origin with id ${id_inventory} doesn't have product with id ${_idProduct}. Firstly, you have to add balance of this product before taking it.`);
         this.originInventoryBalance.set(
           _idProduct,
           new InventoryBalanceObjectValue(
@@ -434,8 +454,7 @@ export class InventoryOperationAggregate {
     }
 
     if(!this.isSpecialInventory(this.targetInventory)) {
-      const { id_inventory } = this.targetInventory
-      console.log("Target inventory balance: ", this.targetInventoryBalance)
+      const { id_inventory, stock_validation } = this.targetInventory
       const productBalance = this.targetInventoryBalance.get(_idProduct);
       
       if (productBalance) { // This particular product has appeared previoulsy in this inventory balance.
@@ -446,7 +465,7 @@ export class InventoryOperationAggregate {
           created_at,
           id_product
         } = productBalance;
-        if (productBalance.quantity + _quantity < 0) throw new BusinessRuleException(`The inventory balance with id ${id_inventory_balance} (representing the product ${_idProduct}) of the target inventory with id ${id_inventory} doesn't have enough product to complete the operation. Current balance: ${quantity}. Items to take from the balance: ${_quantity}`);
+        if (productBalance.quantity + _quantity < 0 && stock_validation === STOCK_VALIDATION_ENUM.ENABLE) throw new BusinessRuleException(`The inventory balance with id ${id_inventory_balance} (representing the product ${_idProduct}) of the target inventory with id ${id_inventory} doesn't have enough product to complete the operation. Current balance: ${quantity}. Items to take from the balance: ${_quantity}`);
         this.targetInventoryBalance.set(_idProduct, new InventoryBalanceObjectValue(
           id_inventory_balance,
           quantity + _quantity,
@@ -455,7 +474,7 @@ export class InventoryOperationAggregate {
           id_product
         ));
       } else { // This particular particular has not been appeard in this inventory balance (First time it appears).
-        if (_quantity < 0) throw new BusinessRuleException(`You are trying to take product that doesn't exist. The target inventory with id ${id_inventory} doesn't have product with id ${_idProduct}. Firstly, you have to add balance of this product before taking it.`);
+        if (_quantity < 0 && stock_validation && stock_validation === STOCK_VALIDATION_ENUM.ENABLE) throw new BusinessRuleException(`You are trying to take product that doesn't exist. The target inventory with id ${id_inventory} doesn't have product with id ${_idProduct}. Firstly, you have to add balance of this product before taking it.`);
         this.targetInventoryBalance.set(
           _idProduct,
           new InventoryBalanceObjectValue(

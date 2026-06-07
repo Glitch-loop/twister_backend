@@ -1,7 +1,13 @@
+// enums
+import { INVENTORY_CONTEXT_ENUM } from "@/src/inventories/core/enums/inventory-context.enum";
+import { INVENTORY_STATE_ENUM } from "@/src/inventories/core/enums/inventory-state-enum";
+import { STOCK_VALIDATION_ENUM } from "@/src/inventories/core/enums/stock-validation.enum";
+
+// Entities
+import { InventoryEntity } from "@/src/inventories/core/entities/inventory.entity";
+
+// Shared
 import { BusinessRuleException } from "@/src/shared/errors/BusinessRuleException";
-import { InventoryEntity } from "../entities/inventory.entity";
-import { INVENTORY_CONTEXT_ENUM } from "../enums/inventory-context.enum";
-import { INVENTORY_STATE_ENUM } from "../enums/inventory-state-enum";
 
 export class InventoryAggregate {
   private inventory: InventoryEntity|null;
@@ -24,6 +30,7 @@ export class InventoryAggregate {
   createNewInventory(
     _id_inventory: string,
     _inventory_context: INVENTORY_CONTEXT_ENUM,
+    _stock_validation: STOCK_VALIDATION_ENUM,
     _inventory_name: string,
     _created_by: string,
     _assigned_to?: string,
@@ -55,6 +62,7 @@ export class InventoryAggregate {
       _inventory_context,
       _inventory_name,
       INVENTORY_STATE_ENUM.ACTIVE,
+      _stock_validation,
       new Date(),
       new Date(),
       _created_by,
@@ -78,6 +86,7 @@ export class InventoryAggregate {
       this.inventory.inventory_context,
       this.inventory.inventory_name,
       INVENTORY_STATE_ENUM.DEACTIVE,
+      this.inventory.stock_validation,
       this.inventory.created_at,
       new Date(),
       this.inventory.created_by,
@@ -101,6 +110,7 @@ export class InventoryAggregate {
       this.inventory.inventory_context,
       this.inventory.inventory_name,
       INVENTORY_STATE_ENUM.ACTIVE,
+      this.inventory.stock_validation,
       this.inventory.created_at,
       new Date(),
       this.inventory.created_by,
@@ -112,7 +122,7 @@ export class InventoryAggregate {
     return this.inventory;
   }
 
-  updateInventory(inventory_name: string): InventoryEntity {
+  updateInventory(inventory_name?: string, stock_validation?: STOCK_VALIDATION_ENUM): InventoryEntity {
     /*
       Business rule (06-03-26)
       The user can modify only the inventory name from those allowed inventories. 
@@ -135,8 +145,9 @@ export class InventoryAggregate {
     this.inventory = new InventoryEntity(
       this.inventory.id_inventory,
       this.inventory.inventory_context,
-      inventory_name,
+      inventory_name ? inventory_name.trim() : this.inventory.inventory_name,
       this.inventory.is_active,
+      stock_validation ? stock_validation : this.inventory.stock_validation,
       this.inventory.created_at,
       new Date(),
       this.inventory.created_by,

@@ -15,6 +15,9 @@ export class InventoryDto {
   @ApiProperty({ type: Number, example: 1 })
   public readonly is_active: number;
 
+  @ApiProperty({ type: Number, example: 0 })
+  public readonly stock_validation: number;
+
   @ApiProperty({ type: String, format: 'date-time', example: '2026-06-03T09:15:00.000Z' })
   public readonly updated_at: Date;
 
@@ -38,6 +41,7 @@ export class InventoryDto {
     inventory_context: number,
     inventory_name: string,
     is_active: number,
+    stock_validation: number,
     created_at: Date,
     updated_at: Date,
     created_by: string,
@@ -49,6 +53,7 @@ export class InventoryDto {
     this.inventory_context = inventory_context;
     this.inventory_name = inventory_name;
     this.is_active = is_active;
+    this.stock_validation = stock_validation;
     this.created_at = created_at;
     this.updated_at = updated_at;
     this.created_by = created_by;

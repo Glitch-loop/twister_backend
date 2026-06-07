@@ -34,4 +34,26 @@ export class RegisterInventoryOperationForTransactionRequestDto {
 
   @ApiPropertyOptional({ type: String })
   public readonly longitude?: string;
+
+  constructor(
+    id_inventory_origin: string,
+    movement_type: MOVEMENT_TYPE_ENUM,
+    document_reference: string,
+    created_by: string,
+    inventory_operation_descriptions: InventoryOperationDescriptionRequestDto[],
+    id_inventory_operation?: string,
+    created_at?: Date,
+    latitude?: string,
+    longitude?: string,
+  ) {
+    this.id_inventory_origin = id_inventory_origin;
+    this.movement_type = movement_type;
+    this.document_reference = document_reference;
+    this.created_by = created_by;
+    this.inventory_operation_descriptions = inventory_operation_descriptions;
+    this.id_inventory_operation = id_inventory_operation;
+    this.created_at = created_at;
+    this.latitude = latitude;
+    this.longitude = longitude;
+  }
 }

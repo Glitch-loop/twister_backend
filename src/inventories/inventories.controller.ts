@@ -71,11 +71,21 @@ export class InventoriesController {
     summary: 'Create inventory',
     description: `Creates an inventory and returns a standardized controller response.
 
-Note: You can create an inventory of one of the following listed inventories:
+Notes 
+
+You can create an inventory of one of the following listed inventories:
 - WAREHOUSE: 1
 - PRODUCT_RESERVATION: 2
 - AVAILABLE_FOR_SALE: 3
 - SHRINKAGE: 4  
+
+You can declare if the inventory will perform a stock validation when an inventory operation
+is performed.
+- ENABLE: 1
+- DISABLE: 0
+
+If you don't provide this information, by default the inventory will be created with an 
+ENABLE stock validation.
 `,
   })
   @ApiBody({ type: CreateInventoryRequestDto })
@@ -86,6 +96,7 @@ Note: You can create an inventory of one of the following listed inventories:
       body.inventory_context,
       body.inventory_name,
       body.created_by,
+      body.stock_validation,
       body.assigned_to,
       body.assigned_facility,
       body.id_inventory,
@@ -97,7 +108,13 @@ Note: You can create an inventory of one of the following listed inventories:
 
   @ApiOperation({
     summary: 'Update inventory',
-    description: 'Updates inventory name and returns a standardized controller response.',
+    description: `Updates inventory name and returns a standardized controller response.
+Stock validation:
+- ENABLE: 1
+- DISABLE: 0
+
+If you don't provide this information, by default the inventory will be created with an 
+ENABLE stock validation.`,
   })
   @ApiParam({ name: 'id_inventory', description: 'Inventory identifier', type: String })
   @ApiBody({ type: UpdateInventoryRequestDto })

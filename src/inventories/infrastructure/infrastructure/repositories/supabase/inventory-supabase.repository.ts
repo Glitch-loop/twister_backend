@@ -11,18 +11,6 @@ import { Inventory } from '@/src/inventories/core/interfaces/Inventory.repositor
 import { InventoryBalanceObjectValue } from '@/src/inventories/core/value-objects/inventory-balance.object-value';
 import { SupabaseDataSource } from '@/src/shared/infrastructure/datasources/supabase-data-source';
 
-interface InventoryRow {
-  id_inventory: string;
-  inventory_context: number;
-  inventory_name: string;
-  is_active: number;
-  created_at: Date | string;
-  updated_at: Date | string;
-  created_by: string;
-  assigned_facility?: string | null;
-  assigned_to?: string | null;
-}
-
 interface InventoryOperationRow {
   id_inventory_operation: string;
   latitude?: string | null;
@@ -231,11 +219,7 @@ export class InventorySupabaseRepository implements Inventory {
         throw new Error(`Failed to retrieve inventory operations: ${error.message}`);
       }
 
-      const operationModels = ((data ?? []) as InventoryOperationRow[]).map((row) =>
-        this.mapInventoryOperationRowToModel(row),
-      );
-
-      return this.composeInventoryOperations(operationModels);
+      return this.composeInventoryOperations(data as InventoryOperationModel[]);
     } catch (error) {
       throw new Error(
         `Failed to retrieve inventory operations: ${error instanceof Error ? error.message : String(error)}`,

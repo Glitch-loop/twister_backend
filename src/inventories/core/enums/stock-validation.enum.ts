@@ -1,0 +1,4 @@
+export enum STOCK_VALIDATION_ENUM {
+  DISABLE = 0,
+  ENABLE = 1
+}

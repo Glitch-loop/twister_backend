@@ -1,5 +1,9 @@
+// Enums
 import { INVENTORY_CONTEXT_ENUM } from '@/src/inventories/core/enums/inventory-context.enum';
 import { INVENTORY_STATE_ENUM } from '@/src/inventories/core/enums/inventory-state-enum';
+import { STOCK_VALIDATION_ENUM } from '@/src/inventories/core/enums/stock-validation.enum';
+
+// Object values
 import { InventoryBalanceObjectValue } from '@/src/inventories/core/value-objects/inventory-balance.object-value';
 
 export class InventoryEntity {
@@ -8,6 +12,7 @@ export class InventoryEntity {
 		public readonly inventory_context: INVENTORY_CONTEXT_ENUM,
 		public readonly inventory_name: string,
 		public readonly is_active: INVENTORY_STATE_ENUM,
+		public readonly stock_validation: STOCK_VALIDATION_ENUM,
 		public readonly created_at: Date,
 		public readonly updated_at: Date,
 		public readonly created_by: string,

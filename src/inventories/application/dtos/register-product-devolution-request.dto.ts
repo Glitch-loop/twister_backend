@@ -4,16 +4,16 @@ import { InventoryOperationDescriptionRequestDto } from '@/src/inventories/appli
 
 export class RegisterProductDevolutionRequestDto {
   @ApiProperty({ type: String, format: 'uuid' })
-  public readonly id_inventory_origin: string;
+  public readonly id_inventory_origin: string = '';
 
   @ApiProperty({ type: String, format: 'uuid' })
-  public readonly created_by: string;
+  public readonly created_by: string = '';
 
   @ApiPropertyOptional({ type: String, format: 'uuid' })
   public readonly document_reference?: string;
 
   @ApiProperty({ type: [InventoryOperationDescriptionRequestDto] })
-  public readonly inventory_operation_descriptions: InventoryOperationDescriptionRequestDto[];
+  public readonly inventory_operation_descriptions: InventoryOperationDescriptionRequestDto[] = [];
 
   @ApiPropertyOptional({ type: String, format: 'uuid' })
   public readonly id_inventory_operation?: string;
@@ -26,4 +26,24 @@ export class RegisterProductDevolutionRequestDto {
 
   @ApiPropertyOptional({ type: String })
   public readonly longitude?: string;
+
+  constructor(
+    id_inventory_origin: string,
+    created_by: string,
+    inventory_operation_descriptions: InventoryOperationDescriptionRequestDto[],
+    document_reference?: string,
+    id_inventory_operation?: string,
+    created_at?: Date,
+    latitude?: string,
+    longitude?: string,
+  ) {
+    this.id_inventory_origin = id_inventory_origin;
+    this.created_by = created_by;
+    this.document_reference = document_reference;
+    this.inventory_operation_descriptions = inventory_operation_descriptions;
+    this.id_inventory_operation = id_inventory_operation;
+    this.created_at = created_at;
+    this.latitude = latitude;
+    this.longitude = longitude;
+  }
 }
