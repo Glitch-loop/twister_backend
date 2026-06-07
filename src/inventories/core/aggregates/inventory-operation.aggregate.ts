@@ -58,6 +58,8 @@ export class InventoryOperationAggregate {
         return new InventoryBalanceObjectValue(
           item.id_inventory_balance,
           item.quantity,
+          item.min_quantity,
+          item.max_quantity,
           item.created_at,
           item.id_inventory,
           item.id_product,
@@ -426,6 +428,8 @@ export class InventoryOperationAggregate {
         const { 
           id_inventory_balance, 
           quantity,
+          min_quantity,
+          max_quantity,
           id_inventory,
           created_at,
           id_product
@@ -434,6 +438,8 @@ export class InventoryOperationAggregate {
         this.originInventoryBalance.set(_idProduct, new InventoryBalanceObjectValue(
           id_inventory_balance,
           quantity - _quantity,
+          min_quantity,
+          max_quantity,
           created_at,
           id_inventory,
           id_product
@@ -445,6 +451,8 @@ export class InventoryOperationAggregate {
           new InventoryBalanceObjectValue(
             _idNewProductInOriginInventory,
             _quantity * -1,
+            null,
+            null,
             new Date(),
             id_inventory,
             _idProduct
@@ -461,6 +469,8 @@ export class InventoryOperationAggregate {
         const { 
           id_inventory_balance, 
           quantity,
+          min_quantity,
+          max_quantity,
           id_inventory,
           created_at,
           id_product
@@ -469,6 +479,8 @@ export class InventoryOperationAggregate {
         this.targetInventoryBalance.set(_idProduct, new InventoryBalanceObjectValue(
           id_inventory_balance,
           quantity + _quantity,
+          min_quantity,
+          max_quantity,
           created_at,
           id_inventory,
           id_product
@@ -480,6 +492,8 @@ export class InventoryOperationAggregate {
           new InventoryBalanceObjectValue(
             _idNewProductInTargetInventory,
             _quantity,
+            null,
+            null,
             new Date(),
             id_inventory,
             _idProduct

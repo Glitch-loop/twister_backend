@@ -7,6 +7,12 @@ export class InventoryBalanceDto {
   @ApiProperty({ type: Number, example: 48.75 })
   public readonly quantity: number;
 
+  @ApiProperty({ type: Number, example: 48.75 })
+  public readonly min_quantity: number | null;
+
+  @ApiProperty({ type: Number, example: 48.75 })
+  public readonly max_quantity: number | null;
+
   @ApiProperty({ type: String, format: 'date-time', example: '2026-06-03T09:15:00.000Z' })
   public readonly created_at: Date;
 
@@ -17,16 +23,20 @@ export class InventoryBalanceDto {
   public readonly id_product: string;
 
   constructor(
-    id_inventory_balance: string,
-    quantity: number,
-    created_at: Date,
-    id_inventory: string,
-    id_product: string,
+    _id_inventory_balance: string,
+    _quantity: number,
+    _min_quantity: number|null,
+    _max_quantity: number|null,
+    _created_at: Date,
+    _id_inventory: string,
+    _id_product: string,
   ) {
-    this.id_inventory_balance = id_inventory_balance;
-    this.quantity = quantity;
-    this.created_at = created_at;
-    this.id_inventory = id_inventory;
-    this.id_product = id_product;
+    this.id_inventory_balance = _id_inventory_balance;
+    this.quantity = _quantity;
+    this.min_quantity = _min_quantity;
+    this.max_quantity = _max_quantity;
+    this.created_at = _created_at;
+    this.id_inventory = _id_inventory;
+    this.id_product = _id_product;
   }
 }

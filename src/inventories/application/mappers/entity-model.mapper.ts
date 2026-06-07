@@ -107,6 +107,8 @@ export class EntityModelMapper {
 		return {
 			id_inventory_balance: domainObject.id_inventory_balance,
 			quantity: domainObject.quantity,
+			min_quantity: domainObject.min_quantity,
+			max_quantity: domainObject.max_quantity,
 			created_at: domainObject.created_at,
 			id_inventory: domainObject.id_inventory,
 			id_product: domainObject.id_product,
@@ -164,6 +166,8 @@ export class EntityModelMapper {
 		return new InventoryBalanceObjectValue(
 			model.id_inventory_balance,
 			model.quantity,
+			model.min_quantity,
+			model.max_quantity,
 			createdAt,
 			model.id_inventory,
 			model.id_product,

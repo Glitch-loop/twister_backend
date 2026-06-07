@@ -1,46 +1,27 @@
+// Libraries
 import { Injectable } from '@nestjs/common';
 
-import { EntityModelMapper } from '@/src/inventories/application/mappers/entity-model.mapper';
+// Repositories
+import { Inventory } from '@/src/inventories/core/interfaces/Inventory.repository';
+
+// Object value
+import { InventoryBalanceObjectValue } from '@/src/inventories/core/value-objects/inventory-balance.object-value';
+
+//Entities
+import { InventoryEntity } from '@/src/inventories/core/entities/inventory.entity';
+import { InventoryOperationEntity } from '@/src/inventories/core/entities/inventory-operation.entity';
+
+// Models
 import { InventoryBalanceModel } from '@/src/inventories/application/models/inventory-balance.model';
 import { InventoryModel } from '@/src/inventories/application/models/inventory.model';
 import { InventoryOperationDescriptionModel } from '@/src/inventories/application/models/inventory-operation-description.model';
 import { InventoryOperationModel } from '@/src/inventories/application/models/inventory-operation.model';
-import { InventoryEntity } from '@/src/inventories/core/entities/inventory.entity';
-import { InventoryOperationEntity } from '@/src/inventories/core/entities/inventory-operation.entity';
-import { Inventory } from '@/src/inventories/core/interfaces/Inventory.repository';
-import { InventoryBalanceObjectValue } from '@/src/inventories/core/value-objects/inventory-balance.object-value';
+
+// Mappers
+import { EntityModelMapper } from '@/src/inventories/application/mappers/entity-model.mapper';
+
+// Shared
 import { SupabaseDataSource } from '@/src/shared/infrastructure/datasources/supabase-data-source';
-
-interface InventoryOperationRow {
-  id_inventory_operation: string;
-  latitude?: string | null;
-  longitude?: string | null;
-  inventory_operation_reference?: string | null;
-  movement_type: number | string;
-  document_reference?: string | null;
-  created_at: Date | string;
-  created_by: string;
-  id_inventory_origin: string;
-  id_inventory_target: string;
-}
-
-interface InventoryBalanceRow {
-  id_inventory_balance: string;
-  quantity: number | string;
-  created_at: Date | string;
-  id_inventory: string;
-  id_product: string;
-}
-
-interface InventoryOperationDescriptionRow {
-  id_inventory_operation_description: string;
-  price_at_moment: number | string;
-  cost_at_moment: number | string;
-  quantity: number | string;
-  created_at: Date | string;
-  id_inventory_operation: string;
-  id_product: string;
-}
 
 @Injectable()
 export class InventorySupabaseRepository implements Inventory {
@@ -192,11 +173,7 @@ export class InventorySupabaseRepository implements Inventory {
         throw new Error(`Failed to list inventory operations: ${error.message}`);
       }
 
-      const operationModels = ((data ?? []) as InventoryOperationRow[]).map((row) =>
-        this.mapInventoryOperationRowToModel(row),
-      );
-
-      return this.composeInventoryOperations(operationModels);
+      return this.composeInventoryOperations(data as InventoryOperationModel[]);
     } catch (error) {
       throw new Error(
         `Failed to list inventory operations: ${error instanceof Error ? error.message : String(error)}`,
@@ -362,9 +339,7 @@ export class InventorySupabaseRepository implements Inventory {
       throw new Error(`Failed to retrieve inventory balances: ${error.message}`);
     }
 
-    const models = ((data ?? []) as InventoryBalanceRow[]).map((row) => this.mapInventoryBalanceRowToModel(row));
-
-    for (const model of models) {
+    for (const model of data as InventoryBalanceModel[]) {
       const list = map.get(model.id_inventory) ?? [];
       list.push(model);
       map.set(model.id_inventory, list);
@@ -391,11 +366,7 @@ export class InventorySupabaseRepository implements Inventory {
       throw new Error(`Failed to retrieve inventory operation descriptions: ${error.message}`);
     }
 
-    const models = ((data ?? []) as InventoryOperationDescriptionRow[]).map((row) =>
-      this.mapInventoryOperationDescriptionRowToModel(row),
-    );
-
-    for (const model of models) {
+    for (const model of data as InventoryOperationDescriptionModel[]) {
       const list = map.get(model.id_inventory_operation) ?? [];
       list.push(model);
       map.set(model.id_inventory_operation, list);
@@ -404,44 +375,6 @@ export class InventorySupabaseRepository implements Inventory {
     return map;
   }
 
-  private mapInventoryOperationRowToModel(row: InventoryOperationRow): InventoryOperationModel {
-    return {
-      id_inventory_operation: row.id_inventory_operation,
-      latitude: row.latitude ?? null,
-      longitude: row.longitude ?? null,
-      inventory_operation_reference: row.inventory_operation_reference ?? undefined,
-      movement_type: this.toNumber(row.movement_type, 'movement_type'),
-      document_reference: row.document_reference ?? undefined,
-      created_at: this.toDate(row.created_at, 'created_at'),
-      created_by: row.created_by,
-      id_inventory_origin: row.id_inventory_origin,
-      id_inventory_target: row.id_inventory_target,
-    };
-  }
-
-  private mapInventoryBalanceRowToModel(row: InventoryBalanceRow): InventoryBalanceModel {
-    return {
-      id_inventory_balance: row.id_inventory_balance,
-      quantity: this.toNumber(row.quantity, 'quantity'),
-      created_at: this.toDate(row.created_at, 'created_at'),
-      id_inventory: row.id_inventory,
-      id_product: row.id_product,
-    };
-  }
-
-  private mapInventoryOperationDescriptionRowToModel(
-    row: InventoryOperationDescriptionRow,
-  ): InventoryOperationDescriptionModel {
-    return {
-      id_inventory_operation_description: row.id_inventory_operation_description,
-      price_at_moment: this.toNumber(row.price_at_moment, 'price_at_moment'),
-      cost_at_moment: this.toNumber(row.cost_at_moment, 'cost_at_moment'),
-      quantity: this.toNumber(row.quantity, 'quantity'),
-      created_at: this.toDate(row.created_at, 'created_at'),
-      id_inventory_operation: row.id_inventory_operation,
-      id_product: row.id_product,
-    };
-  }
 
   private toNumber(value: number | string, fieldName: string): number {
     const parsed = typeof value === 'number' ? value : Number(value);

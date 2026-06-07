@@ -99,6 +99,8 @@ export class EntityDtoMapper {
 		return new InventoryBalanceDto(
 			domainObject.id_inventory_balance,
 			domainObject.quantity,
+			domainObject.min_quantity,
+			domainObject.max_quantity,
 			domainObject.created_at,
 			domainObject.id_inventory,
 			domainObject.id_product,
@@ -160,6 +162,8 @@ export class EntityDtoMapper {
 		return new InventoryBalanceObjectValue(
 			dto.id_inventory_balance,
 			dto.quantity,
+			dto.min_quantity,
+			dto.max_quantity,
 			createdAt,
 			dto.id_inventory,
 			dto.id_product,
