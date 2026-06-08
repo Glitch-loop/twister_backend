@@ -16,6 +16,8 @@ export const isUserDto = (value: unknown): value is UserDto => {
     typeof value.password === 'string' &&
     typeof value.status === 'number' &&
     typeof value.salary === 'number' &&
+    Array.isArray(value.assigned_roles) &&
+    value.assigned_roles.every((role) => typeof role === 'number') &&
     (value.address === undefined || typeof value.address === 'string') &&
     (value.rfc === undefined || typeof value.rfc === 'string') &&
     (value.imss === undefined || typeof value.imss === 'string')

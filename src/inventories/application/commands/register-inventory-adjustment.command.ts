@@ -100,7 +100,7 @@ export class RegisterInventoryAdjustmentCommand {
 		latitude?: string,
 		longitude?: string,
 	) {
-			const originInventory = await this.retrieveInventoryById(id_inventory_origin);
+		const originInventory = await this.retrieveInventoryById(id_inventory_origin);
 		const adjustmentVirtualInventory = await this.retrieveUniqueInventoryByContext(
 			INVENTORY_CONTEXT_ENUM.ADJUSTMENT_VIRTUAL,
 		);

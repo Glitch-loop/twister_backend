@@ -16,8 +16,8 @@ export const isUserModel = (value: unknown): value is UserModel => {
     typeof value.password === 'string' &&
     typeof value.status === 'number' &&
     typeof value.salary === 'number' &&
-    (value.address === undefined || typeof value.address === 'string') &&
-    (value.rfc === undefined || typeof value.rfc === 'string') &&
-    (value.imss === undefined || typeof value.imss === 'string')
+    (value.address === null || typeof value.address === 'string') &&
+    (value.rfc === null || typeof value.rfc === 'string') &&
+    (value.imss === null || typeof value.imss === 'string')
   );
 };

@@ -1,0 +1,5 @@
+export enum ROLES_ENUM {
+  MANAGER = 0,
+  VENDOR = 1,
+  WAREHOUSE_STAFF = 2
+}

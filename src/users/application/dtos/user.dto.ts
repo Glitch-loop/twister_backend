@@ -7,6 +7,7 @@ export interface UserDto {
   salary: number;
   created_at: Date;
   updated_at: Date;
+  assigned_roles: number[]
   address?: string;
   rfc?: string;
   imss?: string;

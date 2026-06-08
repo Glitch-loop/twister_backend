@@ -9,6 +9,7 @@ import { UserEntity } from '@/src/users/core/entities/user.entity';
 
 // Models
 import { UserModel } from '@/src/users/application/models/user.model';
+import { AssignedRoleModel } from '@/src/users/application/models/assigned-role.model';
 
 // Infrastructure
 import { SupabaseDataSource } from '@/src/shared/infrastructure/datasources/supabase-data-source';
@@ -56,8 +57,13 @@ export class UserSupabaseRepository implements UserRepository {
         return [];
       }
 
-      return (data as UserModel[]).map((user) =>
-        this.mapper.toDomainObject(user),
+      const userModels = data as UserModel[];
+      const assignedRolesByUserId = await this.retrieveAssignedRolesByUserIds(
+        userModels.map((user) => user.id_user),
+      );
+
+      return userModels.map((user) =>
+        this.mapper.toDomainObject(user, assignedRolesByUserId.get(user.id_user) ?? []),
       );
     } catch (error) {
       throw new Error(
@@ -138,13 +144,45 @@ export class UserSupabaseRepository implements UserRepository {
         return [];
       }
 
-      return (data as UserModel[]).map((user) =>
-        this.mapper.toDomainObject(user),
+      const userModels = data as UserModel[];
+      const assignedRolesByUserId = await this.retrieveAssignedRolesByUserIds(
+        userModels.map((user) => user.id_user),
+      );
+
+      return userModels.map((user) =>
+        this.mapper.toDomainObject(user, assignedRolesByUserId.get(user.id_user) ?? []),
       );
     } catch (error) {
       throw new Error(
         `Failed to list users: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
+  }
+
+  private async retrieveAssignedRolesByUserIds(
+    userIds: string[],
+  ): Promise<Map<string, AssignedRoleModel[]>> {
+    if (userIds.length === 0) {
+      return new Map<string, AssignedRoleModel[]>();
+    }
+
+    const { data, error } = await this.supabase
+      .from('assigned_roles')
+      .select('*')
+      .in('id_user', userIds);
+
+    if (error) {
+      throw new Error(`Failed to retrieve assigned roles: ${error.message}`);
+    }
+
+    const assignedRolesByUserId = new Map<string, AssignedRoleModel[]>();
+
+    for (const role of data as AssignedRoleModel[]) {
+      const currentRoles = assignedRolesByUserId.get(role.id_user) ?? [];
+      currentRoles.push(role);
+      assignedRolesByUserId.set(role.id_user, currentRoles);
+    }
+
+    return assignedRolesByUserId;
   }
 }
