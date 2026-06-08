@@ -434,7 +434,10 @@ export class InventoryOperationAggregate {
           created_at,
           id_product
         } = productBalance;
-        if (productBalance.quantity - _quantity < 0 && stock_validation === STOCK_VALIDATION_ENUM.ENABLE) throw new BusinessRuleException(`The inventory balance with id ${id_inventory_balance} (representing the product ${_idProduct}) of the origin inventory with id ${id_inventory} doesn't have enough product to complete the operation. Current balance: ${quantity}. Items to take from the balance: ${_quantity}`);
+
+        if(!(this.inventoryOperation!.movement_type === MOVEMENT_TYPE_ENUM.ADJUSTMENT)) {
+          if (productBalance.quantity - _quantity < 0 && stock_validation === STOCK_VALIDATION_ENUM.ENABLE) throw new BusinessRuleException(`The inventory balance with id ${id_inventory_balance} (representing the product ${_idProduct}) of the origin inventory with id ${id_inventory} doesn't have enough product to complete the operation. Current balance: ${quantity}. Items to take from the balance: ${_quantity}`);
+        }
         this.originInventoryBalance.set(_idProduct, new InventoryBalanceObjectValue(
           id_inventory_balance,
           quantity - _quantity,
@@ -445,7 +448,9 @@ export class InventoryOperationAggregate {
           id_product
         ));
       } else { // This particular particular has not been appeard in this inventory balance (First time it appears).
-        if (_quantity * -1 < 0 && stock_validation === STOCK_VALIDATION_ENUM.ENABLE)  throw new BusinessRuleException(`You are trying to take product that doesn't exist. The inventory origin with id ${id_inventory} doesn't have product with id ${_idProduct}. Firstly, you have to add balance of this product before taking it.`);
+        if(!(this.inventoryOperation!.movement_type === MOVEMENT_TYPE_ENUM.ADJUSTMENT)) {
+          if (_quantity * -1 < 0 && stock_validation === STOCK_VALIDATION_ENUM.ENABLE)  throw new BusinessRuleException(`You are trying to take product that doesn't exist. The inventory origin with id ${id_inventory} doesn't have product with id ${_idProduct}. Firstly, you have to add balance of this product before taking it.`);
+        }
         this.originInventoryBalance.set(
           _idProduct,
           new InventoryBalanceObjectValue(
@@ -475,7 +480,9 @@ export class InventoryOperationAggregate {
           created_at,
           id_product
         } = productBalance;
-        if (productBalance.quantity + _quantity < 0 && stock_validation === STOCK_VALIDATION_ENUM.ENABLE) throw new BusinessRuleException(`The inventory balance with id ${id_inventory_balance} (representing the product ${_idProduct}) of the target inventory with id ${id_inventory} doesn't have enough product to complete the operation. Current balance: ${quantity}. Items to take from the balance: ${_quantity}`);
+        if(!(this.inventoryOperation!.movement_type === MOVEMENT_TYPE_ENUM.ADJUSTMENT)) {
+          if (productBalance.quantity + _quantity < 0 && stock_validation === STOCK_VALIDATION_ENUM.ENABLE) throw new BusinessRuleException(`The inventory balance with id ${id_inventory_balance} (representing the product ${_idProduct}) of the target inventory with id ${id_inventory} doesn't have enough product to complete the operation. Current balance: ${quantity}. Items to take from the balance: ${_quantity}`);
+        }
         this.targetInventoryBalance.set(_idProduct, new InventoryBalanceObjectValue(
           id_inventory_balance,
           quantity + _quantity,
@@ -486,7 +493,9 @@ export class InventoryOperationAggregate {
           id_product
         ));
       } else { // This particular particular has not been appeard in this inventory balance (First time it appears).
-        if (_quantity < 0 && stock_validation && stock_validation === STOCK_VALIDATION_ENUM.ENABLE) throw new BusinessRuleException(`You are trying to take product that doesn't exist. The target inventory with id ${id_inventory} doesn't have product with id ${_idProduct}. Firstly, you have to add balance of this product before taking it.`);
+        if(!(this.inventoryOperation!.movement_type === MOVEMENT_TYPE_ENUM.ADJUSTMENT)) {
+          if (_quantity < 0 && stock_validation && stock_validation === STOCK_VALIDATION_ENUM.ENABLE) throw new BusinessRuleException(`You are trying to take product that doesn't exist. The target inventory with id ${id_inventory} doesn't have product with id ${_idProduct}. Firstly, you have to add balance of this product before taking it.`);
+        }
         this.targetInventoryBalance.set(
           _idProduct,
           new InventoryBalanceObjectValue(
