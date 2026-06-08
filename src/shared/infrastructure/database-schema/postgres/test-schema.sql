@@ -354,3 +354,11 @@ CREATE TABLE public.inventories_balance (
   CONSTRAINT inventories_balance_id_inventory_fkey FOREIGN KEY (id_inventory) REFERENCES public.inventories(id_inventory),
   CONSTRAINT inventories_balance_id_product_fkey FOREIGN KEY (id_product) REFERENCES public.products(id_product)
 );
+CREATE TABLE public.assigned_roles (
+  id_assigned_role bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  role smallint NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  id_user uuid NOT NULL,
+  CONSTRAINT assigned_roles_pkey PRIMARY KEY (id_assigned_role),
+  CONSTRAINT assigned_roles_id_user_fkey FOREIGN KEY (id_user) REFERENCES public.users(id_user)
+);

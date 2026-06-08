@@ -40,7 +40,6 @@ export class RouteTransactionsSupabaseRepository implements RouteTransactionRepo
 
   async createTransaction(transaction: TransactionEntity): Promise<void> {
     try {
-      console.log("Transaction to insert: ", transaction)
       const transactionModel = this.mapper.toModel(transaction);
       const { error: transactionError } = await this.supabase
         .from('transactions')

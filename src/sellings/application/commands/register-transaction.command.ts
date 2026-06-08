@@ -1,5 +1,6 @@
 // Libraries
 import { Inject, Injectable } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 // Constant
 import { GENERAL_PUBLIC_CLIENT } from '@/src/sellings/core/constants/general_public_client.constant'
@@ -13,7 +14,11 @@ import { ROUTE_TRANSACTION_OPERATION_TYPE } from '@/src/sellings/core/enums/rout
 // Aggregate
 import { TransactionAggregate } from '@/src/sellings/core/aggregates/transaction.aggregate';
 
+// Mappers
+import { EntityDtoMapper } from '@/src/sellings/application/mappers/entity-dto.mapper';
+
 // Shared
+import { DOMAIN_EVENT_ENUM } from '@/src/shared/core/enums/domain-event.enum';
 import { IntegrityRepository } from '@/src/shared/core/interfaces/integrity.repository';
 
 interface RegisterTransactionDescriptionInput {
@@ -34,6 +39,8 @@ export class RegisterTransactionCommand {
 		private readonly routeTransactionRepository: RouteTransactionRepository,
 		@Inject(IntegrityRepository)
 		private readonly integrityRepository: IntegrityRepository,
+		private readonly eventEmitter: EventEmitter2,
+		private readonly mapper: EntityDtoMapper,
 	) {}
 
 	async execute(
@@ -96,6 +103,11 @@ export class RegisterTransactionCommand {
 		}
 
 		await this.routeTransactionRepository.createTransaction(transactionAggregate.getTransaction());
+
+		this.eventEmitter.emit(
+			DOMAIN_EVENT_ENUM.TRANSACTIONS_OPERATION_EVENT,
+			this.mapper.toDto(transactionAggregate.getTransaction()),
+		);
 	}
 }
 

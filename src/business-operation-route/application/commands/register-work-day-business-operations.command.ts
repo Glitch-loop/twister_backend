@@ -12,11 +12,16 @@ import { WorkDayAggregate } from '@/src/business-operation-route/core/aggregates
 
 // Enums
 import { DAY_OPERATIONS_ENUM } from '@/src/business-operation-route/core/enums/day-operations.enum';
-import { BusinessRuleException } from '@/src/shared/errors/BusinessRuleException';
 import { WorkDayEntity } from '@/src/business-operation-route/core/entities/work-day.entity';
+
+// Errors
+import { BusinessRuleException } from '@/src/shared/errors/BusinessRuleException';
 
 //Entity
 import { WorkDayOperationHistoricEntity } from '@/src/business-operation-route/core/entities/work-day-operation-historic.entity';
+
+// Mapper
+import { Mapper } from '@/src/business-operation-route/application/mappers/entity-dto.mapper';
 
 // External modules
 import { RouteRepository } from '@/src/route-organization/core/interfaces/route.repository';
@@ -26,7 +31,7 @@ import { RouteOrganizationStrategyAggregate } from '@/src/route-organization/cor
 import { ROUTE_ORGANIZATION_STRATEGIES_ENUM } from '@/src/route-organization/core/enums/route-organization-strategies.enum';
 import { RouteDayLocationObjectValue } from '@/src/route-organization/core/value-objects/route-day-location.object-value';
 import { OrganizeRouteDayCommand } from '@/src/route-organization/application/commands/organize-route-day.command';
-import { Mapper } from '../mappers/entity-dto.mapper';
+import { DOMAIN_EVENT_ENUM } from '@/src/shared/core/enums/domain-event.enum';
 
 @Injectable()
 export class RegisterWorkDayBusinessOperationsCommand {
@@ -196,12 +201,9 @@ export class RegisterWorkDayBusinessOperationsCommand {
 		}
 		
 		await this.workDayRepository.insertWorkDayHistoric(newOperations);
-		// this.eventEmitter.emit(
-		// 	'route-business-operation.register',
-		// 	newOperations
-		// )
+
 		this.eventEmitter.emit(
-			'route-business-operation.register',
+			DOMAIN_EVENT_ENUM.BUSINESS_OPERATION_EVENT,
 			newOperations.map((newOperation) => {return this.mapper.toDto(newOperation)})
 		)
 	}

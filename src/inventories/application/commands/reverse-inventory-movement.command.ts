@@ -1,14 +1,31 @@
+// Libraries
 import { Inject, Injectable } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
+// Aggregates
 import { InventoryOperationAggregate } from '@/src/inventories/core/aggregates/inventory-operation.aggregate';
+
+// Entitites
 import { InventoryEntity } from '@/src/inventories/core/entities/inventory.entity';
 import { InventoryOperationEntity } from '@/src/inventories/core/entities/inventory-operation.entity';
-import { Inventory } from '@/src/inventories/core/interfaces/Inventory.repository';
 import { ProductEntity } from '@/src/products/core/entities/product.entity';
-import { PRODUCT_STATUS_ENUM } from '@/src/products/core/enums/product-status.enum';
-import { ProductRepository } from '@/src/products/core/interfaces/ProductRepository.repository';
-import { IntegrityRepository } from '@/src/shared/core/interfaces/integrity.repository';
+
+// Repository
+import { Inventory } from '@/src/inventories/core/interfaces/Inventory.repository';
+
+// Errors
 import { BusinessRuleException } from '@/src/shared/errors/BusinessRuleException';
+
+// Enum
+import { PRODUCT_STATUS_ENUM } from '@/src/products/core/enums/product-status.enum';
+
+// Mappers
+import { EntityDtoMapper } from '@/src/inventories/application/mappers/entity-dto.mapper'
+
+// Shared
+import { IntegrityRepository } from '@/src/shared/core/interfaces/integrity.repository';
+import { ProductRepository } from '@/src/products/core/interfaces/ProductRepository.repository';
+import { DOMAIN_EVENT_ENUM } from '@/src/shared/core/enums/domain-event.enum';
 
 interface InventoryOperationDescriptionInput {
 	id_inventory_operation_description?: string;
@@ -25,6 +42,8 @@ export class ReverseInventoryMovementCommand {
 		@Inject(Inventory) private readonly inventoryRepository: Inventory,
 		@Inject(ProductRepository) private readonly productRepository: ProductRepository,
 		@Inject(IntegrityRepository) private readonly integrityRepository: IntegrityRepository,
+		private readonly eventEmitter: EventEmitter2,
+		private readonly mapper: EntityDtoMapper
 	) {}
 
 	async execute(
@@ -90,6 +109,11 @@ export class ReverseInventoryMovementCommand {
 		for (const balanceRecord of affectedBalanceRecords) {
 			await this.inventoryRepository.UpsertInventoryBalance(balanceRecord);
 		}
+
+		this.eventEmitter.emit(
+			DOMAIN_EVENT_ENUM.INVENTORY_OPERATION_EVENT,
+			this.mapper.toDto(aggregate.getInventoryOperation())
+		);
 	}
 
 	private async retrieveInventoryById(id_inventory: string): Promise<InventoryEntity> {

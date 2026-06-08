@@ -1,14 +1,39 @@
+// Libraries
 import { Inject, Injectable } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
+// Aggregates
 import { InventoryOperationAggregate } from '@/src/inventories/core/aggregates/inventory-operation.aggregate';
+
+// Constants
 import { WASTED_VIRTUAL_INVENTORY } from '@/src/inventories/core/constants/wasted_virtual_inventory.constant';
+
+// Entities
 import { InventoryEntity } from '@/src/inventories/core/entities/inventory.entity';
+
+// Enums
 import { INVENTORY_CONTEXT_ENUM } from '@/src/inventories/core/enums/inventory-context.enum';
+
+// Repository
 import { Inventory } from '@/src/inventories/core/interfaces/Inventory.repository';
+
+// Entities
 import { ProductEntity } from '@/src/products/core/entities/product.entity';
+
+// Enums
 import { PRODUCT_STATUS_ENUM } from '@/src/products/core/enums/product-status.enum';
+
+// Repository
 import { ProductRepository } from '@/src/products/core/interfaces/ProductRepository.repository';
+
+// Mappers
+import { EntityDtoMapper } from '@/src/inventories/application/mappers/entity-dto.mapper';
+
+// Shared
+import { DOMAIN_EVENT_ENUM } from '@/src/shared/core/enums/domain-event.enum';
 import { IntegrityRepository } from '@/src/shared/core/interfaces/integrity.repository';
+
+// Errors
 import { BusinessRuleException } from '@/src/shared/errors/BusinessRuleException';
 
 interface InventoryOperationDescriptionInput {
@@ -26,6 +51,8 @@ export class RegisterWasteInventoryOperationCommand {
 		@Inject(Inventory) private readonly inventoryRepository: Inventory,
 		@Inject(ProductRepository) private readonly productRepository: ProductRepository,
 		@Inject(IntegrityRepository) private readonly integrityRepository: IntegrityRepository,
+		private readonly eventEmitter: EventEmitter2,
+		private readonly mapper: EntityDtoMapper,
 	) {}
 
 	async execute(
@@ -80,6 +107,11 @@ export class RegisterWasteInventoryOperationCommand {
 		for (const balanceRecord of affectedBalanceRecords) {
 			await this.inventoryRepository.UpsertInventoryBalance(balanceRecord);
 		}
+
+		this.eventEmitter.emit(
+			DOMAIN_EVENT_ENUM.INVENTORY_OPERATION_EVENT,
+			this.mapper.toDto(aggregate.getInventoryOperation()),
+		);
 	}
 
 	private async retrieveInventoryById(id_inventory: string): Promise<InventoryEntity> {
