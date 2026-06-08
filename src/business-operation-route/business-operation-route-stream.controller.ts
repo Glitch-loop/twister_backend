@@ -1,51 +1,62 @@
 // Libraries
-import { 
-	Body, 
-	Controller, 
-	Get, 
-	Param, 
-	Patch, 
-	Post, 
-	Query,
-	Sse
-} from '@nestjs/common';
-
-import {
-	ApiBody,
-	ApiOkResponse,
-	ApiOperation,
-	ApiParam,
-	ApiQuery,
-	ApiTags,
-} from '@nestjs/swagger';
+import { Controller, Sse } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 // Streams
 import { OnEvent } from '@nestjs/event-emitter';
-import { Subject, map, Observable } from 'rxjs';
+import { Subject, map, Observable, merge } from 'rxjs';
 
+import { DOMAIN_EVENT_ENUM } from '@/src/shared/core/enums/domain-event.enum';
 
-
-@ApiTags('Business Operation Route')
+@ApiTags('Business Operation Route Streams')
 @Controller('business-operation-route')
 export class BusinessOperationRouteStreamController {
-    // 1. Create an internal RxJS Subject to stream your data
-    private readonly businessOperation$ = new Subject<any>();
-  
-    // 2. The SSE Endpoint: Runs ONCE when a client connects
-    @Sse('stream')
-    sse(): Observable<MessageEvent> {
-      // Return the subject as an observable. 
-      // Format the data into the structure SSE expects ({ data: ... })
-      return this.businessOperation$.asObservable().pipe(
-        map((payload) => ({ data: payload } as MessageEvent))
-      );
-    }
-    
-  // 3. The Event Listener: Fires every time the domain event is emitted
-    @OnEvent('route-business-operation.register', { async: true })
-    handleOrderCreatedEvent(payload: any) {    
-      // Push the event payload directly into the RxJS stream
-      this.businessOperation$.next(payload);
-    }
-  
+  private readonly businessOperation$ = new Subject<unknown>();
+  private readonly inventoryOperation$ = new Subject<unknown>();
+  private readonly transaction$ = new Subject<unknown>();
+
+  @Sse('stream/manager')
+  sse(): Observable<MessageEvent> {
+    return merge(
+      this.businessOperation$.asObservable().pipe(
+        map((payload) => {
+          return {
+            source: DOMAIN_EVENT_ENUM.BUSINESS_OPERATION_EVENT,
+            payload,
+          };
+        }),
+      ),
+      this.inventoryOperation$.asObservable().pipe(
+        map((payload) => {
+          return {
+            source: DOMAIN_EVENT_ENUM.INVENTORY_OPERATION_EVENT,
+            payload,
+          };
+        }),
+      ),
+      this.transaction$.asObservable().pipe(
+        map((payload) => {
+          return {
+            source: DOMAIN_EVENT_ENUM.TRANSACTIONS_OPERATION_EVENT,
+            payload,
+          };
+        }),
+      ),
+    ).pipe(map((eventPayload) => ({ data: eventPayload } as MessageEvent)));
+  }
+
+  @OnEvent(DOMAIN_EVENT_ENUM.BUSINESS_OPERATION_EVENT, { async: true })
+  handleBusinessOperationEvent(payload: unknown): void {
+    this.businessOperation$.next(payload);
+  }
+
+  @OnEvent(DOMAIN_EVENT_ENUM.INVENTORY_OPERATION_EVENT, { async: true })
+  handleInventoryOperationEvent(payload: unknown): void {
+    this.inventoryOperation$.next(payload);
+  }
+
+  @OnEvent(DOMAIN_EVENT_ENUM.TRANSACTIONS_OPERATION_EVENT, { async: true })
+  handleTransactionOperationEvent(payload: unknown): void {
+    this.transaction$.next(payload);
+  }
 }
