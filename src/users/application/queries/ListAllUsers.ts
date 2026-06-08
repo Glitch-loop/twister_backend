@@ -23,7 +23,6 @@ export class ListAllUsers {
 
   async execute(): Promise<Partial<UserDto>[]> {
     const users: UserEntity[] = await this.userRepository.listUsers();
-    console.log("From repo: ", users)
     const userDtos: Partial<UserDto>[] = users.map((user) => this.mapper.userEntityToDto(user));
     
 

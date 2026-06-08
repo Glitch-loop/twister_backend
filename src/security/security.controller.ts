@@ -16,11 +16,14 @@ import {
 	ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { createClient } from '@supabase/supabase-js';
-import { createHmac } from 'crypto';
+import { httpResponseLoginInterface } from '../shared/presentation/http/interfaces/http-response-login.interface';
+import { UserTokenManager } from './core/entities/UserTokenManager';
 
 class SecurityLoginDto {
-	phone: string;
-	password: string;
+	constructor(
+		readonly cellphone: string,
+		readonly password: string,
+	) {}
 }
 
 @ApiTags('Security')
@@ -34,7 +37,7 @@ export class SecurityController {
 		description: 'Credentials for authentication',
 		schema: {
 			type: 'object',
-			required: ['phone', 'password'],
+			required: ['cellphone', 'password'],
 			properties: {
 				phone: {
 					type: 'string',
@@ -60,14 +63,14 @@ export class SecurityController {
 			},
 		},
 	})
-	@ApiBadRequestResponse({ description: 'phone and password are required' })
+	@ApiBadRequestResponse({ description: 'cellphone and password are required' })
 	@ApiUnauthorizedResponse({ description: 'Invalid credentials' })
 	@ApiInternalServerErrorResponse({
 		description: 'Server configuration or Supabase error',
 	})
-	async login(@Body() body: SecurityLoginDto) {
-		if (!body?.phone || !body?.password) {
-			throw new BadRequestException('phone and password are required');
+	async login(@Body() body: SecurityLoginDto): Promise<httpResponseLoginInterface>{
+		if (!body?.cellphone || !body?.password) {
+			throw new BadRequestException('cellphone and password are required');
 		}
 
 		const supabaseUrl = process.env.PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;
@@ -90,7 +93,7 @@ export class SecurityController {
 		const { data, error } = await supabase
 			.from('users')
 			.select('id_user, cellphone')
-			.eq('cellphone', body.phone)
+			.eq('cellphone', body.cellphone)
 			.eq('password', body.password)
 			.limit(1)
 			.maybeSingle();
@@ -104,31 +107,11 @@ export class SecurityController {
 		if (!data) {
 			throw new UnauthorizedException('Invalid credentials');
 		}
-
-		const header = {
-			alg: 'HS256',
-			typ: 'JWT',
-		};
-
-		const iat = Math.floor(Date.now() / 1000);
-		const exp = iat + 60 * 60;
-
-		const payload = {
-			sub: data.id_user,
-			cellphone: data.cellphone,
-			iat,
-			exp,
-		};
-
-		const encodedHeader = Buffer.from(JSON.stringify(header)).toString('base64url');
-		const encodedPayload = Buffer.from(JSON.stringify(payload)).toString('base64url');
-		const unsignedToken = `${encodedHeader}.${encodedPayload}`;
-		const signature = createHmac('sha256', jwtSecret)
-			.update(unsignedToken)
-			.digest('base64url');
+		
+		const tokenManager = new UserTokenManager(data.id_user, data.cellphone, jwtSecret)
 
 		return {
-			access_token: `${unsignedToken}.${signature}`,
+			access_token: tokenManager.generateToken(),
 		};
 	}
 }

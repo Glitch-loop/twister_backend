@@ -35,7 +35,6 @@ export class Mapper {
   toDomainObject(model: AssignedRoleModel): AssignedRoleObjectValue;
   toDomainObject(model: UserModel, assignedRolesModels?: AssignedRoleModel[]): UserEntity;
   toDomainObject(model: UserModel | AssignedRoleModel, assignedRolesModels?: AssignedRoleModel[]): any {
-    console.log(model)
     if (isAssignedRoleModel(model)) {
       return this.assignedRoleModelToDomainObject(model);
     }

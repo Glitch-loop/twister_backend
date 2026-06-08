@@ -39,7 +39,6 @@ export class Mapper {
   toDto(domainObject: UserEntity): any
   {
     if (isUserEntity(domainObject)) {
-      console.log("Entity to convert: ", domainObject)
       return this.userEntityToDto(domainObject);
     }
     
@@ -49,7 +48,6 @@ export class Mapper {
 
   // ==================== MAPPER METHODS DOMAIN OBJECT to DTO ====================
   userEntityToDto(entity: UserEntity): UserDto {
-    console.log("Convert from entity to dto", entity)
     return {
       id_user: entity.id_user,
       cellphone: entity.cellphone,

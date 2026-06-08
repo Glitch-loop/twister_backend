@@ -81,9 +81,7 @@ export class BusinessOperationRouteController {
 	
 // 3. The Event Listener: Fires every time the domain event is emitted
   @OnEvent('route-business-operation.register', { async: true })
-  handleOrderCreatedEvent(payload: any) {
-    console.log('From listener, pushing to SSE:', payload);
-    
+  handleOrderCreatedEvent(payload: any) {    
     // Push the event payload directly into the RxJS stream
     this.businessOperation$.next(payload);
   }
@@ -235,7 +233,6 @@ Related to client operations
 			}>;
 		},
 	): Promise<httpControllerResponse> {
-		console.log("Insert business operations")
 		await this.registerWorkDayBusinessOperationsCommand.execute(body.id_work_day, body.operations);
 
 		const httpResponseFormatter = new httpFormatter();
@@ -283,7 +280,6 @@ Related to client operations
 		const idRouteDay = id_route_day;
 		const idVendor = id_vendor;
 		const idPayStub = id_pay_stub;
-    console.log("idVendor:", idVendor)
 		const httpRequestFormatter = new httpFormatter();
 
 		if (next_item) {
