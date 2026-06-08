@@ -28,6 +28,11 @@ export class RegisterInventoryAdjustmentCommand {
 		@Inject(IntegrityRepository) private readonly integrityRepository: IntegrityRepository,
 	) {}
 
+	/*
+		In this use case, we understand as inventory origin to that inventory that we want to fix
+		the quantity of product.
+	*/
+
 	async execute(
 		id_inventory_origin: string,
 		created_by: string,
@@ -37,11 +42,65 @@ export class RegisterInventoryAdjustmentCommand {
 		latitude?: string,
 		longitude?: string,
 	): Promise<void> {
+		const productInflowingToInventoryOrigin: InventoryOperationDescriptionInput[] = [];
+		const productOutflowingToInventoryOrigin: InventoryOperationDescriptionInput[] = [];
+
 		if (inventory_operation_descriptions.length === 0) {
 			throw new BusinessRuleException('Inventory operation descriptions are required.');
 		}
 
-		const originInventory = await this.retrieveInventoryById(id_inventory_origin);
+		// Determining type of adjustments
+		// Ensuring all movements will be positives.
+		for (const itemAdjustment of inventory_operation_descriptions) {
+			if (itemAdjustment.quantity < 0) {
+				productOutflowingToInventoryOrigin.push({...itemAdjustment, quantity: itemAdjustment.quantity * -1});
+			} else {
+				productInflowingToInventoryOrigin.push({...itemAdjustment});
+			}
+		}
+		
+		// Resolving adjustment for product outflowing
+		if (productOutflowingToInventoryOrigin.length > 0) {
+			await this.executeAdjustmentProcess(
+				id_inventory_origin,
+				created_by,
+				productOutflowingToInventoryOrigin,
+				true,
+				id_inventory_operation,
+				created_at,
+				latitude,
+				longitude,
+			);
+		}
+
+		// Resolving adjustment for product inflowing
+		if (productOutflowingToInventoryOrigin.length > 0) {
+			await this.executeAdjustmentProcess(
+				id_inventory_origin,
+				created_by,
+				productOutflowingToInventoryOrigin,
+				false,
+				id_inventory_operation,
+				created_at,
+				latitude,
+				longitude,
+			);
+		}
+
+		
+	}
+
+	private async executeAdjustmentProcess(
+		id_inventory_origin: string,
+		created_by: string,
+		inventory_operation_descriptions: InventoryOperationDescriptionInput[],
+		inflowForOriginInvetory: boolean,
+		id_inventory_operation?: string,
+		created_at?: Date,
+		latitude?: string,
+		longitude?: string,
+	) {
+			const originInventory = await this.retrieveInventoryById(id_inventory_origin);
 		const adjustmentVirtualInventory = await this.retrieveUniqueInventoryByContext(
 			INVENTORY_CONTEXT_ENUM.ADJUSTMENT_VIRTUAL,
 		);
@@ -51,7 +110,11 @@ export class RegisterInventoryAdjustmentCommand {
 		const createdAtToUse = created_at ?? new Date();
 		const inventoryOperationIdToUse = id_inventory_operation ?? this.integrityRepository.generateUUIDv4();
 
-		const aggregate = new InventoryOperationAggregate(originInventory, adjustmentVirtualInventory);
+
+		const aggregate = new InventoryOperationAggregate(
+			inflowForOriginInvetory ? adjustmentVirtualInventory : originInventory, 
+			inflowForOriginInvetory ? originInventory : adjustmentVirtualInventory, 
+		);
 
 		aggregate.createAdjustmentOperation(
 			inventoryOperationIdToUse,
@@ -79,7 +142,7 @@ export class RegisterInventoryAdjustmentCommand {
 		const affectedBalanceRecords = aggregate.getAffectedInventoryBalanceRecords();
 		for (const balanceRecord of affectedBalanceRecords) {
 			await this.inventoryRepository.UpsertInventoryBalance(balanceRecord);
-		}
+		}		
 	}
 
 	private async retrieveInventoryById(id_inventory: string): Promise<InventoryEntity> {

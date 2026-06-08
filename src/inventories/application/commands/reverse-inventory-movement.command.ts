@@ -49,12 +49,18 @@ export class ReverseInventoryMovementCommand {
 		]);
 
 		await this.assertInventoryOperationNotPreviouslyReversed(id_inventory_operation_to_reverse);
+		this.assertRequestedInventoriesMatchOperationToReverse(
+			inventoryOperationToReverse,
+			id_inventory_origin,
+			id_inventory_target,
+		);
+		await this.assertInventoryOperationToReverseIsLastForInvolvedInventories(inventoryOperationToReverse);
 		await this.assertProductsValid(inventory_operation_descriptions);
 
 		const createdAtToUse = created_at ?? new Date();
 		const inventoryOperationIdToUse = id_inventory_operation ?? this.integrityRepository.generateUUIDv4();
 
-		const aggregate = new InventoryOperationAggregate(originInventory, destinationInventory);
+		const aggregate = new InventoryOperationAggregate(destinationInventory, originInventory);
 
 		aggregate.reverseInventoryOperation(
 			inventoryOperationIdToUse,
@@ -127,6 +133,94 @@ export class ReverseInventoryMovementCommand {
 				`Inventory operation with id ${id_inventory_operation_to_reverse} has already been reversed.`,
 			);
 		}
+	}
+
+	private assertRequestedInventoriesMatchOperationToReverse(
+		inventoryOperationToReverse: InventoryOperationEntity,
+		id_inventory_origin: string,
+		id_inventory_target: string,
+	): void {
+		if (
+			inventoryOperationToReverse.id_inventory_origin !== id_inventory_origin
+			|| inventoryOperationToReverse.id_inventory_target !== id_inventory_target
+		) {
+			throw new BusinessRuleException(
+				`Inventory operation ${inventoryOperationToReverse.id_inventory_operation} does not belong to the requested inventory route ${id_inventory_origin} -> ${id_inventory_target}.`,
+			);
+		}
+	}
+
+	private async assertInventoryOperationToReverseIsLastForInvolvedInventories(
+		inventoryOperationToReverse: InventoryOperationEntity,
+	): Promise<void> {
+		const { id_inventory_origin, id_inventory_target, id_inventory_operation } = inventoryOperationToReverse;
+
+		const involvedInventoryIds = new Set<string>([id_inventory_origin, id_inventory_target]);
+
+		for (const id_inventory of involvedInventoryIds) {
+			const latestOperation = await this.retrieveLatestOperationForInventory(id_inventory);
+
+			if (latestOperation && latestOperation.id_inventory_operation !== id_inventory_operation) {
+				throw new BusinessRuleException(
+					`Inventory operation ${id_inventory_operation} cannot be reversed because it is not the latest operation affecting inventory ${id_inventory}. Latest operation is ${latestOperation.id_inventory_operation}.`,
+				);
+			}
+		}
+	}
+
+	private async retrieveLatestOperationForInventory(
+		id_inventory: string,
+	): Promise<InventoryOperationEntity | undefined> {
+		const [latestAsOrigin, latestAsTarget] = await Promise.all([
+			this.inventoryRepository.listInventoryOperations(
+				1,
+				undefined,
+				undefined,
+				undefined,
+				undefined,
+				undefined,
+				undefined,
+				[id_inventory],
+				undefined,
+			),
+			this.inventoryRepository.listInventoryOperations(
+				1,
+				undefined,
+				undefined,
+				undefined,
+				undefined,
+				undefined,
+				undefined,
+				undefined,
+				[id_inventory],
+			),
+		]);
+
+		const latestOriginOperation = latestAsOrigin[0];
+		const latestTargetOperation = latestAsTarget[0];
+
+		if (!latestOriginOperation) {
+			return latestTargetOperation;
+		}
+
+		if (!latestTargetOperation) {
+			return latestOriginOperation;
+		}
+
+		const latestOriginOperationDate = new Date(latestOriginOperation.created_at).getTime();
+		const latestTargetOperationDate = new Date(latestTargetOperation.created_at).getTime();
+
+		if (latestOriginOperationDate > latestTargetOperationDate) {
+			return latestOriginOperation;
+		}
+
+		if (latestTargetOperationDate > latestOriginOperationDate) {
+			return latestTargetOperation;
+		}
+
+		return latestOriginOperation.id_inventory_operation > latestTargetOperation.id_inventory_operation
+			? latestOriginOperation
+			: latestTargetOperation;
 	}
 
 	private async assertProductsValid(

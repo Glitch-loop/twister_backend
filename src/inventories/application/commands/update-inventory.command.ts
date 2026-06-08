@@ -52,7 +52,7 @@ export class UpdateInventoryCommand {
 			for (const inventoryBalance of affectedInventoryBalanceRecords) {
 				await this.inventoryRepository.UpsertInventoryBalance(inventoryBalance);
 			}
-		}		
+		}
 
 		await this.inventoryRepository.UpdateInventory(updatedInventory);
 	}

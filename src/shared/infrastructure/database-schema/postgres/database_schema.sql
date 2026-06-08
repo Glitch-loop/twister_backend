@@ -253,6 +253,8 @@ CREATE TABLE public.inventories_balance (
   updated_at timestamp without time zone,
   id_inventory uuid NOT NULL,
   id_product uuid NOT NULL,
+  min_quantity numeric,
+  max_quantity numeric,
   CONSTRAINT inventories_balance_pkey PRIMARY KEY (id_inventory_balance),
   CONSTRAINT inventories_balance_id_inventory_fkey FOREIGN KEY (id_inventory) REFERENCES public.inventories(id_inventory),
   CONSTRAINT inventories_balance_id_product_fkey FOREIGN KEY (id_product) REFERENCES public.products(id_product)
@@ -267,6 +269,7 @@ CREATE TABLE public.inventories (
   assigned_to uuid,
   assigned_facility uuid,
   created_by uuid NOT NULL,
+  stock_validation smallint NOT NULL,
   CONSTRAINT inventories_pkey PRIMARY KEY (id_inventory),
   CONSTRAINT inventories_assigned_to_fkey FOREIGN KEY (assigned_to) REFERENCES public.users(id_user),
   CONSTRAINT inventories_assigned_facility_fkey FOREIGN KEY (assigned_facility) REFERENCES public.facilities(id_facility),
