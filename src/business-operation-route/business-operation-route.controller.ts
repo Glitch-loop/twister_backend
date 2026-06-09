@@ -145,8 +145,9 @@ Related to route transaction
 - cancel_route_transaction: ${DAY_OPERATIONS_ENUM.cancel_route_transaction}
 
 Related to client operations
+- prospect_registration: ${DAY_OPERATIONS_ENUM.prospect_registration}
+- new_client_confirmation: ${DAY_OPERATIONS_ENUM.new_client_confirmation}
 - attention_out_of_route: ${DAY_OPERATIONS_ENUM.attention_out_of_route}
-- new_client_registration: ${DAY_OPERATIONS_ENUM.new_client_registration}
 - route_client_attention: ${DAY_OPERATIONS_ENUM.route_client_attention}
 - attend_client_petition: ${DAY_OPERATIONS_ENUM.attend_client_petition}
 `,

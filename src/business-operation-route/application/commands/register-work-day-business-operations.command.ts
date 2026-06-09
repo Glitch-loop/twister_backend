@@ -97,7 +97,8 @@ export class RegisterWorkDayBusinessOperationsCommand {
 			return;
 		}
 		
-		const newClientLocationOperation = newOperations.filter((operation) => operation.id_operation_type === DAY_OPERATIONS_ENUM.new_client_registration);
+		const newClientLocationOperation = newOperations.filter((operation) => operation.id_operation_type === DAY_OPERATIONS_ENUM.new_client_confirmation);
+		// Process for integrating a new client 
 		if (newClientLocationOperation.length > 0) {
 			newClientLocationOperation.forEach((newClientRegistry) => {
 				if (newClientRegistry.id_work_day !== id_work_day) throw new BusinessRuleException(`The business operation with id ${newClientRegistry.id_work_day_operation} (type of operation: register new client) is invalid. Work days differ. Work day that belongs the new client record: ${newClientRegistry.id_work_day}. Work day of the request ${id_work_day}`)
@@ -128,7 +129,7 @@ export class RegisterWorkDayBusinessOperationsCommand {
 			});
 
 			if (id_organization_strategy === ROUTE_ORGANIZATION_STRATEGIES_ENUM.AFTER_LAST_VISIT_OPERATION) {
-				const operationDays = new Set<DAY_OPERATIONS_ENUM>([DAY_OPERATIONS_ENUM.client_visited, DAY_OPERATIONS_ENUM.new_client_registration]);
+				const operationDays = new Set<DAY_OPERATIONS_ENUM>([DAY_OPERATIONS_ENUM.client_visited, DAY_OPERATIONS_ENUM.new_client_confirmation, DAY_OPERATIONS_ENUM.prospect_registration]);
 
 				for (const newClientOp of newClientLocationOperation) { 
 					const { id_location, id_work_day_operation  } = newClientOp;
@@ -201,6 +202,17 @@ export class RegisterWorkDayBusinessOperationsCommand {
 		}
 		
 		await this.workDayRepository.insertWorkDayHistoric(newOperations);
+
+
+		newOperations.forEach((newOperation) => {
+			const { id_operation_type, id_location } = newOperation;
+			if (id_operation_type === DAY_OPERATIONS_ENUM.new_client_confirmation) {
+				this.eventEmitter.emit(
+					DOMAIN_EVENT_ENUM.CONFIRMED_CLIENT_EVENT,
+					id_location
+				)
+			}
+		})
 
 		this.eventEmitter.emit(
 			DOMAIN_EVENT_ENUM.BUSINESS_OPERATION_EVENT,

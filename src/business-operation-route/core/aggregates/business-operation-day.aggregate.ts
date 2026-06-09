@@ -48,8 +48,11 @@ export class BusinessOperationDayAggregate {
 			case DAY_OPERATIONS_ENUM.attention_out_of_route:
 				this.registerClientAttentionOutOfRoute(params);
 				return;
-			case DAY_OPERATIONS_ENUM.new_client_registration:
-				this.registerCreateNewClient(params);
+			case DAY_OPERATIONS_ENUM.prospect_registration:
+				this.registerProspectClient(params);
+				return;
+			case DAY_OPERATIONS_ENUM.new_client_confirmation:
+				this.registerClientConfirmation(params);
 				return;
 			case DAY_OPERATIONS_ENUM.attend_client_petition:
 				this.registerAttendClientPetition(params);
@@ -188,7 +191,7 @@ export class BusinessOperationDayAggregate {
 		this.insertOperationDayNextToCurrentOperation(newDayOperation);
 	}
 
-	private registerCreateNewClient(params: CreateBusinessOperationParams): void {
+	private registerProspectClient(params: CreateBusinessOperationParams): void {
 		if (!params.id_location) {
 			throw new BusinessRuleException('id_location is required for new client registration operations.');
 		}
@@ -197,7 +200,35 @@ export class BusinessOperationDayAggregate {
 
 		const newDayOperation = new WorkDayOperationHistoricEntity(
 			params.id_work_day_operation,
-			DAY_OPERATIONS_ENUM.new_client_registration,
+			DAY_OPERATIONS_ENUM.new_client_confirmation,
+			params.created_at,
+			params.id_work_day,
+			params.latitude,
+			params.longitude,
+			params.id_location,
+			null,
+			null,
+			params.id_route_day,
+			params.id_day_operation_dependent,
+		);
+
+		this.insertOperationDayNextToCurrentOperation(newDayOperation);
+	}
+
+	private registerClientConfirmation(params: CreateBusinessOperationParams): void {
+		if (!params.id_location) {
+			throw new BusinessRuleException('id_location is required for new client confirmation operation.');
+		}
+
+		if (!params.id_route_transaction) {
+			throw new BusinessRuleException('id_route_transaction is required for new client confirmation operation.');
+		}
+
+		this.verifyClientIsNotBeingRepeatedForClientOperations(params.id_location);
+
+		const newDayOperation = new WorkDayOperationHistoricEntity(
+			params.id_work_day_operation,
+			DAY_OPERATIONS_ENUM.new_client_confirmation,
 			params.created_at,
 			params.id_work_day,
 			params.latitude,
@@ -373,7 +404,7 @@ export class BusinessOperationDayAggregate {
 				&& (
 					dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.route_client_attention
 					|| dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.attend_client_petition
-					|| dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.new_client_registration
+					|| dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.new_client_confirmation
 					|| dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.attention_out_of_route
 					|| dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.client_visited
 				);

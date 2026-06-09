@@ -12,6 +12,7 @@ import { LocationTypeObjectValue } from '@/src/clients/core/object-values/locati
 import { TaxClientInformationEntity } from '@/src/clients/core/entities/tax-client-information.entity';
 import { LocationEntity } from '@/src/clients/core/entities/location.entity';
 import { FurnitureEntity } from '@/src/clients/core/entities/furniture.entity';
+import { BusinessRuleException } from '@/src/shared/errors/BusinessRuleException';
 
 export class ClientAggregate {
   private _taxClientInformation: TaxClientInformationEntity | null;
@@ -156,6 +157,39 @@ export class ClientAggregate {
     
     return newLocation;
   }
+
+  confirmNewClient(idLocation: string): LocationEntity {
+    const clientToConfirm: LocationEntity|undefined = this.locations.find((location) => location.id_location === idLocation);
+
+    if(clientToConfirm === undefined) throw new BusinessRuleException(`The location with the ID: ${idLocation} is corrupted. Location should belong to ${this._taxClientInformation?.id_client} but it shouldn't`)
+
+    if(clientToConfirm.status_location !== LOCATION_STATUS_ENUM.CLIENT_PROSPECT) throw new BusinessRuleException(`Only clients with status of prospect (${LOCATION_STATUS_ENUM.CLIENT_PROSPECT}) can be confirmed as new clients. The client with id ${clientToConfirm.id_client} has the status ${clientToConfirm.status_location}`)
+      
+    const updatedLocation = new LocationEntity(
+      clientToConfirm.id_location,
+      clientToConfirm.street,
+      clientToConfirm.ext_number,
+      clientToConfirm.colony,
+      clientToConfirm.postal_code,
+      clientToConfirm.location_name,
+      clientToConfirm.latitude,
+      clientToConfirm.longitude,
+      LOCATION_STATUS_ENUM.CLIENT,
+      clientToConfirm.id_creator,
+      clientToConfirm.id_client,
+      clientToConfirm.created_at,
+      new Date(),
+      clientToConfirm.location_type,
+      clientToConfirm.notes,
+      clientToConfirm.address_reference,
+    );
+
+    this._locations = this._locations.map((loc) =>
+      loc.id_location === idLocation ? updatedLocation : loc,
+    );
+
+    return updatedLocation;
+  } 
 
   addNoteToLocation(_id_location: string, _notes: NoteObjectValue[]): void {
     const locationSet = new Set(this._locations.map((loc) => loc.id_location));

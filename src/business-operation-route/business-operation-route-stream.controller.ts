@@ -6,6 +6,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { OnEvent } from '@nestjs/event-emitter';
 import { Subject, map, Observable, merge } from 'rxjs';
 
+// Shared
 import { DOMAIN_EVENT_ENUM } from '@/src/shared/core/enums/domain-event.enum';
 
 @ApiTags('Business Operation Route Streams')
