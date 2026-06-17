@@ -222,7 +222,7 @@ export class Mapper {
 				new RouteDayLocationObjectValue(
 					location.position_in_route,
 					location.id_location,
-					location.id_user,
+					location.id_location,
 					location.id_route_day_location,
 				),
 			),

@@ -39,9 +39,9 @@ export class SecurityController {
 			type: 'object',
 			required: ['cellphone', 'password'],
 			properties: {
-				phone: {
+				cellphone: {
 					type: 'string',
-					example: '+525512345678',
+					example: '3215898747',
 				},
 				password: {
 					type: 'string',

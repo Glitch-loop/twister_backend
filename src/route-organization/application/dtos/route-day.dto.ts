@@ -13,7 +13,7 @@ export class RouteDayDto {
 
   @ApiProperty({ type: [RouteDayLocationDto] })
   public readonly locations: RouteDayLocationDto[];
-
+  
   constructor(
     id_route_day: string,
     id_route: string,
