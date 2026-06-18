@@ -1,3 +1,4 @@
 export interface httpResponseLoginInterface {
-  access_token: string 
+  message: string
+  data: string 
 }

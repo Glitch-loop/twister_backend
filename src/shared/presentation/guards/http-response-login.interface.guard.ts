@@ -8,6 +8,7 @@ export function isHttpResponseLogin(value: unknown): value is httpResponseLoginI
   const record = value as Record<string, unknown>;
 
   return (
-    typeof record.access_token === 'string'
+    typeof record.message === 'string' &&
+    typeof record.data === 'string'
   );
 }

@@ -13,7 +13,9 @@ export class RouteDayDto {
 
   @ApiProperty({ type: [RouteDayLocationDto] })
   public readonly locations: RouteDayLocationDto[];
-  
+
+  // Expied at field is no set in this dto because it's a behaviour from backend, so is not necessary frontend know about it.
+
   constructor(
     id_route_day: string,
     id_route: string,

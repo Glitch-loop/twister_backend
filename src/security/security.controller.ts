@@ -111,7 +111,8 @@ export class SecurityController {
 		const tokenManager = new UserTokenManager(data.id_user, data.cellphone, jwtSecret)
 
 		return {
-			access_token: tokenManager.generateToken(),
+			message: "Login sucessfully.",
+			data: tokenManager.generateToken(),
 		};
 	}
 }
