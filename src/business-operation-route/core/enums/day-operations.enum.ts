@@ -5,15 +5,16 @@ export enum DAY_OPERATIONS_ENUM {
 	end_shift_inventory 					= 'b94e615c-9899-4e82-99f1-979d773b8341',
 	product_devolution_inventory 	= '8e93283a-39a3-4b2d-9383-af418d6ddfe2',
 	consult_inventory 						= 'f3055418-04ea-4d27-baf5-7da940e47662',
-	cancel_inventory_operation 		= 'be37a25c-f06a-4d8a-b2e5-de56c163ac0c', // This operation doesn't exist in the central database.
+	cancel_inventory_operation 		= 'be37a25c-f06a-4d8a-b2e5-de56c163ac0c',
 
 	// Related to route transactions.
 	product_devolution 				= '8ebe4f07-d28e-46f5-988e-3ab3790e612d',
 	sales 										= '992f002c-13e2-4fb8-ac20-b7b571b9162a',
+	sample 										= 'f77da214-a8e8-480b-ac8d-e41d2ed6c5af',
 	product_reposition 				= 'ec313b8e-ba1d-4a77-bbfb-bb662663720c',
 	route_transaction 				= '3dfde724-fb9c-4944-b38b-2022a9689bb4',
-	cancel_route_transaction 	= 'f11d95a4-2d40-4dad-9209-d2731c884597', // This operation doesn't exist in the central database.
-
+	cancel_route_transaction 	= 'f11d95a4-2d40-4dad-9209-d2731c884597',
+	
 	// Related to client operations.
 	prospect_registration 	= '144addfa-2963-486e-9c13-0ac97537fda3',
 	new_client_confirmation = 'a29dccef-d5a0-470d-a353-2f95e1057514',
