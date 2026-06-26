@@ -130,26 +130,28 @@ date at moment of the creation.`,
 		description: `Adds operation records to a work day and returns a standardized controller response.
 Supported operations:
 Related to inventory
-- start_shift_inventory: ${DAY_OPERATIONS_ENUM.start_shift_inventory}
-- restock_inventory: ${DAY_OPERATIONS_ENUM.restock_inventory}
-- end_shift_inventory: ${DAY_OPERATIONS_ENUM.end_shift_inventory}
+- start_shift_inventory: 				${DAY_OPERATIONS_ENUM.start_shift_inventory}
+- restock_inventory: 						${DAY_OPERATIONS_ENUM.restock_inventory}
+- end_shift_inventory: 					${DAY_OPERATIONS_ENUM.end_shift_inventory}
 - product_devolution_inventory: ${DAY_OPERATIONS_ENUM.product_devolution_inventory}
-- consult_inventory: ${DAY_OPERATIONS_ENUM.consult_inventory}
-- cancel_inventory_operation: ${DAY_OPERATIONS_ENUM.cancel_inventory_operation}
+- consult_inventory: 						${DAY_OPERATIONS_ENUM.consult_inventory}
+- cancel_inventory_operation:		${DAY_OPERATIONS_ENUM.cancel_inventory_operation}
 
 Related to route transaction
-- product_devolution: ${DAY_OPERATIONS_ENUM.product_devolution}
-- sales: ${DAY_OPERATIONS_ENUM.sales}
-- product_reposition: ${DAY_OPERATIONS_ENUM.product_reposition}
-- route_transaction: ${DAY_OPERATIONS_ENUM.route_transaction}
+- product_devolution: 			${DAY_OPERATIONS_ENUM.product_devolution}
+- sales: 										${DAY_OPERATIONS_ENUM.sales}
+- sample: 									${DAY_OPERATIONS_ENUM.sample}
+- product_reposition: 			${DAY_OPERATIONS_ENUM.product_reposition}
+- route_transaction: 				${DAY_OPERATIONS_ENUM.route_transaction}
 - cancel_route_transaction: ${DAY_OPERATIONS_ENUM.cancel_route_transaction}
 
 Related to client operations
-- prospect_registration: ${DAY_OPERATIONS_ENUM.prospect_registration}
-- new_client_confirmation: ${DAY_OPERATIONS_ENUM.new_client_confirmation}
-- attention_out_of_route: ${DAY_OPERATIONS_ENUM.attention_out_of_route}
-- route_client_attention: ${DAY_OPERATIONS_ENUM.route_client_attention}
-- attend_client_petition: ${DAY_OPERATIONS_ENUM.attend_client_petition}
+- prospect_registration: 		${DAY_OPERATIONS_ENUM.prospect_registration}
+- new_client_confirmation: 	${DAY_OPERATIONS_ENUM.new_client_confirmation}
+- attention_out_of_route: 	${DAY_OPERATIONS_ENUM.attention_out_of_route}
+- route_client_attention: 	${DAY_OPERATIONS_ENUM.route_client_attention}
+- attend_client_petition: 	${DAY_OPERATIONS_ENUM.attend_client_petition}
+- client_visited: 					${DAY_OPERATIONS_ENUM.client_visited}
 `,
 	})
 	@ApiBody({

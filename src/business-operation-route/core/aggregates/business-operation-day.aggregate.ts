@@ -64,6 +64,7 @@ export class BusinessOperationDayAggregate {
 			case DAY_OPERATIONS_ENUM.cancel_route_transaction:
 			case DAY_OPERATIONS_ENUM.product_devolution:
 			case DAY_OPERATIONS_ENUM.sales:
+			case DAY_OPERATIONS_ENUM.sample:
 			case DAY_OPERATIONS_ENUM.product_reposition:
 				this.registerRouteTransactionOperation(params);
 				return;
