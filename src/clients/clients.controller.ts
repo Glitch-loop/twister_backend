@@ -224,6 +224,7 @@ export class ClientsController {
    */
   @ApiOperation({ summary: 'Create location', description: `Creates a location for a client context.
     Notes:
+    
     - Client may provide an UUIDv4 for the new client otherwise the server will assign one.
     - A new client will be always created with the status of "Prospect".` })
   @ApiOkResponse({ description: 'Standardized response with operation message.' })
