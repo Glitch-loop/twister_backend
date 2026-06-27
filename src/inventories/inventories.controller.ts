@@ -9,7 +9,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-
 // Commands
 import { CreateInventoryCommand } from '@/src/inventories/application/commands/create-inventory.command';
 import { DeactiveInventoryCommand } from '@/src/inventories/application/commands/deactive-inventory.command';

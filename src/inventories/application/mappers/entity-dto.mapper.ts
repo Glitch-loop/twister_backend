@@ -18,6 +18,7 @@ import { InventoryDto } from '@/src/inventories/application/dtos/inventory.dto';
 import { InventoryOperationDto } from '@/src/inventories/application/dtos/inventory-operation.dto';
 import { InventoryBalanceDto } from '@/src/inventories/application/dtos/inventory-balance.dto';
 import { InventoryOperationDescriptionDto } from '@/src/inventories/application/dtos/inventory-operation-description.dto';
+import { RouteInventoryOperationDescriptionDto } from '@/src/inventories/application/dtos/route-inventory-operation-description.dto';
 
 // Entity guards
 import { isInventoryEntity } from '@/src/inventories/application/guards/entities/inventory.guard';
@@ -32,6 +33,7 @@ import { isInventoryDto } from '@/src/inventories/application/guards/dtos/invent
 import { isInventoryOperationDto } from '@/src/inventories/application/guards/dtos/inventory-operation.guard';
 import { isInventoryBalanceDto } from '@/src/inventories/application/guards/dtos/inventory-balance.guard';
 import { isInventoryOperationDescriptionDto } from '@/src/inventories/application/guards/dtos/inventory-operation-description.guard';
+import { isRouteInventoryOperationDescriptionDto } from '@/src/inventories/application/guards/dtos/route-inventory-operation-description.guard';
 
 @Injectable()
 export class EntityDtoMapper {
@@ -39,17 +41,22 @@ export class EntityDtoMapper {
 	// toDomainObject overloads
 	toDomainObject(dto: InventoryBalanceDto): InventoryBalanceObjectValue;
 	toDomainObject(dto: InventoryOperationDescriptionDto): InventoryOperationDescriptionObjectValue;
+	toDomainObject(dto: RouteInventoryOperationDescriptionDto): InventoryOperationDescriptionObjectValue;
 	toDomainObject(dto: InventoryDto): InventoryEntity;
 	toDomainObject(dto: InventoryOperationDto): InventoryOperationEntity;
 	toDomainObject(
 		dto:
 			| InventoryBalanceDto
 			| InventoryOperationDescriptionDto
+			| RouteInventoryOperationDescriptionDto
 			| InventoryDto
 			| InventoryOperationDto,
 	): any {
 		if (isInventoryBalanceDto(dto)) {
 			return this.inventoryBalanceDtoToDomainObject(dto);
+		}
+		if (isRouteInventoryOperationDescriptionDto(dto)) {
+			return this.routeInventoryOperationDescriptionDtoToDomainObject(dto);
 		}
 		if (isInventoryOperationDescriptionDto(dto)) {
 			return this.inventoryOperationDescriptionDtoToDomainObject(dto);
@@ -177,6 +184,22 @@ export class EntityDtoMapper {
 
 		return new InventoryOperationDescriptionObjectValue(
 			dto.id_inventory_operation_description,
+			dto.price_at_moment,
+			dto.cost_at_moment,
+			dto.quantity,
+			createdAt,
+			dto.id_inventory_operation,
+			dto.id_product,
+		);
+	}
+
+	private routeInventoryOperationDescriptionDtoToDomainObject(
+		dto: RouteInventoryOperationDescriptionDto,
+	): InventoryOperationDescriptionObjectValue {
+		const createdAt = this.toDate(dto.created_at, 'RouteInventoryOperationDescriptionDto.created_at');
+
+		return new InventoryOperationDescriptionObjectValue(
+			dto.id_product_operation_description,
 			dto.price_at_moment,
 			dto.cost_at_moment,
 			dto.quantity,
