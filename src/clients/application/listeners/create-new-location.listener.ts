@@ -16,7 +16,7 @@ import { TaxClientInformationEntity } from '@/src/clients/core/entities/tax-clie
 
 // Enums
 import { DOMAIN_EVENT_ENUM } from '@/src/shared/core/enums/domain-event.enum';
-import type { ConfirmedClientEvent } from '@/src/shared/events/interfaces/ConfirmedClientEvent';
+import type { ConfirmedClientEvent } from '@/src/shared/events/interfaces/confirmed-client-event.interface';
 import { BusinessRuleException } from '@/src/shared/errors/BusinessRuleException';
 
 console.log("LISTENER ENUM CHECK:", DOMAIN_EVENT_ENUM.CONFIRMED_CLIENT_EVENT);

@@ -32,7 +32,7 @@ import { ROUTE_ORGANIZATION_STRATEGIES_ENUM } from '@/src/route-organization/cor
 import { RouteDayLocationObjectValue } from '@/src/route-organization/core/value-objects/route-day-location.object-value';
 import { OrganizeRouteDayCommand } from '@/src/route-organization/application/commands/organize-route-day.command';
 import { DOMAIN_EVENT_ENUM } from '@/src/shared/core/enums/domain-event.enum';
-import { ConfirmedClientEvent } from '@/src/shared/events/interfaces/ConfirmedClientEvent';
+import { ConfirmedClientEvent } from '@/src/shared/events/interfaces/confirmed-client-event.interface';
 
 console.log("EMITTER ENUM CHECK:", DOMAIN_EVENT_ENUM.CONFIRMED_CLIENT_EVENT);
 @Injectable()
