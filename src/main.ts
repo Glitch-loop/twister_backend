@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,9 +13,14 @@ async function bootstrap() {
   .setVersion('1.0')
   .build();
 
+  // const eventEmitter = app.get(EventEmitter2);
+  // eventEmitter.onAny((event, value) => {
+  //   console.log(`[EVENT_DEBUG] Received event: "${event}"`);
+  //   console.log(`[EVENT_DEBUG] Payload:`, value);
+  // });
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document)
-  app.close();  
   await app.listen(process.env.PORT ?? 3000);
 }
 

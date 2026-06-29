@@ -1,5 +1,5 @@
 // Libraries
-import { Injectable, Inject, forwardRef } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter'
 
 // Interfaces
@@ -24,12 +24,12 @@ console.log("LISTENER ENUM CHECK:", DOMAIN_EVENT_ENUM.CONFIRMED_CLIENT_EVENT);
 @Injectable()
 export class CreateNewLocationListener {
   constructor(
-    @Inject(forwardRef(() => LocationRepository)) private readonly locationRepository: LocationRepository,
-    @Inject(forwardRef(() => ClientRepository)) private readonly clientRepository: ClientRepository,
+    @Inject(LocationRepository) private readonly locationRepository: LocationRepository,
+    @Inject(ClientRepository) private readonly clientRepository: ClientRepository,
   ) { }
 
   @OnEvent(DOMAIN_EVENT_ENUM.CONFIRMED_CLIENT_EVENT, { async: true })
-  async handleClientConfirmed(payload: ConfirmedClientEvent) {
+  private async handleClientConfirmed(payload: ConfirmedClientEvent) {
     console.log("MODIFYING LOCATION DOMAIN EVENT LISTENER.")
     console.log(payload)
     try {
