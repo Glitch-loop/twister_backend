@@ -66,7 +66,7 @@ export class Mapper {
 			return this.workDayModelToDomainObject(model, workDayNoteModels);
 		}
 
-		throw new Error('Invalid input for mapping to domain object.');
+		throw new Error('Invalid input for mapping from model to domain object.');
 	}
 
 	// ==================== MAPPER METHODS DOMAIN OBJECT to MODEL ====================

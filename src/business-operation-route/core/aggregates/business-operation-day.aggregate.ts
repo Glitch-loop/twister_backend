@@ -173,8 +173,6 @@ export class BusinessOperationDayAggregate {
 			throw new BusinessRuleException('id_location is required for attention out of route operations.');
 		}
 
-		this.verifyClientIsNotBeingRepeatedForClientOperations(params.id_location);
-
 		const newDayOperation = new WorkDayOperationHistoricEntity(
 			params.id_work_day_operation,
 			DAY_OPERATIONS_ENUM.attention_out_of_route,
@@ -197,11 +195,11 @@ export class BusinessOperationDayAggregate {
 			throw new BusinessRuleException('id_location is required for new client registration operations.');
 		}
 
-		this.verifyClientIsNotBeingRepeatedForClientOperations(params.id_location);
+		this.verifyClientIsNotBeingRepeatedForClientOperations(params.id_location, DAY_OPERATIONS_ENUM.prospect_registration);
 
 		const newDayOperation = new WorkDayOperationHistoricEntity(
 			params.id_work_day_operation,
-			DAY_OPERATIONS_ENUM.new_client_confirmation,
+			DAY_OPERATIONS_ENUM.prospect_registration,
 			params.created_at,
 			params.id_work_day,
 			params.latitude,
@@ -225,7 +223,7 @@ export class BusinessOperationDayAggregate {
 			throw new BusinessRuleException('id_route_transaction is required for new client confirmation operation.');
 		}
 
-		this.verifyClientIsNotBeingRepeatedForClientOperations(params.id_location);
+		this.verifyClientIsNotBeingRepeatedForClientOperations(params.id_location, DAY_OPERATIONS_ENUM.new_client_confirmation);
 
 		const newDayOperation = new WorkDayOperationHistoricEntity(
 			params.id_work_day_operation,
@@ -235,7 +233,7 @@ export class BusinessOperationDayAggregate {
 			params.latitude,
 			params.longitude,
 			params.id_location,
-			null,
+			params.id_route_transaction,
 			null,
 			params.id_route_day,
 			params.id_day_operation_dependent,
@@ -248,8 +246,6 @@ export class BusinessOperationDayAggregate {
 		if (!params.id_location) {
 			throw new BusinessRuleException('id_location is required for attend client petition operations.');
 		}
-
-		this.verifyClientIsNotBeingRepeatedForClientOperations(params.id_location);
 
 		const newDayOperation = new WorkDayOperationHistoricEntity(
 			params.id_work_day_operation,
@@ -272,8 +268,6 @@ export class BusinessOperationDayAggregate {
 		if (!params.id_location) {
 			throw new BusinessRuleException('id_location is required for client visited operations.');
 		}
-
-		this.verifyClientIsNotBeingRepeatedForClientOperations(params.id_location);
 
 		const newDayOperation = new WorkDayOperationHistoricEntity(
 			params.id_work_day_operation,
@@ -326,8 +320,8 @@ export class BusinessOperationDayAggregate {
 			params.latitude,
 			params.longitude,
 			null,
-			params.id_inventory_operation,
 			null,
+			params.id_inventory_operation,
 			params.id_route_day,
 			params.id_day_operation_dependent,
 		);
@@ -393,7 +387,7 @@ export class BusinessOperationDayAggregate {
 		return indexCurrentOperationDay;
 	}
 
-	private verifyClientIsNotBeingRepeatedForClientOperations(idClient: string): void {
+	private verifyClientIsNotBeingRepeatedForClientOperations(idLocation: string, id_operation_type_to_valid: DAY_OPERATIONS_ENUM): void {
 		if (this.dayOperations === null) {
 			throw new BusinessRuleException(
 				'There are no operations registered for the day. So the operation cannot be registered.',
@@ -401,14 +395,7 @@ export class BusinessOperationDayAggregate {
 		}
 
 		const isClientAlreadyRegistered = this.dayOperations.some((dayOperation) => {
-			return dayOperation.id_location === idClient
-				&& (
-					dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.route_client_attention
-					|| dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.attend_client_petition
-					|| dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.new_client_confirmation
-					|| dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.attention_out_of_route
-					|| dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.client_visited
-				);
+			return dayOperation.id_location === idLocation && dayOperation.id_operation_type === id_operation_type_to_valid
 		});
 
 		if (isClientAlreadyRegistered) {

@@ -107,13 +107,13 @@ export class WorkDaySupabaseRepository implements WorkDayRepository {
 		}
 	}
 
-	async insertWorkDayHistoric(work_day_operations_hisotic: WorkDayOperationHistoricEntity[]): Promise<void> {
+	async insertWorkDayHistoric(work_day_operations_historic: WorkDayOperationHistoricEntity[]): Promise<void> {
 		try {
-			if (work_day_operations_hisotic.length === 0) {
+			if (work_day_operations_historic.length === 0) {
 				return;
 			}
 
-			const historicModel: WorkDayOperationHistoricModel[] = work_day_operations_hisotic.map((historic) =>
+			const historicModel: WorkDayOperationHistoricModel[] = work_day_operations_historic.map((historic) =>
 				this.mapper.toModel(historic),
 			);
 

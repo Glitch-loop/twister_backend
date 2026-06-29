@@ -48,6 +48,7 @@ export class BusinessOperationRouteStreamController {
 
   @OnEvent(DOMAIN_EVENT_ENUM.BUSINESS_OPERATION_EVENT, { async: true })
   handleBusinessOperationEvent(payload: unknown): void {
+    console.log("Business operation generated: ", payload)
     this.businessOperation$.next(payload);
   }
 

@@ -45,7 +45,7 @@ import { HttpInterceptor } from '@/src/http.interceptor';
     {
       provide: APP_INTERCEPTOR,
       useClass: HttpInterceptor
-    }
+    },
   ],
 })
 export class AppModule {}

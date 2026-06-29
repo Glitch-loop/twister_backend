@@ -39,7 +39,7 @@ the process determines to which inventories the operaion affects using the inven
 operation type applying the changes to the affected inventories.
 `,
   })
-  @ApiBody({ type: RouteInventoryOperationDto })
+  @ApiBody({ type: [ RouteInventoryOperationDto ] })
   @ApiOkResponse({ description: 'Standardized response with operation message.' })
   @Post('')
   async createInventory(@Body() body: RouteInventoryOperationDto[]): Promise<httpControllerResponse> {

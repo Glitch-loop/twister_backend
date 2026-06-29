@@ -40,6 +40,7 @@ import { ClientsController } from '@/src/clients/clients.controller';
 
 // Modules
 import { SharedModule } from '@/src/shared/shared.module';
+import { CreateNewLocationListener } from './application/listeners/create-new-location.listener';
 
 @Module({
   imports: [SharedModule],
@@ -73,6 +74,7 @@ import { SharedModule } from '@/src/shared/shared.module';
       provide: LocationRepository,
       useExisting: LocationSupabaseRepository,
     },
+    CreateNewLocationListener
   ],
 })
 

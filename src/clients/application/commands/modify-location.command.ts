@@ -1,6 +1,5 @@
 // Libraries
 import { Injectable, Inject } from '@nestjs/common';
-import { OnEvent } from '@nestjs/event-emitter'
 
 // Interfaces
 import { LocationRepository } from '@/src/clients/core/interfaces/location.repository';
@@ -18,10 +17,7 @@ import { LocationTypeObjectValue } from '@/src/clients/core/object-values/locati
 
 // Enums
 import { LOCATION_STATUS_ENUM } from '@/src/clients/core/enums/client-status.enum';
-import { Mapper } from '../mappers/entity-dto.mapper';
-import { DOMAIN_EVENT_ENUM } from '@/src/shared/core/enums/domain-event.enum';
-import type { ConfirmedClientEvent } from '@/src/shared/events/interfaces/ConfirmedClientEvent';
-import { BusinessRuleException } from '@/src/shared/errors/BusinessRuleException';
+import { Mapper } from '@/src/clients/application/mappers/entity-dto.mapper';
 
 @Injectable()
 export class ModifyLocationCommand {
@@ -113,43 +109,5 @@ export class ModifyLocationCommand {
 			location_type: updatedLocation.location_type,
 			address_reference: updatedLocation.address_reference,
 		});
-	}
-
-	@OnEvent(DOMAIN_EVENT_ENUM.CONFIRMED_CLIENT_EVENT, { async: true })
-	private async handleClientConfirmed(event: ConfirmedClientEvent) {
-		try {
-			const { idLocation } = event;
-			const locations: LocationEntity[] = await this.locationRepository.retrieveLocationById([
-				idLocation,
-			]);
-			const existingLocation: LocationEntity = locations[0];
-			const{ id_client } = existingLocation;
-			const clients: TaxClientInformationEntity[] = await this.clientRepository.retrieveClientById([
-				id_client,
-			]);
-
-			const clientAggregate: ClientAggregate = new ClientAggregate(clients[0], [existingLocation], []);
-
-			const locationToUpdate:LocationEntity = clientAggregate.confirmNewClient(idLocation);
-
-			await this.locationRepository.updateLocation(idLocation, {
-				street: locationToUpdate.street,
-				ext_number: locationToUpdate.ext_number,
-				colony: locationToUpdate.colony,
-				postal_code: locationToUpdate.postal_code,
-				location_name: locationToUpdate.location_name,
-				latitude: locationToUpdate.latitude,
-				longitude: locationToUpdate.longitude,
-				status_location: locationToUpdate.status_location,
-				id_creator: locationToUpdate.id_creator,
-				id_client: locationToUpdate.id_client,
-				updated_at: locationToUpdate.updated_at,
-				location_type: locationToUpdate.location_type,
-				address_reference: locationToUpdate.address_reference,
-			});
-		} catch (error) {
-			// Log this to a file or monitoring tool so you don't lose the record
-			throw new BusinessRuleException('Something were wrong at moment of confirming a new error: ' + error)
-		}		
 	}
 }

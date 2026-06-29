@@ -27,10 +27,10 @@ export class WorkDayOperationHistoricDto {
 	public readonly id_inventory_operation: string | null;
 
 	@ApiProperty({ type: String, example: '19.45602930548609' })
-	public readonly latitude: string;
+	public readonly latitude: string | null;
 
 	@ApiProperty({ type: String, example: '-99.13450312485135' })
-	public readonly longitude: string;
+	public readonly longitude: string | null;
 
 	@ApiProperty({ type: String, example: '0e72ec26-0df4-4dc0-a204-b8f3223bb8f8' })
 	public readonly id_day_operation_dependent: string | null;
@@ -39,8 +39,8 @@ export class WorkDayOperationHistoricDto {
 		_id_work_day_operation: string,
 		_id_operation_type: DAY_OPERATIONS_ENUM,
 		_created_at: Date,
-		_latitude: string,
-		_longitude: string,
+		_latitude: string | null,
+		_longitude: string | null,
 		_id_work_day: string,
 		_id_location: string | null,
 		_id_route_transaction: string | null,

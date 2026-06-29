@@ -137,6 +137,10 @@ Related to inventory
 - consult_inventory: 						${DAY_OPERATIONS_ENUM.consult_inventory}
 - cancel_inventory_operation:		${DAY_OPERATIONS_ENUM.cancel_inventory_operation}
 
+For this type of day operations, it's required the following fields: 
+
+- id_inventory_operation
+
 Related to route transaction
 - product_devolution: 			${DAY_OPERATIONS_ENUM.product_devolution}
 - sales: 										${DAY_OPERATIONS_ENUM.sales}
@@ -145,6 +149,12 @@ Related to route transaction
 - route_transaction: 				${DAY_OPERATIONS_ENUM.route_transaction}
 - cancel_route_transaction: ${DAY_OPERATIONS_ENUM.cancel_route_transaction}
 
+For this type of day operations, it's required the following fields: 
+
+- id_route_transaction
+- latitude and longitude are required fields, but since it is being tested the mechanism 
+for retrieve the location, this two fields are set as optional.
+
 Related to client operations
 - prospect_registration: 		${DAY_OPERATIONS_ENUM.prospect_registration}
 - new_client_confirmation: 	${DAY_OPERATIONS_ENUM.new_client_confirmation}
@@ -152,6 +162,20 @@ Related to client operations
 - route_client_attention: 	${DAY_OPERATIONS_ENUM.route_client_attention}
 - attend_client_petition: 	${DAY_OPERATIONS_ENUM.attend_client_petition}
 - client_visited: 					${DAY_OPERATIONS_ENUM.client_visited}
+
+
+For this type of day operations, it's required the following fields: 
+
+- id_locaion
+
+
+Special cases. These are cases that needs all the information described below
+and particular information that needs the case
+
+new_client_confirmation
+
+- id_route_transaction
+
 `,
 	})
 	@ApiBody({

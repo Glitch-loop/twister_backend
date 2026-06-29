@@ -9,7 +9,7 @@ export interface WorkDayOperationHistoricModel {
   id_route_transaction: string|null;
   id_inventory_operation: string|null;
   id_route_day: string;
-  latitude: string;
-  longitude: string;
+  latitude: string|null;
+  longitude: string|null;
   id_day_operation_dependent: string|null;
 }
