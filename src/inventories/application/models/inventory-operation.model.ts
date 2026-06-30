@@ -4,7 +4,7 @@ export interface InventoryOperationModel {
   id_inventory_operation: string;
   latitude: string | null;
   longitude: string | null;
-  inventory_operation_reference?: string;
+  inventory_operation_referenced?: string;
   movement_type: MOVEMENT_TYPE_ENUM;
   document_reference?: string;
   created_at: Date;

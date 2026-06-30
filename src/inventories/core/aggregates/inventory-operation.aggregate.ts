@@ -160,6 +160,42 @@ export class InventoryOperationAggregate {
     
   }
 
+  createProductDevolution (
+    _idInventoryOperation: string,
+    _CreatedBy: string,
+    _createdAt: Date,
+    _latitude?: string, 
+    _longitude?: string,
+    _documentReference?: string,
+  ) {
+    this.assertionOriginInventoryAndTargetInventoryAreNotTheSame();
+    this.assertionInventoryInvolvedActive();
+
+    if (_documentReference === undefined) 
+      throw new BusinessRuleException(`For creating a PRODUCT_DEVOLUTION, you have to provide the id of the transaction that originated the movement.`);
+
+    if (!(this.originInventory.inventory_context === INVENTORY_CONTEXT_ENUM.SHRINKAGE)) 
+      throw new BusinessRuleException(`For creating a PRODUCT_DEVOLUTION movement for a route transaction, the origin inventory must be SHRINKAGE type.`);
+
+    if (!(this.targetInventory.inventory_context === INVENTORY_CONTEXT_ENUM.SHRINKAGE)) 
+      throw new BusinessRuleException(`For creating a PRODUCT_DEVOLUTION movement for a route transaction, the target inventory must be SHRINKAGE type.`);
+  
+    this.inventoryOperation = new InventoryOperationEntity(
+      _idInventoryOperation,
+      _latitude ? _latitude : null,
+      _longitude ? _longitude : null,
+      MOVEMENT_TYPE_ENUM.PRODUCT_DEVOLUTUION,
+      _createdAt,
+      _CreatedBy,
+      this.originInventory.id_inventory,
+      this.targetInventory.id_inventory,
+      [],
+      undefined,
+      _documentReference
+    );
+    
+  }
+
   reverseInventoryOperation (
     _idInventoryOperation: string,
     _createdBy: string,
@@ -569,6 +605,7 @@ export class InventoryOperationAggregate {
           id_product,
         );
       }),
+      undefined,
       document_reference,
     );
   }

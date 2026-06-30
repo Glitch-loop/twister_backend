@@ -37,6 +37,15 @@ This endpoint was designed for syncing the vendor's inventory operations.
 The inventory operation is created and registered in the database, in the same way,
 the process determines to which inventories the operaion affects using the inventory
 operation type applying the changes to the affected inventories.
+
+Route inventory available:
+
+- start_shift_inventory: ${ROUTE_INVENTORY_OPERATION_TYPE.start_shift_inventory}
+- restock_inventory: ${ROUTE_INVENTORY_OPERATION_TYPE.restock_inventory}
+- end_shift_inventory: ${ROUTE_INVENTORY_OPERATION_TYPE.end_shift_inventory}
+- product_devolution_inventory: ${ROUTE_INVENTORY_OPERATION_TYPE.product_devolution_inventory}
+- cancel_inventory_operation: ${ROUTE_INVENTORY_OPERATION_TYPE.cancel_inventory_operation}
+
 `,
   })
   @ApiBody({ type: [ RouteInventoryOperationDto ] })

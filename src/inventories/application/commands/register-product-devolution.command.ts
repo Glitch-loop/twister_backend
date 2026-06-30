@@ -62,13 +62,31 @@ export class RegisterProductDevolutionCommand {
 		latitude?: string,
 		longitude?: string,
 	): Promise<void> {
+
+		/*
+			TODO: Fix this command.
+
+			Issue:
+			This command is being used for registering transaction movements and the 
+			inventory that is declared at the end of the day.
+
+			Quick fix:
+			Both inventories doesn't have balance validation.
+			The target inventory will always be the facility shirnkage. 
+		*/
+
 		if (inventory_operation_descriptions.length === 0) {
 			throw new BusinessRuleException('Inventory operation descriptions are required.');
 		}
-
+		console.log("Inventory")
 		const originInventory = await this.retrieveInventoryById(id_inventory_origin);
-		const shrinkageInventory = await this.retrieveUniqueInventoryByContext(INVENTORY_CONTEXT_ENUM.SHRINKAGE);
+		console.log("originInventory: ", originInventory)
+		const shrinkageInventory = await this.retrieveUniqueInventoryByContext(
+			INVENTORY_CONTEXT_ENUM.SHRINKAGE,
+			'f2a31d77-7124-4103-b320-4b7ab5babbb4'
+		);
 
+		console.log("shrinkageInventory: ", shrinkageInventory)
 		await this.assertProductsValid(inventory_operation_descriptions);
 
 		const createdAtToUse = created_at ?? new Date();
@@ -76,13 +94,13 @@ export class RegisterProductDevolutionCommand {
 
 		const aggregate = new InventoryOperationAggregate(originInventory, shrinkageInventory);
 
-		aggregate.createProductDevolutionForTransaction(
+		aggregate.createProductDevolution(
 			inventoryOperationIdToUse,
 			created_by,
 			createdAtToUse,
 			latitude,
 			longitude,
-			document_reference,
+			'2ef5c81c-8717-46dd-9328-b91bc5fb767b',//document_reference,
 		);
 
 		for (const description of inventory_operation_descriptions) {
@@ -97,7 +115,7 @@ export class RegisterProductDevolutionCommand {
 				description.created_at ?? createdAtToUse,
 			);
 		}
-
+		console.log("Inventory operation to create: ", aggregate.getInventoryOperation())
 		await this.inventoryRepository.CreateInventoryOperation(aggregate.getInventoryOperation());
 
 		const affectedBalanceRecords = aggregate.getAffectedInventoryBalanceRecords();
@@ -123,12 +141,18 @@ export class RegisterProductDevolutionCommand {
 
 	private async retrieveUniqueInventoryByContext(
 		inventory_context: INVENTORY_CONTEXT_ENUM,
+		id_facility_assigned_to: string 
 	): Promise<InventoryEntity> {
 		const inventories = await this.inventoryRepository.listInventories(
 			2,
 			undefined,
 			undefined,
 			[inventory_context],
+			[],
+			[],
+			[],
+			[],
+			[id_facility_assigned_to]
 		);
 
 		if (inventories.length === 0) {

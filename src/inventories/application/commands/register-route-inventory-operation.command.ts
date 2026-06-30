@@ -98,7 +98,7 @@ export class RegisterRouteInventoryOperationCommand {
 
     if (id_inventory_operation_type === ROUTE_INVENTORY_OPERATION_TYPE.product_devolution_inventory) {
       const availableInventory = await this.retrieveInventoryByContextForUser(
-        INVENTORY_CONTEXT_ENUM.AVAILABLE_FOR_SALE,
+        INVENTORY_CONTEXT_ENUM.SHRINKAGE,
         id_user,
       );
 
@@ -111,17 +111,17 @@ export class RegisterRouteInventoryOperationCommand {
         createdAtDate,
       );
 
-      const shrinkageInventory = await this.retrieveUniqueInventoryByContext(
-        INVENTORY_CONTEXT_ENUM.SHRINKAGE,
-      );
+      // const shrinkageInventory = await this.retrieveUniqueInventoryByContext(
+      //   INVENTORY_CONTEXT_ENUM.SHRINKAGE,
+      // );
 
-      await this.registerWasteInventoryOperationCommand.execute(
-        shrinkageInventory.id_inventory,
-        id_user,
-        inventory_operation_descriptions,
-        undefined,
-        createdAtDate,
-      );
+      // await this.registerWasteInventoryOperationCommand.execute(
+      //   shrinkageInventory.id_inventory,
+      //   id_user,
+      //   inventory_operation_descriptions,
+      //   undefined,
+      //   createdAtDate,
+      // );
       return;
     }
 
@@ -198,7 +198,7 @@ export class RegisterRouteInventoryOperationCommand {
       undefined,
       [id_user],
     );
-
+    
     if (inventories.length === 0) {
       throw new BusinessRuleException(
         `Expected one inventory with context ${inventory_context} assigned to user ${id_user}, but none was found.`,
