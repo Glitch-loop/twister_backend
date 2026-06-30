@@ -47,39 +47,35 @@ export class ReverseInventoryMovementCommand {
 	) {}
 
 	async execute(
-		id_inventory_origin: string,
-		id_inventory_target: string,
 		id_inventory_operation_to_reverse: string,
 		created_by: string,
-		inventory_operation_descriptions: InventoryOperationDescriptionInput[],
-		id_inventory_operation?: string,
 		created_at?: Date,
+		id_inventory_operation?: string,
 		latitude?: string,
-		longitude?: string,
+		longitude?: string
 	): Promise<void> {
-		if (inventory_operation_descriptions.length === 0) {
-			throw new BusinessRuleException('Inventory operation descriptions are required.');
-		}
-
-		const [originInventory, destinationInventory, inventoryOperationToReverse] = await Promise.all([
-			this.retrieveInventoryById(id_inventory_origin),
-			this.retrieveInventoryById(id_inventory_target),
-			this.retrieveInventoryOperationById(id_inventory_operation_to_reverse),
-		]);
+		const inventoryOperationToReverse: InventoryOperationEntity = await this.retrieveInventoryOperationById(id_inventory_operation_to_reverse);
+		const idInventoryOriginOfOperationToReverse = inventoryOperationToReverse.id_inventory_origin
+		const idInventoryTargetOfOperationToReverse = inventoryOperationToReverse.id_inventory_target
+		const { inventory_operation_descriptions } = inventoryOperationToReverse
 
 		await this.assertInventoryOperationNotPreviouslyReversed(id_inventory_operation_to_reverse);
 		this.assertRequestedInventoriesMatchOperationToReverse(
 			inventoryOperationToReverse,
-			id_inventory_origin,
-			id_inventory_target,
+			idInventoryOriginOfOperationToReverse,
+			idInventoryTargetOfOperationToReverse,
 		);
+
 		await this.assertInventoryOperationToReverseIsLastForInvolvedInventories(inventoryOperationToReverse);
 		await this.assertProductsValid(inventory_operation_descriptions);
+
+		const originInventoryOfOperationToReverse = await this.retrieveInventoryById(idInventoryOriginOfOperationToReverse);
+		const targetInventoryOfOperationToReverse = await this.retrieveInventoryById(idInventoryTargetOfOperationToReverse);
 
 		const createdAtToUse = created_at ?? new Date();
 		const inventoryOperationIdToUse = id_inventory_operation ?? this.integrityRepository.generateUUIDv4();
 
-		const aggregate = new InventoryOperationAggregate(destinationInventory, originInventory);
+		const aggregate = new InventoryOperationAggregate(targetInventoryOfOperationToReverse, originInventoryOfOperationToReverse);
 
 		aggregate.reverseInventoryOperation(
 			inventoryOperationIdToUse,
@@ -92,7 +88,7 @@ export class ReverseInventoryMovementCommand {
 
 		for (const description of inventory_operation_descriptions) {
 			aggregate.addInventoryOperationDescription(
-				description.id_inventory_operation_description ?? this.integrityRepository.generateUUIDv4(),
+				this.integrityRepository.generateUUIDv4(),
 				description.price_at_moment,
 				description.cost_at_moment,
 				description.quantity,

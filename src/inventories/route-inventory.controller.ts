@@ -44,7 +44,6 @@ Route inventory available:
 - restock_inventory: ${ROUTE_INVENTORY_OPERATION_TYPE.restock_inventory}
 - end_shift_inventory: ${ROUTE_INVENTORY_OPERATION_TYPE.end_shift_inventory}
 - product_devolution_inventory: ${ROUTE_INVENTORY_OPERATION_TYPE.product_devolution_inventory}
-- cancel_inventory_operation: ${ROUTE_INVENTORY_OPERATION_TYPE.cancel_inventory_operation}
 
 `,
   })

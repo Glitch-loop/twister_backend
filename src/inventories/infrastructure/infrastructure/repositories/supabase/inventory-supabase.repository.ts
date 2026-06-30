@@ -79,6 +79,7 @@ export class InventorySupabaseRepository implements Inventory {
   async CreateInventoryOperation(inventoryOperation: InventoryOperationEntity): Promise<void> {
     try {
       const operationModel = this.mapper.toModel(inventoryOperation);
+
       const { error } = await this.supabase.from('inventory_operations').insert(operationModel);
 
       if (error) {
@@ -128,7 +129,7 @@ export class InventorySupabaseRepository implements Inventory {
     limit: number,
     lastCreatedAt?: string,
     lastIdInventoryOperation?: string,
-    inventory_operation_referenced?: string[],
+    inventory_operation_reference?: string[],
     movement_type?: number[],
     document_reference?: string[],
     created_by?: string[],
@@ -138,8 +139,8 @@ export class InventorySupabaseRepository implements Inventory {
     try {
       const query = this.supabase.from('inventory_operations').select('*');
 
-      if (inventory_operation_referenced && inventory_operation_referenced.length > 0) {
-        query.in('inventory_operation_reference', inventory_operation_referenced);
+      if (inventory_operation_reference && inventory_operation_reference.length > 0) {
+        query.in('inventory_operation_reference', inventory_operation_reference);
       }
       if (movement_type && movement_type.length > 0) {
         query.in('movement_type', movement_type);

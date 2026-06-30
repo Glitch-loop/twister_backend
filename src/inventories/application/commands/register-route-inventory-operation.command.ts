@@ -145,23 +145,6 @@ export class RegisterRouteInventoryOperationCommand {
       return;
     }
 
-    if (id_inventory_operation_type === ROUTE_INVENTORY_OPERATION_TYPE.cancel_inventory_operation) {
-      const inventoryOperationToReverse = await this.retrieveInventoryOperationById(
-        id_inventory_operation,
-      );
-
-      await this.reverseInventoryMovementCommand.execute(
-        inventoryOperationToReverse.id_inventory_origin,
-        inventoryOperationToReverse.id_inventory_target,
-        id_inventory_operation,
-        id_user,
-        inventory_operation_descriptions,
-        undefined,
-        createdAtDate,
-      );
-      return;
-    }
-
     throw new BusinessRuleException(
       `Route inventory operation type ${id_inventory_operation_type} is not supported.`,
     );

@@ -306,12 +306,8 @@ ENABLE stock validation.`,
     @Body() body: ReverseInventoryMovementRequestDto,
   ): Promise<httpControllerResponse> {
     await this.reverseInventoryMovementCommand.execute(
-      body.id_inventory_origin,
-      body.id_inventory_target,
       body.id_inventory_operation_to_reverse,
-      body.created_by,
-      body.inventory_operation_descriptions,
-      body.id_inventory_operation,
+      body.reversed_by,
       body.created_at,
       body.latitude,
       body.longitude,
@@ -421,7 +417,7 @@ ENABLE stock validation.`,
   })
   @ApiQuery({ name: 'limit', required: false, type: String, description: 'Page size (max 1000).' })
   @ApiQuery({ name: 'next_item', required: false, type: String, description: 'Opaque cursor for next page.' })
-  @ApiQuery({ name: 'inventory_operation_referenced', required: false, type: String, isArray: true })
+  @ApiQuery({ name: 'inventory_operation_reference', required: false, type: String, isArray: true })
   @ApiQuery({ name: 'movement_type', required: false, type: String, isArray: true })
   @ApiQuery({ name: 'document_reference', required: false, type: String, isArray: true })
   @ApiQuery({ name: 'created_by', required: false, type: String, isArray: true })
@@ -432,7 +428,7 @@ ENABLE stock validation.`,
   async listInventoryOperations(
     @Query('limit') limit?: string,
     @Query('next_item') next_item?: string,
-    @Query('inventory_operation_referenced') inventory_operation_referenced?: string | string[],
+    @Query('inventory_operation_reference') inventory_operation_reference?: string | string[],
     @Query('movement_type') movement_type?: string | string[],
     @Query('document_reference') document_reference?: string | string[],
     @Query('created_by') created_by?: string | string[],
@@ -470,7 +466,7 @@ ENABLE stock validation.`,
 
     const data = await this.listInventoryOperationsQuery.execute(
       parsedLimit,
-      toArray(inventory_operation_referenced),
+      toArray(inventory_operation_reference),
       movementTypeParsed,
       toArray(document_reference),
       toArray(created_by),

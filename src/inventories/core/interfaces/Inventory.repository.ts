@@ -12,7 +12,7 @@ export abstract class Inventory {
     limit: number,
     lastCreatedAt?: string,
     lastIdInventoryOperation?: string,
-    inventory_operation_referenced?: string[],
+    inventory_operation_reference?: string[],
     movement_type?: number[],
     document_reference?: string[],
     created_by?: string[],

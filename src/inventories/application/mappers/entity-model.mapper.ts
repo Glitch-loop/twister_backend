@@ -48,6 +48,7 @@ export class EntityModelMapper {
 			| InventoryOperationModel,
 		nestedModels?: InventoryBalanceModel[] | InventoryOperationDescriptionModel[],
 	): any {
+		console.log(model)
 		if (isInventoryBalanceModel(model)) {
 			return this.inventoryBalanceModelToDomainObject(model);
 		}
@@ -149,7 +150,7 @@ export class EntityModelMapper {
 			id_inventory_operation: domainObject.id_inventory_operation,
 			latitude: domainObject.latitude,
 			longitude: domainObject.longitude,
-			inventory_operation_referenced: domainObject.inventory_operation_reference,
+			inventory_operation_reference: domainObject.inventory_operation_reference,
 			movement_type: domainObject.movement_type,
 			document_reference: domainObject.document_reference,
 			created_at: domainObject.created_at,
@@ -245,7 +246,7 @@ export class EntityModelMapper {
 			inventoryOperationDescriptionModels.map((desc) =>
 				this.inventoryOperationDescriptionModelToDomainObject(desc),
 			),
-			model.inventory_operation_referenced,
+			model.inventory_operation_reference,
 			model.document_reference,
 		);
 	}

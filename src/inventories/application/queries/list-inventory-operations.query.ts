@@ -15,7 +15,7 @@ export class ListInventoryOperationsQuery {
 
   async execute(
     limit?: number,
-    inventory_operation_referenced?: string[],
+    inventory_operation_reference?: string[],
     movement_type?: number[],
     document_reference?: string[],
     created_by?: string[],
@@ -44,7 +44,7 @@ export class ListInventoryOperationsQuery {
         limitToUse,
         lastCreatedAt,
         lastIdInventoryOperation,
-        inventory_operation_referenced,
+        inventory_operation_reference,
         movement_type,
         document_reference,
         created_by,
