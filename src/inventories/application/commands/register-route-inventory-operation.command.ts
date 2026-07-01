@@ -49,6 +49,7 @@ export class RegisterRouteInventoryOperationCommand {
     id_user: string,
     inventory_operation_descriptions: InventoryOperationDescriptionObjectValue[]
   ): Promise<void> {
+    console.log("Registering route information")
     if (inventory_operation_descriptions.length === 0) {
       throw new BusinessRuleException('Inventory operation descriptions are required.');
     }
@@ -56,6 +57,7 @@ export class RegisterRouteInventoryOperationCommand {
     const createdAtDate = this.toDate(created_at, 'RouteInventoryOperationDto.date');
 
     if (id_inventory_operation_type === ROUTE_INVENTORY_OPERATION_TYPE.start_shift_inventory) {
+      console.log("Start shift inventory")
       const reservationInventory = await this.retrieveInventoryByContextForUser(
         INVENTORY_CONTEXT_ENUM.PRODUCT_RESERVATION,
         id_user,

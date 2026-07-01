@@ -2,10 +2,10 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ReverseInventoryMovementRequestDto {
   @ApiProperty({ type: String, format: 'uuid' })
-  public readonly id_inventory_operation_to_reverse: string = '';
+  public readonly id_inventory_operation_to_reverse: string;
 
   @ApiProperty({ type: String, format: 'uuid' })
-  public readonly reversed_by: string = '';
+  public readonly reversed_by: string;
 
   @ApiPropertyOptional({ type: String, format: 'date-time' })
   public readonly created_at?: Date;

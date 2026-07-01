@@ -52,13 +52,13 @@ Route inventory available:
   @Post('')
   async createInventory(@Body() body: RouteInventoryOperationDto[]): Promise<httpControllerResponse> {
     for (const invOp of body) {
-      await this.registerRouteInventoryOperationCommand.execute(
-        invOp.id_inventory_operation,
-        invOp.date,
-        invOp.id_inventory_operation_type as ROUTE_INVENTORY_OPERATION_TYPE,
-        invOp.id_user,
-        invOp.inventory_operation_descriptions,
-      );
+        await this.registerRouteInventoryOperationCommand.execute(
+          invOp.id_inventory_operation,
+          invOp.date,
+          invOp.id_inventory_operation_type as ROUTE_INVENTORY_OPERATION_TYPE,
+          invOp.id_user,
+          invOp.inventory_operation_descriptions,
+        );
     }
 
     const httpResponseFormatter = new httpFormatter();
