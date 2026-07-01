@@ -12,7 +12,7 @@ export class InventoryOperationEntity {
 		public readonly id_inventory_origin: string,
 		public readonly id_inventory_target: string,
 		public readonly inventory_operation_descriptions: InventoryOperationDescriptionObjectValue[],
-		public readonly inventory_operation_reference?: string,
-		public readonly document_reference?: string,
+		public readonly inventory_operation_reference: string | null,
+		public readonly document_reference: string | null,
 	) {}
 }
