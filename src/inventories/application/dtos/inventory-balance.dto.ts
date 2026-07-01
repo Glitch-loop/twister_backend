@@ -7,14 +7,14 @@ export class InventoryBalanceDto {
   @ApiProperty({ type: Number, example: 48.75 })
   public readonly quantity: number;
 
-  @ApiProperty({ type: Number, example: 48.75 })
+  @ApiProperty({ type: Number, example: 10 })
   public readonly min_quantity: number | null;
 
-  @ApiProperty({ type: Number, example: 48.75 })
+  @ApiProperty({ type: Number, example: 100 })
   public readonly max_quantity: number | null;
 
   @ApiProperty({ type: String, format: 'date-time', example: '2026-06-03T09:15:00.000Z' })
-  public readonly created_at: Date;
+  public readonly created_at: string;
 
   @ApiProperty({ type: String, format: 'uuid', example: '1b3c5d7e-9f01-4a23-8b45-6c7d8e9f0123' })
   public readonly id_inventory: string;
@@ -27,10 +27,23 @@ export class InventoryBalanceDto {
     _quantity: number,
     _min_quantity: number|null,
     _max_quantity: number|null,
-    _created_at: Date,
+    _created_at: string,
     _id_inventory: string,
     _id_product: string,
   ) {
+    /*
+      Design note (07-01-26)
+
+      An inventory balance might not have limit for minimum and maximum quantity,
+      the abscence is expressed as null.
+
+      So, although it is possible to let these fields "undefiend":
+       - min_quantity 
+       - max_quantity 
+
+      It was preferred to explicitly let the as null to indicate in requests or responses
+      that the inventory balance doesn't have a limit.
+    */
     this.id_inventory_balance = _id_inventory_balance;
     this.quantity = _quantity;
     this.min_quantity = _min_quantity;

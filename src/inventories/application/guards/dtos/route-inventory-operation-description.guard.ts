@@ -2,9 +2,7 @@ import type { RouteInventoryOperationDescriptionDto } from '@/src/inventories/ap
 
 import { isRecord } from '@/src/shared/application/guards/utils';
 
-export const isRouteInventoryOperationDescriptionDto = (
-  value: unknown,
-): value is RouteInventoryOperationDescriptionDto => {
+export const isRouteInventoryOperationDescriptionDto = (value: unknown): value is RouteInventoryOperationDescriptionDto => {
   if (!isRecord(value)) {
     return false;
   }
@@ -14,6 +12,7 @@ export const isRouteInventoryOperationDescriptionDto = (
     typeof value.price_at_moment === 'number' &&
     typeof value.cost_at_moment === 'number' &&
     typeof value.quantity === 'number' &&
+    typeof value.created_at === 'string' &&
     typeof value.id_inventory_operation === 'string' &&
     typeof value.id_product === 'string'
   );

@@ -19,10 +19,10 @@ export class InventoryDto {
   public readonly stock_validation: number;
 
   @ApiProperty({ type: String, format: 'date-time', example: '2026-06-03T09:15:00.000Z' })
-  public readonly updated_at: Date;
+  public readonly updated_at: string;
 
   @ApiProperty({ type: String, format: 'date-time', example: '2026-06-03T09:15:00.000Z' })
-  public readonly created_at: Date;
+  public readonly created_at: string;
 
   @ApiProperty({ type: String, format: 'uuid', example: '0a1b2c3d-4e5f-6789-abcd-ef0123456789' })
   public readonly created_by: string;
@@ -42,8 +42,8 @@ export class InventoryDto {
     inventory_name: string,
     is_active: number,
     stock_validation: number,
-    created_at: Date,
-    updated_at: Date,
+    created_at: string,
+    updated_at: string,
     created_by: string,
     inventory_balance: InventoryBalanceDto[],
     assigned_facility: string | null,

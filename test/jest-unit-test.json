@@ -2,7 +2,7 @@
   "moduleFileExtensions": ["js", "json", "ts"],
   "rootDir": ".",
   "testEnvironment": "node",
-  "testRegex": "src/.*\\.unit-tests-spec\\.ts$",
+  "testRegex": "src/.*\\.unit-test.spec\\.ts$",
   "moduleNameMapper": {
     "^@/(.*)$": "<rootDir>/../$1"
   },

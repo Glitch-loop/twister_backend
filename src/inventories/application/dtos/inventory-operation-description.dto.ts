@@ -7,14 +7,14 @@ export class InventoryOperationDescriptionDto {
   @ApiProperty({ type: Number, example: 52.25 })
   public readonly price_at_moment: number;
 
-  @ApiProperty({ type: Number, example: 41.1 })
+  @ApiProperty({ type: Number, example: 20.25 })
   public readonly cost_at_moment: number;
 
-  @ApiProperty({ type: Number, example: 12 })
+  @ApiProperty({ type: Number, example: 14 })
   public readonly quantity: number;
 
   @ApiProperty({ type: String, format: 'date-time', example: '2026-06-03T09:15:00.000Z' })
-  public readonly created_at: Date;
+  public readonly created_at: string;
 
   @ApiProperty({ type: String, format: 'uuid', example: '9c1b2a3d-4e5f-4a67-8b90-1c2d3e4f5a67' })
   public readonly id_inventory_operation: string;
@@ -27,7 +27,7 @@ export class InventoryOperationDescriptionDto {
     price_at_moment: number,
     cost_at_moment: number,
     quantity: number,
-    created_at: Date,
+    created_at: string,
     id_inventory_operation: string,
     id_product: string,
   ) {

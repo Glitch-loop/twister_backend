@@ -2,9 +2,7 @@ import type { InventoryOperationDescriptionDto } from '@/src/inventories/applica
 
 import { isRecord } from '@/src/shared/application/guards/utils';
 
-export const isInventoryOperationDescriptionDto = (
-  value: unknown,
-): value is InventoryOperationDescriptionDto => {
+export const isInventoryOperationDescriptionDto = (value: unknown): value is InventoryOperationDescriptionDto => {
   if (!isRecord(value)) {
     return false;
   }
@@ -14,6 +12,7 @@ export const isInventoryOperationDescriptionDto = (
     typeof value.price_at_moment === 'number' &&
     typeof value.cost_at_moment === 'number' &&
     typeof value.quantity === 'number' &&
+    typeof value.created_at === 'string' &&
     typeof value.id_inventory_operation === 'string' &&
     typeof value.id_product === 'string'
   );
