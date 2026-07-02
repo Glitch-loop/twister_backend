@@ -13,6 +13,7 @@ export const isInventoryBalanceDto = (value: unknown): value is InventoryBalance
     (typeof value.min_quantity === 'number' || value.min_quantity === null) &&
     (typeof value.max_quantity === 'number' || value.max_quantity === null) &&
     typeof value.created_at === 'string' &&
+    typeof value.updated_at === 'string' &&
     typeof value.id_inventory === 'string' &&
     typeof value.id_product === 'string'
   );

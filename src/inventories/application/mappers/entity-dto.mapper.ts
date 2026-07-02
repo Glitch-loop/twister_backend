@@ -109,6 +109,7 @@ export class EntityDtoMapper {
 			domainObject.min_quantity,
 			domainObject.max_quantity,
 			domainObject.created_at.toISOString(),
+			domainObject.updated_at.toISOString(),
 			domainObject.id_inventory,
 			domainObject.id_product,
 		);
@@ -165,6 +166,7 @@ export class EntityDtoMapper {
 	// ==================== MAPPER METHODS DTO to DOMAIN OBJECT ====================
 	private inventoryBalanceDtoToDomainObject(dto: InventoryBalanceDto): InventoryBalanceObjectValue {
 		const createdAt = this.toDate(dto.created_at, 'InventoryBalanceDto.created_at');
+		const updatedAt = this.toDate(dto.updated_at, 'InventoryBalanceModel.updated_at');
 
 		return new InventoryBalanceObjectValue(
 			dto.id_inventory_balance,
@@ -172,6 +174,7 @@ export class EntityDtoMapper {
 			dto.min_quantity,
 			dto.max_quantity,
 			createdAt,
+			updatedAt,
 			dto.id_inventory,
 			dto.id_product,
 		);

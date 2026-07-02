@@ -16,6 +16,9 @@ export class InventoryBalanceDto {
   @ApiProperty({ type: String, format: 'date-time', example: '2026-06-03T09:15:00.000Z' })
   public readonly created_at: string;
 
+  @ApiProperty({ type: String, format: 'date-time', example: '2026-06-03T09:15:00.000Z' })
+  public readonly updated_at: string;
+
   @ApiProperty({ type: String, format: 'uuid', example: '1b3c5d7e-9f01-4a23-8b45-6c7d8e9f0123' })
   public readonly id_inventory: string;
 
@@ -28,6 +31,7 @@ export class InventoryBalanceDto {
     _min_quantity: number|null,
     _max_quantity: number|null,
     _created_at: string,
+    _updated_at: string,
     _id_inventory: string,
     _id_product: string,
   ) {
@@ -49,6 +53,7 @@ export class InventoryBalanceDto {
     this.min_quantity = _min_quantity;
     this.max_quantity = _max_quantity;
     this.created_at = _created_at;
+    this.updated_at = _updated_at;
     this.id_inventory = _id_inventory;
     this.id_product = _id_product;
   }

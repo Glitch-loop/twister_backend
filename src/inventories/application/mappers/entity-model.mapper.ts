@@ -116,7 +116,7 @@ export class EntityModelMapper {
 			min_quantity: domainObject.min_quantity,
 			max_quantity: domainObject.max_quantity,
 			created_at: domainObject.created_at.toISOString(),
-			updated_at: domainObject..toISOString()
+			updated_at: domainObject.updated_at.toISOString(),
 			id_inventory: domainObject.id_inventory,
 			id_product: domainObject.id_product,
 		};
@@ -130,7 +130,7 @@ export class EntityModelMapper {
 			price_at_moment: domainObject.price_at_moment,
 			cost_at_moment: domainObject.cost_at_moment,
 			quantity: domainObject.quantity,
-			created_at: domainObject.created_at,
+			created_at: domainObject.created_at.toISOString(),
 			id_inventory_operation: domainObject.id_inventory_operation,
 			id_product: domainObject.id_product,
 		};
@@ -143,8 +143,8 @@ export class EntityModelMapper {
 			inventory_name: domainObject.inventory_name,
 			is_active: domainObject.is_active,
 			stock_validation: domainObject.stock_validation,
-			created_at: domainObject.created_at,
-			updated_at: domainObject.updated_at,
+			created_at: domainObject.created_at.toISOString(),
+			updated_at: domainObject.updated_at.toISOString(),
 			created_by: domainObject.created_by,
 			assigned_facility: domainObject.assigned_facility,
 			assigned_to: domainObject.assigned_to,
@@ -159,7 +159,7 @@ export class EntityModelMapper {
 			inventory_operation_reference: domainObject.inventory_operation_reference,
 			movement_type: domainObject.movement_type,
 			document_reference: domainObject.document_reference,
-			created_at: domainObject.created_at,
+			created_at: domainObject.created_at.toISOString(),
 			created_by: domainObject.created_by,
 			id_inventory_origin: domainObject.id_inventory_origin,
 			id_inventory_target: domainObject.id_inventory_target,
@@ -169,6 +169,7 @@ export class EntityModelMapper {
 	// ==================== MAPPER METHODS MODEL to DOMAIN OBJECT ====================
 	private inventoryBalanceModelToDomainObject(model: InventoryBalanceModel): InventoryBalanceObjectValue {
 		const createdAt = this.toDate(model.created_at, 'InventoryBalanceModel.created_at');
+		const updatedAt = this.toDate(model.updated_at, 'InventoryBalanceModel.updated_at');
 
 		return new InventoryBalanceObjectValue(
 			model.id_inventory_balance,
@@ -176,6 +177,7 @@ export class EntityModelMapper {
 			model.min_quantity,
 			model.max_quantity,
 			createdAt,
+			updatedAt,
 			model.id_inventory,
 			model.id_product,
 		);

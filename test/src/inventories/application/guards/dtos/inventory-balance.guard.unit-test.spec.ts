@@ -8,6 +8,7 @@ describe('isInventoryBalanceDto', () => {
       min_quantity: 1,
       max_quantity: 100,
       created_at: '2026-07-01T00:00:00Z',
+      updated_at: '2026-07-01T00:00:00Z',
       id_inventory: 'inv-1',
       id_product: 'prod-1',
     };
@@ -22,6 +23,7 @@ describe('isInventoryBalanceDto', () => {
       min_quantity: null,
       max_quantity: null,
       created_at: '2026-07-01T00:00:00Z',
+      updated_at: '2026-07-01T00:00:00Z',
       id_inventory: 'inv-1',
       id_product: 'prod-1',
     };
@@ -42,6 +44,7 @@ describe('isInventoryBalanceDto', () => {
       min_quantity: 1,
       max_quantity: 100,
       created_at: '2026-07-01T00:00:00Z',
+      updated_at: '2026-07-01T00:00:00Z',
       id_inventory: 'inv-1',
       id_product: 'prod-1',
     };
