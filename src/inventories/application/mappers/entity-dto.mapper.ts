@@ -25,8 +25,8 @@ import { isInventoryEntity } from '@/src/inventories/application/guards/entities
 import { isInventoryOperationEntity } from '@/src/inventories/application/guards/entities/inventory-operation.guard';
 
 // Object-value guards (structurally equivalent to model guards, used for OV dispatch)
-import { isInventoryBalanceModel } from '@/src/inventories/application/guards/object-values/inventory-balance.guard';
-import { isInventoryOperationDescriptionModel } from '@/src/inventories/application/guards/object-values/inventory-operation-description.guard';
+import { isInventoryBalanceObjectValue } from '@/src/inventories/application/guards/object-values/inventory-balance.guard';
+import { isInventoryOperationDescriptionObjectValue } from '@/src/inventories/application/guards/object-values/inventory-operation-description.guard';
 
 // Dto guards
 import { isInventoryDto } from '@/src/inventories/application/guards/dtos/inventory.guard';
@@ -89,10 +89,10 @@ export class EntityDtoMapper {
 		if (isInventoryOperationEntity(domainObject)) {
 			return this.InventoryOperationEntityToDto(domainObject);
 		}
-		if (isInventoryBalanceModel(domainObject)) {
+		if (isInventoryBalanceObjectValue(domainObject)) {
 			return this.inventoryBalanceObjectValueToDto(domainObject);
 		}
-		if (isInventoryOperationDescriptionModel(domainObject)) {
+		if (isInventoryOperationDescriptionObjectValue(domainObject)) {
 			return this.inventoryOperationDescriptionObjectValueToDto(
 				domainObject,
 			);
@@ -108,7 +108,7 @@ export class EntityDtoMapper {
 			domainObject.quantity,
 			domainObject.min_quantity,
 			domainObject.max_quantity,
-			domainObject.created_at,
+			domainObject.created_at.toISOString(),
 			domainObject.id_inventory,
 			domainObject.id_product,
 		);
@@ -122,7 +122,7 @@ export class EntityDtoMapper {
 			domainObject.price_at_moment,
 			domainObject.cost_at_moment,
 			domainObject.quantity,
-			domainObject.created_at,
+			domainObject.created_at.toISOString(),
 			domainObject.id_inventory_operation,
 			domainObject.id_product,
 		);
@@ -135,8 +135,8 @@ export class EntityDtoMapper {
 			domainObject.inventory_name,
 			domainObject.is_active,
 			domainObject.stock_validation,
-			domainObject.created_at,
-			domainObject.updated_at,
+			domainObject.created_at.toISOString(),
+			domainObject.updated_at.toISOString(),
 			domainObject.created_by,
 			domainObject.inventory_balance.map((balance) => this.inventoryBalanceObjectValueToDto(balance)),
 			domainObject.assigned_facility,
@@ -148,7 +148,7 @@ export class EntityDtoMapper {
 		return new InventoryOperationDto(
 			domainObject.id_inventory_operation,
 			domainObject.movement_type,
-			domainObject.created_at,
+			domainObject.created_at.toISOString(),
 			domainObject.created_by,
 			domainObject.id_inventory_origin,
 			domainObject.id_inventory_target,
@@ -255,8 +255,8 @@ export class EntityDtoMapper {
 			dto.inventory_operation_descriptions.map((desc) =>
 				this.inventoryOperationDescriptionDtoToDomainObject(desc),
 			),
-			dto.inventory_operation_reference,
-			dto.document_reference,
+			dto.inventory_operation_reference === undefined ? null : dto.inventory_operation_reference,
+			dto.document_reference === undefined ? null : dto.document_reference,
 		);
 	}
 

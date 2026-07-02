@@ -3,7 +3,7 @@ export interface InventoryOperationDescriptionModel {
   price_at_moment: number;
   cost_at_moment: number;
   quantity: number;
-  created_at: Date;
+  created_at: string;
   id_inventory_operation: string;
   id_product: string;
 }

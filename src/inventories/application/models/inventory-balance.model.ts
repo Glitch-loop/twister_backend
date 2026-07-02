@@ -3,7 +3,8 @@ export interface InventoryBalanceModel {
   quantity: number;
   min_quantity: number|null;
   max_quantity: number|null;
-  created_at: Date;
+  created_at: string;
+  updated_at: string;
   id_inventory: string;
   id_product: string;
 }

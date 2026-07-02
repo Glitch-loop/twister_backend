@@ -8,6 +8,7 @@ describe('isInventoryBalanceObjectValue', () => {
       min_quantity: 1,
       max_quantity: 100,
       created_at: new Date('2026-07-01T00:00:00Z'),
+      updated_at: new Date('2026-07-01T00:00:00Z'),
       id_inventory: 'inv-1',
       id_product: 'prod-1',
     };
@@ -22,6 +23,7 @@ describe('isInventoryBalanceObjectValue', () => {
       min_quantity: null,
       max_quantity: null,
       created_at: new Date('2026-07-01T00:00:00Z'),
+      updated_at: new Date('2026-07-01T00:00:00Z'),
       id_inventory: 'inv-1',
       id_product: 'prod-1',
     };
@@ -42,6 +44,22 @@ describe('isInventoryBalanceObjectValue', () => {
       min_quantity: 1,
       max_quantity: 100,
       created_at: '2026-07-01T00:00:00Z',
+      updated_at: new Date('2026-07-01T00:00:00Z'),
+      id_inventory: 'inv-1',
+      id_product: 'prod-1',
+    };
+
+    expect(isInventoryBalanceObjectValue(value)).toBe(false);
+  });
+
+  it('returns false when updated_at is not a Date instance', () => {
+    const value: unknown = {
+      id_inventory_balance: 'inv-bal-3',
+      quantity: 10,
+      min_quantity: 1,
+      max_quantity: 100,
+      created_at: new Date('2026-07-01T00:00:00Z'),
+      updated_at: '2026-07-01T00:00:00Z',
       id_inventory: 'inv-1',
       id_product: 'prod-1',
     };
@@ -56,6 +74,7 @@ describe('isInventoryBalanceObjectValue', () => {
       min_quantity: '1',
       max_quantity: null,
       created_at: new Date('2026-07-01T00:00:00Z'),
+      updated_at: new Date('2026-07-01T00:00:00Z'),
       id_inventory: 'inv-1',
       id_product: 'prod-1',
     };

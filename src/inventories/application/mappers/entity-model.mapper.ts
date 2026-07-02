@@ -23,11 +23,16 @@ import type { InventoryOperationDescriptionModel } from '@/src/inventories/appli
 import { isInventoryEntity } from '@/src/inventories/application/guards/entities/inventory.guard';
 import { isInventoryOperationEntity } from '@/src/inventories/application/guards/entities/inventory-operation.guard';
 
+// Object value guards
+import { isInventoryBalanceObjectValue } from '@/src/inventories/application/guards/object-values/inventory-balance.guard';
+import { isInventoryOperationDescriptionObjectValue } from '@/src/inventories/application/guards/object-values/inventory-operation-description.guard';
+
 // Model guards
 import { isInventoryModel } from '@/src/inventories/application/guards/models/inventory.guard';
 import { isInventoryOperationModel } from '@/src/inventories/application/guards/models/inventory-operation.guard';
-import { isInventoryBalanceModel } from '@/src/inventories/application/guards/object-values/inventory-balance.guard';
-import { isInventoryOperationDescriptionModel } from '@/src/inventories/application/guards/object-values/inventory-operation-description.guard';
+import { isInventoryBalanceModel } from '@/src/inventories/application/guards/models/inventory-balance.guard';
+import { isInventoryOperationDescriptionModel } from '@/src/inventories/application/guards/models/inventory-operation-description.guard';
+
 
 @Injectable()
 export class EntityModelMapper {
@@ -91,10 +96,10 @@ export class EntityModelMapper {
 		if (isInventoryOperationEntity(domainObject)) {
 			return this.InventoryOperationEntityToModel(domainObject);
 		}
-		if (isInventoryBalanceModel(domainObject)) {
+		if (isInventoryBalanceObjectValue(domainObject)) {
 			return this.inventoryBalanceObjectValueToModel(domainObject);
 		}
-		if (isInventoryOperationDescriptionModel(domainObject)) {
+		if (isInventoryOperationDescriptionObjectValue(domainObject)) {
 			return this.inventoryOperationDescriptionObjectValueToModel(
 				domainObject,
 			);
@@ -110,7 +115,8 @@ export class EntityModelMapper {
 			quantity: domainObject.quantity,
 			min_quantity: domainObject.min_quantity,
 			max_quantity: domainObject.max_quantity,
-			created_at: domainObject.created_at,
+			created_at: domainObject.created_at.toISOString(),
+			updated_at: domainObject..toISOString()
 			id_inventory: domainObject.id_inventory,
 			id_product: domainObject.id_product,
 		};
