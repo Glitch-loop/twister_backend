@@ -61,6 +61,7 @@ export class InventoryOperationAggregate {
           item.min_quantity,
           item.max_quantity,
           item.created_at,
+          item.updated_at,
           item.id_inventory,
           item.id_product,
         )
@@ -89,9 +90,9 @@ export class InventoryOperationAggregate {
     _movementType: MOVEMENT_TYPE_ENUM,
     _CreatedBy: string,
     _createdAt: Date,
-    _documentReference?: string,
-    _latitude?: string, 
-    _longitude?: string
+    _documentReference: string | null,
+    _latitude: string | null, 
+    _longitude: string | null
   ) {
     this.assertionInventoryInvolvedActive();
 
@@ -100,7 +101,7 @@ export class InventoryOperationAggregate {
       || _movementType === MOVEMENT_TYPE_ENUM.COURTESY)) 
       throw new BusinessRuleException(`You are trying to create an invalid movement type (selling or product reposition) in an inventory operation for transaction.`)
 
-    if (_documentReference === undefined) 
+    if (_documentReference === null) 
       throw new BusinessRuleException(`For creating one of the following movements: SELLING or PRODUCT_REPOSITION, you have to provide the id of the transaction that originated the movement.`);
 
     if (!(this.originInventory.inventory_context === INVENTORY_CONTEXT_ENUM.AVAILABLE_FOR_SALE)) 
@@ -119,7 +120,7 @@ export class InventoryOperationAggregate {
       this.originInventory.id_inventory,
       this.targetInventory.id_inventory,
       [],
-      undefined,
+      null,
       _documentReference
     )
   }
@@ -128,8 +129,8 @@ export class InventoryOperationAggregate {
     _idInventoryOperation: string,
     _CreatedBy: string,
     _createdAt: Date,
-    _latitude?: string, 
-    _longitude?: string,
+    _latitude: string | null, 
+    _longitude: string | null,
     _documentReference?: string,
   ) {
     this.assertionOriginInventoryAndTargetInventoryAreNotTheSame();
@@ -146,15 +147,15 @@ export class InventoryOperationAggregate {
   
     this.inventoryOperation = new InventoryOperationEntity(
       _idInventoryOperation,
-      _latitude ? _latitude : null,
-      _longitude ? _longitude : null,
+      _latitude,
+      _longitude,
       MOVEMENT_TYPE_ENUM.PRODUCT_DEVOLUTUION,
       _createdAt,
       _CreatedBy,
       this.originInventory.id_inventory,
       this.targetInventory.id_inventory,
       [],
-      undefined,
+      null,
       _documentReference
     );
     
@@ -164,14 +165,14 @@ export class InventoryOperationAggregate {
     _idInventoryOperation: string,
     _CreatedBy: string,
     _createdAt: Date,
-    _latitude?: string, 
-    _longitude?: string,
-    _documentReference?: string,
+    _latitude: string | null, 
+    _longitude: string | null,
+    _documentReference: string | null,
   ) {
     this.assertionOriginInventoryAndTargetInventoryAreNotTheSame();
     this.assertionInventoryInvolvedActive();
 
-    if (_documentReference === undefined) 
+    if (_documentReference === null) 
       throw new BusinessRuleException(`For creating a PRODUCT_DEVOLUTION, you have to provide the id of the transaction that originated the movement.`);
 
     if (!(this.originInventory.inventory_context === INVENTORY_CONTEXT_ENUM.SHRINKAGE)) 
@@ -182,15 +183,15 @@ export class InventoryOperationAggregate {
   
     this.inventoryOperation = new InventoryOperationEntity(
       _idInventoryOperation,
-      _latitude ? _latitude : null,
-      _longitude ? _longitude : null,
+      _latitude,
+      _longitude,
       MOVEMENT_TYPE_ENUM.PRODUCT_DEVOLUTUION,
       _createdAt,
       _CreatedBy,
       this.originInventory.id_inventory,
       this.targetInventory.id_inventory,
       [],
-      undefined,
+      null,
       _documentReference
     );
     
@@ -201,8 +202,8 @@ export class InventoryOperationAggregate {
     _createdBy: string,
     _createdAt: Date,
     _inventoryOperation: InventoryOperationEntity,
-    _latitude?: string,
-    _longitude?: string,
+    _latitude: string | null,
+    _longitude: string | null,
   ) {
     this.assertionOriginInventoryAndTargetInventoryAreNotTheSame();
     this.assertionInventoryInvolvedActive();
@@ -212,13 +213,10 @@ export class InventoryOperationAggregate {
     if (movement_type === MOVEMENT_TYPE_ENUM.REVERSED) 
       throw new BusinessRuleException(`REVERSE (CANCEL) operation cannot be reversed (cancelled).`);
 
-    if (_inventoryOperation === undefined || _inventoryOperation === null) 
-      throw new BusinessRuleException(`For creating a REVERSE inventory operation, you have to provide the id of the inventory operation to be reversed.`);
-
     this.inventoryOperation = new InventoryOperationEntity(
       _idInventoryOperation,
-      _latitude ? _latitude : _inventoryOperation.latitude,
-      _longitude ? _longitude : _inventoryOperation.longitude,
+      _latitude, // Store the position where the movement was performed
+      _longitude, // Store the position where the movement was performed
       MOVEMENT_TYPE_ENUM.REVERSED,
       _createdAt,
       _createdBy,
@@ -226,18 +224,16 @@ export class InventoryOperationAggregate {
       this.targetInventory.id_inventory,
       [],
       id_inventory_operation,
-      undefined
+      null
     );
-
-    // TODO: Add information
   }
 
   createInternalInventoryOperation (
     _idInventoryOperation: string,
     _createdBy: string,
     _createdAt: Date,
-    _latitude?: string, 
-    _longitude?: string,
+    _latitude: string | null, 
+    _longitude: string | null,
   ) {
     this.assertionOriginInventoryAndTargetInventoryAreNotTheSame();
     this.assertionInventoryInvolvedActive();
@@ -256,16 +252,16 @@ export class InventoryOperationAggregate {
 
     this.inventoryOperation = new InventoryOperationEntity(
       _idInventoryOperation,
-      _latitude ? _latitude : null,
-      _longitude ? _longitude : null,
+      _latitude,
+      _longitude,
       MOVEMENT_TYPE_ENUM.INTERNAL_MOVEMENT,
       _createdAt,
       _createdBy,
       this.originInventory.id_inventory,
       this.targetInventory.id_inventory,
       [],
-      undefined,
-      undefined
+      null,
+      null
     );      
   }
     
@@ -273,8 +269,8 @@ export class InventoryOperationAggregate {
     _idInventoryOperation: string,
     _createdBy: string,
     _createdAt: Date,
-    _latitude?: string,
-    _longitude?: string,
+    _latitude: string | null,
+    _longitude: string | null,
   ) {
     this.assertionOriginInventoryAndTargetInventoryAreNotTheSame();
     this.assertionInventoryInvolvedActive();
@@ -296,16 +292,16 @@ export class InventoryOperationAggregate {
 
     this.inventoryOperation = new InventoryOperationEntity(
       _idInventoryOperation,
-      _latitude ? _latitude : null,
-      _longitude ? _longitude : null,
+      _latitude,
+      _longitude,
       MOVEMENT_TYPE_ENUM.ADJUSTMENT,
       _createdAt,
       _createdBy,
       this.originInventory.id_inventory,
       this.targetInventory.id_inventory,
       [],
-      undefined,
-      undefined
+      null,
+      null
     );
   }
 
@@ -313,8 +309,8 @@ export class InventoryOperationAggregate {
     _idInventoryOperation: string,
     _createdBy: string,
     _createdAt: Date,
-    _latitude?: string, 
-    _longitude?: string,    
+    _latitude: string | null, 
+    _longitude: string | null,
   ) {
     this.assertionInventoryInvolvedActive();
     this.assertionOriginInventoryAndTargetInventoryAreNotTheSame();
@@ -335,16 +331,16 @@ export class InventoryOperationAggregate {
 
     this.inventoryOperation = new InventoryOperationEntity(
       _idInventoryOperation,
-      _latitude ? _latitude : null,
-      _longitude ? _longitude : null,
+      _latitude,
+      _longitude,
       MOVEMENT_TYPE_ENUM.SUPPLIER_RECIPT,
       _createdAt,
       _createdBy,
       this.originInventory.id_inventory,
       this.targetInventory.id_inventory,
       [],
-      undefined,
-      undefined
+      null,
+      null
     );
   }
   
@@ -352,8 +348,8 @@ export class InventoryOperationAggregate {
     _idInventoryOperation: string,
     _createdBy: string,
     _createdAt: Date,
-    _latitude?: string,
-    _longitude?: string,
+    _latitude: string | null,
+    _longitude: string | null,
   ) {
     this.assertionInventoryInvolvedActive();
     this.assertionOriginInventoryAndTargetInventoryAreNotTheSame();
@@ -375,16 +371,16 @@ export class InventoryOperationAggregate {
 
     this.inventoryOperation = new InventoryOperationEntity(
       _idInventoryOperation,
-      _latitude ? _latitude : null,
-      _longitude ? _longitude : null,
+      _latitude,
+      _longitude,
       MOVEMENT_TYPE_ENUM.INVENTORY_SCRAP,
       _createdAt,
       _createdBy,
       this.originInventory.id_inventory,
       this.targetInventory.id_inventory,
       [],
-      undefined,
-      undefined
+      null,
+      null
     );
   }
 
@@ -480,6 +476,7 @@ export class InventoryOperationAggregate {
           min_quantity,
           max_quantity,
           created_at,
+          new Date(),
           id_inventory,
           id_product
         ));
@@ -494,6 +491,7 @@ export class InventoryOperationAggregate {
             _quantity * -1,
             null,
             null,
+            new Date(),
             new Date(),
             id_inventory,
             _idProduct
@@ -525,6 +523,7 @@ export class InventoryOperationAggregate {
           min_quantity,
           max_quantity,
           created_at,
+          new Date(),
           id_inventory,
           id_product
         ));
@@ -539,6 +538,7 @@ export class InventoryOperationAggregate {
             _quantity,
             null,
             null,
+            new Date(),
             new Date(),
             id_inventory,
             _idProduct
@@ -605,7 +605,7 @@ export class InventoryOperationAggregate {
           id_product,
         );
       }),
-      undefined,
+      null,
       document_reference,
     );
   }

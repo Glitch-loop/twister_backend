@@ -40,7 +40,7 @@ export class InventoryAggregate {
     this.productInOperation = new Set<string>();
   }
 
-    private cloneInventory(inventory: InventoryEntity): InventoryEntity {
+  private cloneInventory(inventory: InventoryEntity): InventoryEntity {
     return new InventoryEntity(
       inventory.id_inventory,
       inventory.inventory_context,
@@ -57,6 +57,7 @@ export class InventoryAggregate {
           item.min_quantity,
           item.max_quantity,
           item.created_at,
+          item.updated_at,
           item.id_inventory,
           item.id_product,
         )
@@ -80,15 +81,14 @@ export class InventoryAggregate {
     return balanceOfProductMap;
   }
 
-
   createNewInventory(
     _id_inventory: string,
     _inventory_context: INVENTORY_CONTEXT_ENUM,
     _stock_validation: STOCK_VALIDATION_ENUM,
     _inventory_name: string,
     _created_by: string,
-    _assigned_to?: string,
-    _assigned_facility?: string
+    _assigned_to: string | null,
+    _assigned_facility: string | null
   ):InventoryEntity {
     if (!this.isValidInventoryContext(_inventory_context)) {
       throw new BusinessRuleException('You are trying to create an inventory in a context that does not exist.');
@@ -102,7 +102,7 @@ export class InventoryAggregate {
       throw new BusinessRuleException('You are trying to create an inventory of a forbbiden type.');
     }
     
-    if (_assigned_to === undefined && _assigned_facility === undefined) {
+    if (_assigned_to === null && _assigned_facility === null) {
       throw new BusinessRuleException('For creating a new inventory, you have to assign to the inventory at least an user or a facility.');
     }
     
@@ -227,7 +227,13 @@ export class InventoryAggregate {
     const { id_inventory } = this.inventory;
     
     if(this.inventoryBalance.has(_idProduct)) { // This product is already considered in the controller.
-      const { id_inventory_balance, quantity, created_at, id_inventory, id_product } = this.inventoryBalance.get(_idProduct)!;
+      const { 
+        id_inventory_balance, 
+        quantity, 
+        created_at, 
+        id_inventory, 
+        id_product 
+      } = this.inventoryBalance.get(_idProduct)!;
       this.inventoryBalance.set(
         id_product,
         new InventoryBalanceObjectValue(
@@ -236,6 +242,7 @@ export class InventoryAggregate {
           _minQuantity,
           _maxQuantity,
           created_at,
+          new Date(),
           id_inventory,
           id_product
         )
@@ -249,6 +256,7 @@ export class InventoryAggregate {
           _minQuantity,
           _maxQuantity,
           new Date(),
+          new Date(),
           id_inventory,
           _idProduct
         )
@@ -260,6 +268,11 @@ export class InventoryAggregate {
 
   getAffectedInventoryBalance() {
     return this.getAffectedInventoryBalanceRecordsFromInventoryBalance(this.inventoryBalance);
+  }
+
+  getInventory(): InventoryEntity {
+    if (this.inventory === null) throw new Error('The inventory has not been initialized.');
+    return this.cloneInventory(this.inventory);
   }
 
   private getAffectedInventoryBalanceRecordsFromInventoryBalance(_inventoryBalanceMap: Map<string, InventoryBalanceObjectValue>): InventoryBalanceObjectValue[] {
