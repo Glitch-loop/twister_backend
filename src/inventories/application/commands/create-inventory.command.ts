@@ -38,7 +38,7 @@ export class CreateInventoryCommand {
 		const newInventory: InventoryEntity = aggregate.createNewInventory(
 			id_inventory ?? this.integrityRepository.generateUUIDv4(),
 			inventory_context,
-			stock_validation ? stock_validation : STOCK_VALIDATION_ENUM.ENABLE, 
+			stock_validation ?? STOCK_VALIDATION_ENUM.ENABLE,
 			inventory_name.trim(),
 			created_by,
 			assigned_to,

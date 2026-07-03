@@ -201,7 +201,7 @@ export class InventoryAggregate {
       this.inventory.inventory_context,
       inventory_name ? inventory_name.trim() : this.inventory.inventory_name,
       this.inventory.is_active,
-      stock_validation ? stock_validation : this.inventory.stock_validation,
+      stock_validation ?? this.inventory.stock_validation,
       this.inventory.created_at,
       new Date(),
       this.inventory.created_by,
