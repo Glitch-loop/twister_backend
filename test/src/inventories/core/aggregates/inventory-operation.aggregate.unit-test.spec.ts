@@ -8,7 +8,7 @@ import {
   createInventoryBalance,
   createInventoryEntity,
   createInventoryOperationEntity,
-} from '@/test/test-helpers';
+} from '@/test/utils/test-creation-artifact.helper';
 
 describe('InventoryOperationAggregate', () => {
   const now = new Date('2026-07-03T00:00:00.000Z');

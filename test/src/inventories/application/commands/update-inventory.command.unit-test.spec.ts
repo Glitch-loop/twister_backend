@@ -3,7 +3,7 @@ import { STOCK_VALIDATION_ENUM } from '@/src/inventories/core/enums/stock-valida
 import { InventoryRepository } from '@/src/inventories/core/interfaces/Inventory.repository';
 import { IntegrityRepository } from '@/src/shared/core/interfaces/integrity.repository';
 
-import { createInventoryBalance, createInventoryEntity } from '../../../../test-helpers';
+import { createInventoryBalance, createInventoryEntity } from '../../../../utils/test-creation-artifact.helper';
 
 describe('UpdateInventoryCommand', () => {
   let retrieveInventories: jest.Mock;

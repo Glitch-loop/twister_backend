@@ -3,7 +3,7 @@ import { ListInventoryOperationsQuery } from '@/src/inventories/application/quer
 import { MOVEMENT_TYPE_ENUM } from '@/src/inventories/core/enums/movement-type.enum';
 import { InventoryRepository } from '@/src/inventories/core/interfaces/Inventory.repository';
 
-import { createInventoryOperationEntity } from '../../../../test-helpers';
+import { createInventoryOperationEntity } from '../../../../utils/test-creation-artifact.helper';
 
 describe('ListInventoryOperationsQuery', () => {
   let listInventoryOperations: jest.Mock;

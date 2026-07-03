@@ -2,7 +2,7 @@ import { DeactiveInventoryCommand } from '@/src/inventories/application/commands
 import { INVENTORY_STATE_ENUM } from '@/src/inventories/core/enums/inventory-state-enum';
 import { InventoryRepository } from '@/src/inventories/core/interfaces/Inventory.repository';
 
-import { createInventoryEntity } from '../../../../test-helpers';
+import { createInventoryEntity } from '../../../../utils/test-creation-artifact.helper';
 
 describe('DeactiveInventoryCommand', () => {
   let retrieveInventories: jest.Mock;

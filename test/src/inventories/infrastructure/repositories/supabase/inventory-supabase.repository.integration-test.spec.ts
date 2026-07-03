@@ -11,8 +11,11 @@ import {
   createInventoryOperationDescription,
   createInventoryOperationEntity,
   createUserModel,
-} from '@/test/test-helpers';
+} from '@/test/utils/test-creation-artifact.helper';
 import { SupabaseClient } from '@supabase/supabase-js';
+import { dumpRecordType } from '@/test/types/dump-record.types';
+import { createDumpRecord, createDumpRecordInDatabase, deleteDumpRecordInDatabase } from '@/test/utils/dump-creation-records-supabase.helper';
+import { dumpRecordInterface } from '@/test/interfaces/dump-record.interface';
 
 type QueryResult = {
   data?: unknown;
@@ -359,29 +362,32 @@ describe('Inventory supabase repository', () => {
 
   it('creates an inventory with the mapped model', async () => {
     // Setting environment
-    // const userTest = createUserModel();
-    // const facilityTypeTest = createFacilityTypeModel();
-    // const facilityTest =  createFacilityModel({ id_facility_type: facilityTypeTest.id_facility_type});
+    const dumpRecords: dumpRecordInterface[] = [];
     
-    // await supabaseClient.from('facility_types').insert(facilityTypeTest);
-    // await supabaseClient.from('facilities').insert(facilityTest);
-    // supabaseClient.from('users').insert(userTest);
+    const userTest = createUserModel();
+    const facilityTypeTest = createFacilityTypeModel();
+    const facilityTest =  createFacilityModel({ id_facility_type: facilityTypeTest.id_facility_type});
+    
+    dumpRecords.push(await createDumpRecordInDatabase(supabaseClient, userTest.id_user, 'users', userTest));
+    dumpRecords.push(await createDumpRecordInDatabase(supabaseClient, facilityTypeTest.id_facility_type, 'facility_types', facilityTypeTest));
+    dumpRecords.push(await createDumpRecordInDatabase(supabaseClient, facilityTest.id_facility, 'facilities', facilityTest));
 
     // Test
     const createInventory = createInventoryEntity({ 
-      inventory_name: 'TEST Warehouse',
+      inventory_name: 'TEST Warehouse' + new Date().toISOString(),
       assigned_facility: id_facility_test,
       assigned_to: null,
       created_by: id_created_by,
     });
+
+    dumpRecords.push(createDumpRecord(createInventory.id_inventory, 'inventories', createInventory))
+
     const createInventorySpy = jest.spyOn(repository, 'CreateInventory');
     
     await expect(repository.CreateInventory(createInventory)).resolves.toBeUndefined();
     expect(createInventorySpy).toHaveBeenCalledWith(createInventory);
 
-    // supabaseClient.from('facility_types').delete();
-    // supabaseClient.from('facilities').insert(facilityTest);
-    // supabaseClient.from('users').insert(userTest);
+    await deleteDumpRecordInDatabase(supabaseClient, dumpRecords);
   });
 
 

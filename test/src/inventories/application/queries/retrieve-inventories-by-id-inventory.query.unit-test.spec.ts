@@ -2,7 +2,7 @@ import { EntityDtoMapper } from '@/src/inventories/application/mappers/entity-dt
 import { RetrieveInventoriesByIdInventoryQuery } from '@/src/inventories/application/queries/retrieve-inventories-by-id-inventory.query';
 import { InventoryRepository } from '@/src/inventories/core/interfaces/Inventory.repository';
 
-import { createInventoryEntity } from '../../../../test-helpers';
+import { createInventoryEntity } from '../../../../utils/test-creation-artifact.helper';
 
 describe('RetrieveInventoriesByIdInventoryQuery', () => {
   let retrieveInventories: jest.Mock;

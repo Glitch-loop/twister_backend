@@ -9,7 +9,7 @@ import { ProductRepository } from '@/src/products/core/interfaces/ProductReposit
 import { DOMAIN_EVENT_ENUM } from '@/src/shared/core/enums/domain-event.enum';
 import { IntegrityRepository } from '@/src/shared/core/interfaces/integrity.repository';
 
-import { createInventoryBalance, createInventoryEntity, createProductEntity } from '../../../../test-helpers';
+import { createInventoryBalance, createInventoryEntity, createProductEntity } from '../../../../utils/test-creation-artifact.helper';
 
 describe('RegisterInventoryOperatonBetweenInventoriesCommand', () => {
   let retrieveInventories: jest.Mock;

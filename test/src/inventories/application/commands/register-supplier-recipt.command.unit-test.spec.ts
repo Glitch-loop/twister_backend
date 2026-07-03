@@ -10,7 +10,7 @@ import { PRODUCT_STATUS_ENUM } from '@/src/products/core/enums/product-status.en
 import { DOMAIN_EVENT_ENUM } from '@/src/shared/core/enums/domain-event.enum';
 import { IntegrityRepository } from '@/src/shared/core/interfaces/integrity.repository';
 
-import { createInventoryEntity, createProductEntity } from '../../../../test-helpers';
+import { createInventoryEntity, createProductEntity } from '../../../../utils/test-creation-artifact.helper';
 
 describe('RegisterSupplierReciptCommand', () => {
   let retrieveInventories: jest.Mock;
