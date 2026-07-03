@@ -37,6 +37,7 @@ export class InventorySupabaseRepository implements InventoryRepository {
   async CreateInventory(inventory: InventoryEntity): Promise<void> {
     try {
       const inventoryModel = this.mapper.toModel(inventory);
+
       const { error } = await this.supabase.from('inventories').insert(inventoryModel);
 
       if (error) {
