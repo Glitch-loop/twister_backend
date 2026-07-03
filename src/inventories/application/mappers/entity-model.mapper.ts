@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
 // Enums
-import { INVENTORY_CONTEXT_ENUM } from '@/src/inventories/core/enums/inventory-context.enum';
-import { INVENTORY_STATE_ENUM } from '@/src/inventories/core/enums/inventory-state-enum';
 import { MOVEMENT_TYPE_ENUM } from '@/src/inventories/core/enums/movement-type.enum';
 
 // Entities
@@ -32,6 +30,9 @@ import { isInventoryModel } from '@/src/inventories/application/guards/models/in
 import { isInventoryOperationModel } from '@/src/inventories/application/guards/models/inventory-operation.guard';
 import { isInventoryBalanceModel } from '@/src/inventories/application/guards/models/inventory-balance.guard';
 import { isInventoryOperationDescriptionModel } from '@/src/inventories/application/guards/models/inventory-operation-description.guard';
+import { INVENTORY_CONTEXT_ENUM } from '../../core/enums/inventory-context.enum';
+import { INVENTORY_STATE_ENUM } from '../../core/enums/inventory-state-enum';
+import { STOCK_VALIDATION_ENUM } from '../../core/enums/stock-validation.enum';
 
 
 @Injectable()
@@ -53,7 +54,6 @@ export class EntityModelMapper {
 			| InventoryOperationModel,
 		nestedModels?: InventoryBalanceModel[] | InventoryOperationDescriptionModel[],
 	): any {
-		console.log(model)
 		if (isInventoryBalanceModel(model)) {
 			return this.inventoryBalanceModelToDomainObject(model);
 		}
@@ -61,10 +61,13 @@ export class EntityModelMapper {
 			return this.inventoryOperationDescriptionModelToDomainObject(model);
 		}
 		if (isInventoryModel(model)) {
+			if (nestedModels === undefined) throw new Error('Missing inventory balance models for InventoryModel to domain object conversion');
 			if (Array.isArray(nestedModels) && nestedModels.every(isInventoryBalanceModel)) {
 				return this.inventoryModelToDomainObject(model, nestedModels);
+			} else {
+				throw new Error('Invalid balance model at moment of transforming inventory model to domain object');
 			}
-			throw new Error('Missing inventory balance models for InventoryModel to domain object conversion');
+			
 		}
 		if (isInventoryOperationModel(model)) {
 			if (Array.isArray(nestedModels) && nestedModels.every(isInventoryOperationDescriptionModel)) {
@@ -210,11 +213,15 @@ export class EntityModelMapper {
 		const createdAt = this.toDate(model.created_at, 'InventoryModel.created_at');
 
 		if (!Object.values(INVENTORY_CONTEXT_ENUM).includes(model.inventory_context)) {
-			throw new Error('Invalid inventory_context in InventoryModel');
+			throw new Error('Error at moment of transforming inventory model. Invalid inventory context.')
 		}
 
 		if (!Object.values(INVENTORY_STATE_ENUM).includes(model.is_active)) {
-			throw new Error('Invalid is_active in InventoryModel');
+			throw new Error('Error at moment of transforming inventory model. Invalid inventory state.')
+		}
+
+		if (!Object.values(STOCK_VALIDATION_ENUM).includes(model.stock_validation)) {
+			throw new Error('Error at moment of transforming inventory model. Invalid stock validatio state.')
 		}
 
 		return new InventoryEntity(
@@ -261,7 +268,6 @@ export class EntityModelMapper {
 
 	private toDate(value: Date | string, fieldName: string): Date {
 		const parsedDate = value instanceof Date ? value : new Date(value);
-
 		if (isNaN(parsedDate.getTime())) {
 			throw new Error(`Invalid ${fieldName} format`);
 		}

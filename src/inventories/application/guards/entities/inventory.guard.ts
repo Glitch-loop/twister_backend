@@ -7,10 +7,7 @@ import { INVENTORY_STATE_ENUM } from '@/src/inventories/core/enums/inventory-sta
 import { STOCK_VALIDATION_ENUM } from '@/src/inventories/core/enums/stock-validation.enum';
 
 // Utils
-import { isArray, isRecord } from '@/src/shared/application/guards/utils';
-
-// Guards
-import { isInventoryBalanceObjectValue } from '@/src/inventories/application/guards/object-values/inventory-balance.guard';
+import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isInventoryEntity = (value: unknown): value is InventoryEntity => {
   if (!isRecord(value)) {
@@ -26,7 +23,6 @@ export const isInventoryEntity = (value: unknown): value is InventoryEntity => {
     value.created_at instanceof Date &&
     value.updated_at instanceof Date &&
     typeof value.created_by === 'string' &&
-    isArray(value.inventory_balance) && value.inventory_balance.every(isInventoryBalanceObjectValue) &&
     (value.assigned_facility === null || typeof value.assigned_facility === 'string') &&
     (value.assigned_to === null || typeof value.assigned_to === 'string')
   );
