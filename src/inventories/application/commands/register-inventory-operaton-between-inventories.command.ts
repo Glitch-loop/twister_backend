@@ -9,7 +9,7 @@ import { InventoryOperationAggregate } from '@/src/inventories/core/aggregates/i
 import { InventoryEntity } from '@/src/inventories/core/entities/inventory.entity';
 
 // Repository
-import { Inventory } from '@/src/inventories/core/interfaces/Inventory.repository';
+import { InventoryRepository } from '@/src/inventories/core/interfaces/Inventory.repository';
 
 // Entitites
 import { ProductEntity } from '@/src/products/core/entities/product.entity';
@@ -42,7 +42,7 @@ interface InventoryOperationDescriptionInput {
 @Injectable()
 export class RegisterInventoryOperatonBetweenInventoriesCommand {
 	constructor(
-		@Inject(Inventory) private readonly inventoryRepository: Inventory,
+		@Inject(InventoryRepository) private readonly inventoryRepository: InventoryRepository,
 		@Inject(ProductRepository) private readonly productRepository: ProductRepository,
 		@Inject(IntegrityRepository) private readonly integrityRepository: IntegrityRepository,
 		private readonly eventEmitter: EventEmitter2,
@@ -79,8 +79,8 @@ export class RegisterInventoryOperatonBetweenInventoriesCommand {
 			inventoryOperationIdToUse,
 			created_by,
 			createdAtToUse,
-			latitude,
-			longitude,
+			latitude ? latitude : null,
+			longitude ? longitude : null,
 		);
 
 		for (const description of inventory_operation_descriptions) {

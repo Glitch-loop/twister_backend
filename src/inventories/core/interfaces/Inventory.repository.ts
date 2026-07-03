@@ -3,7 +3,7 @@ import { InventoryEntity } from "@/src/inventories/core/entities/inventory.entit
 import { InventoryBalanceObjectValue } from "@/src/inventories/core/value-objects/inventory-balance.object-value";
 
 
-export abstract class Inventory {
+export abstract class InventoryRepository {
   abstract CreateInventory(Inventory: InventoryEntity): Promise<void>;
   abstract UpdateInventory(Inventory: InventoryEntity): Promise<void>;
   abstract CreateInventoryOperation(InventoryOperation: InventoryOperationEntity): Promise<void>;

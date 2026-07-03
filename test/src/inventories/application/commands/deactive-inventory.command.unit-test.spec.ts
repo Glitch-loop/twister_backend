@@ -1,8 +1,8 @@
 import { DeactiveInventoryCommand } from '@/src/inventories/application/commands/deactive-inventory.command';
 import { INVENTORY_STATE_ENUM } from '@/src/inventories/core/enums/inventory-state-enum';
-import { Inventory } from '@/src/inventories/core/interfaces/Inventory.repository';
+import { InventoryRepository } from '@/src/inventories/core/interfaces/Inventory.repository';
 
-import { createInventoryEntity } from '../test-helpers';
+import { createInventoryEntity } from '../../../../test-helpers';
 
 describe('DeactiveInventoryCommand', () => {
   let retrieveInventories: jest.Mock;
@@ -17,7 +17,7 @@ describe('DeactiveInventoryCommand', () => {
       {
         retrieveInventories,
         UpdateInventory: updateInventory,
-      } as unknown as Inventory,
+      } as unknown as InventoryRepository,
     );
   });
 

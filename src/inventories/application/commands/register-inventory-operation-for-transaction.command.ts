@@ -16,7 +16,7 @@ import { MOVEMENT_TYPE_ENUM } from '@/src/inventories/core/enums/movement-type.e
 import { INVENTORY_CONTEXT_ENUM } from '@/src/inventories/core/enums/inventory-context.enum';
 
 // Repository
-import { Inventory } from '@/src/inventories/core/interfaces/Inventory.repository';
+import { InventoryRepository } from '@/src/inventories/core/interfaces/Inventory.repository';
 
 // Entities
 import { ProductEntity } from '@/src/products/core/entities/product.entity';
@@ -49,7 +49,7 @@ interface InventoryOperationDescriptionInput {
 @Injectable()
 export class RegisterInventoryOperationForTransactionCommand {
 	constructor(
-		@Inject(Inventory) private readonly inventoryRepository: Inventory,
+		@Inject(InventoryRepository) private readonly inventoryRepository: InventoryRepository,
 		@Inject(ProductRepository) private readonly productRepository: ProductRepository,
 		@Inject(IntegrityRepository) private readonly integrityRepository: IntegrityRepository,
 		private readonly eventEmitter: EventEmitter2,
@@ -89,8 +89,8 @@ export class RegisterInventoryOperationForTransactionCommand {
 			created_by,
 			createdAtToUse,
 			document_reference,
-			latitude,
-			longitude,
+			latitude ? latitude : null,
+			longitude ? longitude : null,
 		);
 
 		for (const description of inventory_operation_descriptions) {

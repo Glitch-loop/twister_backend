@@ -11,7 +11,7 @@ import { InventoryOperationEntity } from '@/src/inventories/core/entities/invent
 import { ProductEntity } from '@/src/products/core/entities/product.entity';
 
 // Repository
-import { Inventory } from '@/src/inventories/core/interfaces/Inventory.repository';
+import { InventoryRepository } from '@/src/inventories/core/interfaces/Inventory.repository';
 
 // Errors
 import { BusinessRuleException } from '@/src/shared/errors/BusinessRuleException';
@@ -39,7 +39,7 @@ interface InventoryOperationDescriptionInput {
 @Injectable()
 export class ReverseInventoryMovementCommand {
 	constructor(
-		@Inject(Inventory) private readonly inventoryRepository: Inventory,
+		@Inject(InventoryRepository) private readonly inventoryRepository: InventoryRepository,
 		@Inject(ProductRepository) private readonly productRepository: ProductRepository,
 		@Inject(IntegrityRepository) private readonly integrityRepository: IntegrityRepository,
 		private readonly eventEmitter: EventEmitter2,
@@ -82,8 +82,8 @@ export class ReverseInventoryMovementCommand {
 			created_by,
 			createdAtToUse,
 			inventoryOperationToReverse,
-			latitude,
-			longitude,
+			latitude ? latitude : null,
+			longitude ? longitude : null,
 		);
 
 		for (const description of inventory_operation_descriptions) {

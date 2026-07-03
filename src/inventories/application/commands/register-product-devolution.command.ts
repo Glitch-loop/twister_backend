@@ -12,7 +12,7 @@ import { InventoryEntity } from '@/src/inventories/core/entities/inventory.entit
 import { INVENTORY_CONTEXT_ENUM } from '@/src/inventories/core/enums/inventory-context.enum';
 
 // Repository
-import { Inventory } from '@/src/inventories/core/interfaces/Inventory.repository';
+import { InventoryRepository } from '@/src/inventories/core/interfaces/Inventory.repository';
 
 // Entities
 import { ProductEntity } from '@/src/products/core/entities/product.entity';
@@ -45,7 +45,7 @@ interface InventoryOperationDescriptionInput {
 @Injectable()
 export class RegisterProductDevolutionCommand {
 	constructor(
-		@Inject(Inventory) private readonly inventoryRepository: Inventory,
+		@Inject(InventoryRepository) private readonly inventoryRepository: InventoryRepository,
 		@Inject(ProductRepository) private readonly productRepository: ProductRepository,
 		@Inject(IntegrityRepository) private readonly integrityRepository: IntegrityRepository,
 		private readonly eventEmitter: EventEmitter2,
@@ -98,8 +98,8 @@ export class RegisterProductDevolutionCommand {
 			inventoryOperationIdToUse,
 			created_by,
 			createdAtToUse,
-			latitude,
-			longitude,
+			latitude ? latitude : null,
+			longitude ? longitude : null,
 			'2ef5c81c-8717-46dd-9328-b91bc5fb767b',//document_reference,
 		);
 

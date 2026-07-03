@@ -1,12 +1,15 @@
+import { Test, TestingModule } from '@nestjs/testing';
 import { InventorySupabaseRepository } from '@/src/inventories/infrastructure/repositories/supabase/inventory-supabase.repository';
 import { EntityModelMapper } from '@/src/inventories/application/mappers/entity-model.mapper';
 import { SupabaseDataSource } from '@/src/shared/infrastructure/datasources/supabase-data-source';
+import { InventoryRepository } from '@/src/inventories/core/interfaces/Inventory.repository';
 import {
   createInventoryBalance,
   createInventoryEntity,
   createInventoryOperationDescription,
   createInventoryOperationEntity,
-} from '@/test/src/inventories/application/test-helpers';
+} from '@/test/test-helpers';
+import { SupabaseClient } from '@supabase/supabase-js';
 
 type QueryResult = {
   data?: unknown;
@@ -39,66 +42,12 @@ class QueryBuilderMock implements PromiseLike<QueryResult> {
   }
 }
 
-describe('InventorySupabaseRepository', () => {
+describe('InventorySupabaseRepositoryGenerated', () => {
   let mapper: jest.Mocked<Pick<EntityModelMapper, 'toModel' | 'toDomainObject'>>;
   let supabaseDataSource: jest.Mocked<Pick<SupabaseDataSource, 'getClient'>>;
   let supabaseClient: { from: jest.Mock };
   let repository: InventorySupabaseRepository;
   let tables: Record<string, QueryBuilderMock>;
-
-  const inventoryEntity = createInventoryEntity();
-  const inventoryWithoutDescriptions = createInventoryOperationEntity({
-    inventory_operation_descriptions: [],
-  });
-  const inventoryOperationEntity = createInventoryOperationEntity();
-  const inventoryBalance = createInventoryBalance();
-
-  const inventoryModel = {
-    id_inventory: 'inv-1',
-    inventory_context: inventoryEntity.inventory_context,
-    inventory_name: inventoryEntity.inventory_name,
-    is_active: inventoryEntity.is_active,
-    stock_validation: inventoryEntity.stock_validation,
-    created_at: '2026-07-01T00:00:00.000Z',
-    updated_at: '2026-07-01T01:00:00.000Z',
-    created_by: inventoryEntity.created_by,
-    assigned_facility: inventoryEntity.assigned_facility,
-    assigned_to: inventoryEntity.assigned_to,
-  };
-
-  const inventoryOperationModel = {
-    id_inventory_operation: 'operation-1',
-    latitude: null,
-    longitude: null,
-    inventory_operation_reference: 'ref-1',
-    movement_type: inventoryOperationEntity.movement_type,
-    document_reference: 'doc-1',
-    created_at: '2026-07-01T00:00:00.000Z',
-    created_by: inventoryOperationEntity.created_by,
-    id_inventory_origin: inventoryOperationEntity.id_inventory_origin,
-    id_inventory_target: inventoryOperationEntity.id_inventory_target,
-  };
-
-  const descriptionModel = {
-    id_inventory_operation_description: 'desc-1',
-    price_at_moment: 12,
-    cost_at_moment: 10,
-    quantity: 2,
-    created_at: '2026-07-01T00:00:00.000Z',
-    id_inventory_operation: 'operation-1',
-    id_product: 'prod-1',
-  };
-
-  const balanceModel = {
-    id_inventory_balance: 'balance-1',
-    quantity: 10,
-    min_quantity: null,
-    max_quantity: null,
-    created_at: '2026-07-01T00:00:00.000Z',
-    updated_at: '2026-07-01T01:00:00.000Z',
-    id_inventory: 'inv-1',
-    id_product: 'prod-1',
-  };
 
   beforeEach(() => {
     tables = {
@@ -379,5 +328,58 @@ describe('InventorySupabaseRepository', () => {
     await expect(repository.listInventoryOperations(10)).rejects.toThrow(
       'Failed to list inventory operations: Failed to list inventory operations: list failed',
     );
+  });
+});
+
+describe('Inventory supabase repository', () => {
+  // Varaibles related to testing module
+  let moduleRef: TestingModule;
+  let supabaseDataSource: SupabaseDataSource;
+  let repository: InventorySupabaseRepository;
+  let mapper: EntityModelMapper;
+  let inventoryRepository: InventoryRepository;
+  let supabaseClient:SupabaseClient;
+
+  beforeEach(async () => {
+    moduleRef = await Test.createTestingModule({
+      controllers: [],
+      providers: [
+        SupabaseDataSource,
+        InventorySupabaseRepository,
+        EntityModelMapper,
+        {
+          provide: InventoryRepository,
+          useExisting: InventorySupabaseRepository,
+        },
+      ],
+    }).compile();
+
+    supabaseDataSource = moduleRef.get(SupabaseDataSource);
+    repository = moduleRef.get(InventorySupabaseRepository);
+    inventoryRepository = moduleRef.get(InventoryRepository);
+    mapper = moduleRef.get(EntityModelMapper);
+
+    supabaseClient = supabaseDataSource.getClient();
+  });
+
+  it('instantiates providers through the testing module', () => {
+    expect(supabaseDataSource).toBeDefined();
+    expect(repository).toBeDefined();
+    expect(inventoryRepository).toBe(repository);
+    expect(mapper).toBe(mapper);
+  });
+
+  it('creates an inventory with the mapped model', async () => {
+    
+
+    const createInventory = createInventoryEntity({ inventory_name: 'TEST Warehouse' });
+    const createInventorySpy = jest.spyOn(repository, 'CreateInventory');
+    
+    await expect(repository.CreateInventory(createInventory)).resolves.toBeUndefined();
+    expect(createInventorySpy).toHaveBeenCalledWith(createInventory);
+  });
+
+  afterEach(async () => {
+    await moduleRef.close();
   });
 });

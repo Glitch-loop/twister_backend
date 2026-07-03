@@ -1,9 +1,9 @@
 import { UpdateInventoryCommand } from '@/src/inventories/application/commands/update-inventory.command';
 import { STOCK_VALIDATION_ENUM } from '@/src/inventories/core/enums/stock-validation.enum';
-import { Inventory } from '@/src/inventories/core/interfaces/Inventory.repository';
+import { InventoryRepository } from '@/src/inventories/core/interfaces/Inventory.repository';
 import { IntegrityRepository } from '@/src/shared/core/interfaces/integrity.repository';
 
-import { createInventoryBalance, createInventoryEntity } from '../test-helpers';
+import { createInventoryBalance, createInventoryEntity } from '../../../../test-helpers';
 
 describe('UpdateInventoryCommand', () => {
   let retrieveInventories: jest.Mock;
@@ -23,7 +23,7 @@ describe('UpdateInventoryCommand', () => {
         retrieveInventories,
         UpdateInventory: updateInventory,
         UpsertInventoryBalance: upsertInventoryBalance,
-      } as unknown as Inventory,
+      } as unknown as InventoryRepository,
       { generateUUIDv4 } as unknown as IntegrityRepository,
     );
   });

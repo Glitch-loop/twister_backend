@@ -1,7 +1,7 @@
 import { CreateInventoryCommand } from '@/src/inventories/application/commands/create-inventory.command';
 import { INVENTORY_CONTEXT_ENUM } from '@/src/inventories/core/enums/inventory-context.enum';
 import { STOCK_VALIDATION_ENUM } from '@/src/inventories/core/enums/stock-validation.enum';
-import { Inventory } from '@/src/inventories/core/interfaces/Inventory.repository';
+import { InventoryRepository } from '@/src/inventories/core/interfaces/Inventory.repository';
 import { IntegrityRepository } from '@/src/shared/core/interfaces/integrity.repository';
 import { BusinessRuleException } from '@/src/shared/errors/BusinessRuleException';
 
@@ -15,7 +15,7 @@ describe('CreateInventoryCommand', () => {
     generateUUIDv4 = jest.fn().mockReturnValue('generated-id');
 
     command = new CreateInventoryCommand(
-      { CreateInventory: createInventory } as unknown as Inventory,
+      { CreateInventory: createInventory } as unknown as InventoryRepository,
       { generateUUIDv4 } as unknown as IntegrityRepository,
     );
   });

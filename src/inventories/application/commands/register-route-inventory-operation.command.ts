@@ -22,7 +22,7 @@ import { INVENTORY_CONTEXT_ENUM } from '@/src/inventories/core/enums/inventory-c
 import { ROUTE_INVENTORY_OPERATION_TYPE } from '@/src/inventories/core/enums/route-inventory-operation-type.enum';
 
 // Repository
-import { Inventory } from '@/src/inventories/core/interfaces/Inventory.repository';
+import { InventoryRepository } from '@/src/inventories/core/interfaces/Inventory.repository';
 
 // Object values
 import { InventoryOperationDescriptionObjectValue } from '@/src/inventories/core/value-objects/inventory-operation-description.object-value';
@@ -34,7 +34,7 @@ import { BusinessRuleException } from '@/src/shared/errors/BusinessRuleException
 @Injectable()
 export class RegisterRouteInventoryOperationCommand {
   constructor(
-    @Inject(Inventory) private readonly inventoryRepository: Inventory,
+    @Inject(InventoryRepository) private readonly inventoryRepository: InventoryRepository,
     private readonly mapper: EntityDtoMapper,
     private readonly registerInventoryOperatonBetweenInventoriesCommand: RegisterInventoryOperatonBetweenInventoriesCommand,
     private readonly registerProductDevolutionCommand: RegisterProductDevolutionCommand,

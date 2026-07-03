@@ -25,8 +25,8 @@ import { EntityDtoMapper } from '@/src/inventories/application/mappers/entity-dt
 import { EntityModelMapper } from '@/src/inventories/application/mappers/entity-model.mapper';
 
 // Interfaces
-import { Inventory } from '@/src/inventories/core/interfaces/Inventory.repository';
-import { InventorySupabaseRepository } from '@/src/inventories/infrastructure/infrastructure/repositories/supabase/inventory-supabase.repository';
+import { InventoryRepository } from '@/src/inventories/core/interfaces/Inventory.repository';
+import { InventorySupabaseRepository } from '@/src/inventories/infrastructure/repositories/supabase/inventory-supabase.repository';
 
 //Controllers
 import { InventoriesController } from '@/src/inventories/inventories.controller';
@@ -63,7 +63,7 @@ import { SharedModule } from '@/src/shared/shared.module';
     SupabaseDataSource,
     InventorySupabaseRepository,
     {
-      provide: Inventory,
+      provide: InventoryRepository,
       useExisting: InventorySupabaseRepository,
     },
   ],

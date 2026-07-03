@@ -2,7 +2,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 
 // Repositories
-import { Inventory } from '@/src/inventories/core/interfaces/Inventory.repository';
+import { InventoryRepository } from '@/src/inventories/core/interfaces/Inventory.repository';
 
 // Aggregate
 import { InventoryAggregate } from '@/src/inventories/core/aggregates/inventory.aggregate';
@@ -20,7 +20,7 @@ import { IntegrityRepository } from '@/src/shared/core/interfaces/integrity.repo
 @Injectable()
 export class CreateInventoryCommand {
 	constructor(
-		@Inject(Inventory) private readonly inventoryRepository: Inventory,
+		@Inject(InventoryRepository) private readonly inventoryRepository: InventoryRepository,
 		@Inject(IntegrityRepository) private readonly integrityRepository: IntegrityRepository,
 	) {}
 
@@ -41,8 +41,8 @@ export class CreateInventoryCommand {
 			stock_validation ?? STOCK_VALIDATION_ENUM.ENABLE,
 			inventory_name.trim(),
 			created_by,
-			assigned_to,
-			assigned_facility,
+			assigned_to ? assigned_to : null,
+			assigned_facility ? assigned_facility : null,
 		);
 
 		await this.inventoryRepository.CreateInventory(newInventory);

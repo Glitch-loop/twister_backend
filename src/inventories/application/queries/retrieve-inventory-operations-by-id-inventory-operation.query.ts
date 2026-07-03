@@ -3,13 +3,12 @@ import { Inject, Injectable } from '@nestjs/common';
 import { InventoryOperationDto } from '@/src/inventories/application/dtos/inventory-operation.dto';
 import { EntityDtoMapper } from '@/src/inventories/application/mappers/entity-dto.mapper';
 import { InventoryOperationEntity } from '@/src/inventories/core/entities/inventory-operation.entity';
-import { Inventory } from '@/src/inventories/core/interfaces/Inventory.repository';
+import { InventoryRepository } from '@/src/inventories/core/interfaces/Inventory.repository';
 
 @Injectable()
 export class RetrieveInventoryOperationsByIdInventoryOperationQuery {
   constructor(
-    @Inject(Inventory)
-    private readonly inventoryRepository: Inventory,
+    @Inject(InventoryRepository) private readonly inventoryRepository: InventoryRepository,
     private readonly mapper: EntityDtoMapper,
   ) {}
 

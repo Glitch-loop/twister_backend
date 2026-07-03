@@ -4,7 +4,7 @@ import { INVENTORY_STATE_ENUM } from '@/src/inventories/core/enums/inventory-sta
 import { STOCK_VALIDATION_ENUM } from '@/src/inventories/core/enums/stock-validation.enum';
 import { InventoryBalanceObjectValue } from '@/src/inventories/core/value-objects/inventory-balance.object-value';
 
-import { createInventoryBalance, createInventoryEntity } from '@/test/src/inventories/application/test-helpers';
+import { createInventoryBalance, createInventoryEntity } from '@/test/test-helpers';
 
 describe('InventoryAggregate', () => {
   it('creates a new inventory when context (WAREHOUSE) and assignment are valid (user case)', () => {

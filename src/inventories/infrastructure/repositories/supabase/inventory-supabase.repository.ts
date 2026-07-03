@@ -2,7 +2,7 @@
 import { Injectable } from '@nestjs/common';
 
 // Repositories
-import { Inventory } from '@/src/inventories/core/interfaces/Inventory.repository';
+import { InventoryRepository } from '@/src/inventories/core/interfaces/Inventory.repository';
 
 // Object value
 import { InventoryBalanceObjectValue } from '@/src/inventories/core/value-objects/inventory-balance.object-value';
@@ -24,7 +24,7 @@ import { EntityModelMapper } from '@/src/inventories/application/mappers/entity-
 import { SupabaseDataSource } from '@/src/shared/infrastructure/datasources/supabase-data-source';
 
 @Injectable()
-export class InventorySupabaseRepository implements Inventory {
+export class InventorySupabaseRepository implements InventoryRepository {
   constructor(
     private readonly supabaseDataSource: SupabaseDataSource,
     private readonly mapper: EntityModelMapper,

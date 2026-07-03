@@ -1,9 +1,9 @@
 import { EntityDtoMapper } from '@/src/inventories/application/mappers/entity-dto.mapper';
 import { ListInventoryOperationsQuery } from '@/src/inventories/application/queries/list-inventory-operations.query';
 import { MOVEMENT_TYPE_ENUM } from '@/src/inventories/core/enums/movement-type.enum';
-import { Inventory } from '@/src/inventories/core/interfaces/Inventory.repository';
+import { InventoryRepository } from '@/src/inventories/core/interfaces/Inventory.repository';
 
-import { createInventoryOperationEntity } from '../test-helpers';
+import { createInventoryOperationEntity } from '../../../../test-helpers';
 
 describe('ListInventoryOperationsQuery', () => {
   let listInventoryOperations: jest.Mock;
@@ -15,7 +15,7 @@ describe('ListInventoryOperationsQuery', () => {
     mapperToDto = jest.fn();
 
     query = new ListInventoryOperationsQuery(
-      { listInventoryOperations } as unknown as Inventory,
+      { listInventoryOperations } as unknown as InventoryRepository,
       { toDto: mapperToDto } as unknown as EntityDtoMapper,
     );
   });

@@ -2,12 +2,12 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import { InventoryAggregate } from '@/src/inventories/core/aggregates/inventory.aggregate';
 import { InventoryEntity } from '@/src/inventories/core/entities/inventory.entity';
-import { Inventory } from '@/src/inventories/core/interfaces/Inventory.repository';
+import { InventoryRepository } from '@/src/inventories/core/interfaces/Inventory.repository';
 
 @Injectable()
 export class DeactiveInventoryCommand {
 	constructor(
-		@Inject(Inventory) private readonly inventoryRepository: Inventory,
+		@Inject(InventoryRepository) private readonly inventoryRepository: InventoryRepository,
 	) {}
 
 	async execute(id_inventory: string): Promise<void> {

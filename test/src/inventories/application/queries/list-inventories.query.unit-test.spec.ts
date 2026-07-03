@@ -3,7 +3,7 @@ import { InventoryEntity } from '@/src/inventories/core/entities/inventory.entit
 import { INVENTORY_CONTEXT_ENUM } from '@/src/inventories/core/enums/inventory-context.enum';
 import { INVENTORY_STATE_ENUM } from '@/src/inventories/core/enums/inventory-state-enum';
 import { STOCK_VALIDATION_ENUM } from '@/src/inventories/core/enums/stock-validation.enum';
-import { Inventory } from '@/src/inventories/core/interfaces/Inventory.repository';
+import { InventoryRepository } from '@/src/inventories/core/interfaces/Inventory.repository';
 import { EntityDtoMapper } from '@/src/inventories/application/mappers/entity-dto.mapper';
 
 describe('ListInventoriesQuery', () => {
@@ -30,7 +30,7 @@ describe('ListInventoriesQuery', () => {
     mapperToDto = jest.fn();
 
     query = new ListInventoriesQuery(
-      { listInventories } as unknown as Inventory,
+      { listInventories } as unknown as InventoryRepository,
       { toDto: mapperToDto } as unknown as EntityDtoMapper,
     );
   });

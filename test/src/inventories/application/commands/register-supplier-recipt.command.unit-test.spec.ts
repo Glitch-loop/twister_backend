@@ -4,13 +4,13 @@ import { RegisterSupplierReciptCommand } from '@/src/inventories/application/com
 import { EntityDtoMapper } from '@/src/inventories/application/mappers/entity-dto.mapper';
 import { INVENTORY_CONTEXT_ENUM } from '@/src/inventories/core/enums/inventory-context.enum';
 import { MOVEMENT_TYPE_ENUM } from '@/src/inventories/core/enums/movement-type.enum';
-import { Inventory } from '@/src/inventories/core/interfaces/Inventory.repository';
+import { InventoryRepository } from '@/src/inventories/core/interfaces/Inventory.repository';
 import { ProductRepository } from '@/src/products/core/interfaces/ProductRepository.repository';
 import { PRODUCT_STATUS_ENUM } from '@/src/products/core/enums/product-status.enum';
 import { DOMAIN_EVENT_ENUM } from '@/src/shared/core/enums/domain-event.enum';
 import { IntegrityRepository } from '@/src/shared/core/interfaces/integrity.repository';
 
-import { createInventoryEntity, createProductEntity } from '../test-helpers';
+import { createInventoryEntity, createProductEntity } from '../../../../test-helpers';
 
 describe('RegisterSupplierReciptCommand', () => {
   let retrieveInventories: jest.Mock;
@@ -46,7 +46,7 @@ describe('RegisterSupplierReciptCommand', () => {
         CreateInventory: createInventory,
         CreateInventoryOperation: createInventoryOperation,
         UpsertInventoryBalance: upsertInventoryBalance,
-      } as unknown as Inventory,
+      } as unknown as InventoryRepository,
       { retrieveProducts } as unknown as ProductRepository,
       { generateUUIDv4 } as unknown as IntegrityRepository,
       { emit } as unknown as EventEmitter2,

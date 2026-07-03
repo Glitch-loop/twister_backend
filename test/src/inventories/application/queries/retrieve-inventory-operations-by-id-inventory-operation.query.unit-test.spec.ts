@@ -1,8 +1,8 @@
 import { EntityDtoMapper } from '@/src/inventories/application/mappers/entity-dto.mapper';
 import { RetrieveInventoryOperationsByIdInventoryOperationQuery } from '@/src/inventories/application/queries/retrieve-inventory-operations-by-id-inventory-operation.query';
-import { Inventory } from '@/src/inventories/core/interfaces/Inventory.repository';
+import { InventoryRepository } from '@/src/inventories/core/interfaces/Inventory.repository';
 
-import { createInventoryOperationEntity } from '../test-helpers';
+import { createInventoryOperationEntity } from '../../../../test-helpers';
 
 describe('RetrieveInventoryOperationsByIdInventoryOperationQuery', () => {
   let retrieveInventoryOperations: jest.Mock;
@@ -14,7 +14,7 @@ describe('RetrieveInventoryOperationsByIdInventoryOperationQuery', () => {
     mapperToDto = jest.fn();
 
     query = new RetrieveInventoryOperationsByIdInventoryOperationQuery(
-      { retrieveInventoryOperations } as unknown as Inventory,
+      { retrieveInventoryOperations } as unknown as InventoryRepository,
       { toDto: mapperToDto } as unknown as EntityDtoMapper,
     );
   });

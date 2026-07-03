@@ -4,12 +4,12 @@ import { RegisterInventoryOperatonBetweenInventoriesCommand } from '@/src/invent
 import { EntityDtoMapper } from '@/src/inventories/application/mappers/entity-dto.mapper';
 import { INVENTORY_CONTEXT_ENUM } from '@/src/inventories/core/enums/inventory-context.enum';
 import { MOVEMENT_TYPE_ENUM } from '@/src/inventories/core/enums/movement-type.enum';
-import { Inventory } from '@/src/inventories/core/interfaces/Inventory.repository';
+import { InventoryRepository } from '@/src/inventories/core/interfaces/Inventory.repository';
 import { ProductRepository } from '@/src/products/core/interfaces/ProductRepository.repository';
 import { DOMAIN_EVENT_ENUM } from '@/src/shared/core/enums/domain-event.enum';
 import { IntegrityRepository } from '@/src/shared/core/interfaces/integrity.repository';
 
-import { createInventoryBalance, createInventoryEntity, createProductEntity } from '../test-helpers';
+import { createInventoryBalance, createInventoryEntity, createProductEntity } from '../../../../test-helpers';
 
 describe('RegisterInventoryOperatonBetweenInventoriesCommand', () => {
   let retrieveInventories: jest.Mock;
@@ -39,7 +39,7 @@ describe('RegisterInventoryOperatonBetweenInventoriesCommand', () => {
         retrieveInventories,
         CreateInventoryOperation: createInventoryOperation,
         UpsertInventoryBalance: upsertInventoryBalance,
-      } as unknown as Inventory,
+      } as unknown as InventoryRepository,
       { retrieveProducts } as unknown as ProductRepository,
       { generateUUIDv4 } as unknown as IntegrityRepository,
       { emit } as unknown as EventEmitter2,

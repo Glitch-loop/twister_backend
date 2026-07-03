@@ -12,7 +12,7 @@ import { InventoryBalanceObjectValue } from '@/src/inventories/core/value-object
 
 // Entities
 import { InventoryEntity } from '@/src/inventories/core/entities/inventory.entity';
-import { Inventory } from '@/src/inventories/core/interfaces/Inventory.repository';
+import { InventoryRepository } from '@/src/inventories/core/interfaces/Inventory.repository';
 
 
 interface ProductLimitsInterface {
@@ -24,7 +24,7 @@ interface ProductLimitsInterface {
 @Injectable()
 export class UpdateInventoryCommand {
 	constructor(
-		@Inject(Inventory) private readonly inventoryRepository: Inventory,
+		@Inject(InventoryRepository) private readonly inventoryRepository: InventoryRepository,
 		@Inject(IntegrityRepository) private readonly integrityRepository: IntegrityRepository,
 	) {}
 
