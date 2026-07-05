@@ -10,6 +10,7 @@ export const isTransactionDescriptionObjectValue = (value: unknown): value is Tr
     typeof value.id_transaction_description === 'string' &&
     typeof value.price_at_moment === 'number' &&
     typeof value.cost_at_moment === 'number' &&
+    value.created_at instanceof Date &&
     typeof value.quantity === 'number' &&
     typeof value.id_transaction === 'string' &&
     typeof value.id_transaction_operation_type === 'string' &&

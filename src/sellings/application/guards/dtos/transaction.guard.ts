@@ -24,7 +24,6 @@ export const isTransactionDto = (value: unknown): value is TransactionDto => {
     typeof value.id_work_day === 'string' &&
     isPaymentMethodDto(value.payment_method) &&
     isPaymentSchemaDto(value.payment_schema) &&
-    Array.isArray(value.transaction_descriptions) &&
-    value.transaction_descriptions.every((description) => isTransactionDescriptionDto(description))
+    Array.isArray(value.transaction_descriptions) && value.transaction_descriptions.every((description) => isTransactionDescriptionDto(description))
   );
 };

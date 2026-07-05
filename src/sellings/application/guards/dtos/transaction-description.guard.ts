@@ -13,6 +13,7 @@ export const isTransactionDescriptionDto = (value: unknown): value is Transactio
     typeof value.cost_at_moment === 'number' &&
     typeof value.quantity === 'number' &&
     typeof value.id_transaction === 'string' &&
+    value.created_at instanceof Date &&
     typeof value.id_transaction_operation_type === 'string' &&
     typeof value.id_product === 'string'
   );

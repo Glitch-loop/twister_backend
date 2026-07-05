@@ -15,10 +15,11 @@ export const isTransactionModel = (value: unknown): value is TransactionModel =>
     (value.id_invoice_concept === null || typeof value.id_invoice_concept === 'string') &&
     (value.latitude === null || typeof value.latitude === 'string') &&
     (value.longitude === null || typeof value.longitude === 'string') &&
+    value.created_at instanceof Date &&
     (value.id_location === null || typeof value.id_location === 'string') &&
     typeof value.id_client === 'string' &&
-    typeof value.created_by === 'string' &&
     typeof value.id_work_day === 'string' &&
+    typeof value.created_by === 'string' &&
     typeof value.id_payment_method === 'string' &&
     typeof value.id_payment_schema === 'string'
   );
