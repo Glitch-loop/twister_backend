@@ -140,7 +140,7 @@ describe('EntityModelMapper', () => {
   it('throws when transaction model created_at has invalid format', () => {
     expect(() =>
       mapper.toDomainObject(
-        { ...baseTransactionModel, created_at: 'invalid-date' as unknown as Date },
+        { ...baseTransactionModel, created_at: 'invalid-date' },
         paymentMethodModel,
         paymentSchemaModel,
         validDescriptionModels,
