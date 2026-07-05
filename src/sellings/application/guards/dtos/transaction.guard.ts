@@ -16,6 +16,7 @@ export const isTransactionDto = (value: unknown): value is TransactionDto => {
     typeof value.state === 'number' &&
     typeof value.received_amount === 'number' &&
     typeof value.created_by === 'string' &&
+    value.created_at instanceof Date &&
     (value.id_invoice_concept === null || typeof value.id_invoice_concept === 'string') &&
     (value.latitude === null || typeof value.latitude === 'string') &&
     (value.longitude === null || typeof value.longitude === 'string') &&

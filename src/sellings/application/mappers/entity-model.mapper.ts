@@ -90,20 +90,18 @@ export class EntityModelMapper {
 			return this.taxModelToDomainObject(model);
 		}
 		if (isTransactionModel(model)) {
-			if (
-				isPaymentMethodModel(paymentMethodModel) &&
-				isPaymentSchemaModel(paymentSchemaModel) &&
-				Array.isArray(transactionDescriptionModels) &&
-				transactionDescriptionModels.every((description) => isTransactionDescriptionModel(description))
-			) {
-				return this.transactionModelToDomainObject(
-					model,
-					paymentMethodModel,
-					paymentSchemaModel,
-					transactionDescriptionModels,
-				);
-			}
-			throw new Error('Missing nested models for TransactionModel to domain object conversion');
+			if (!isPaymentMethodModel(paymentMethodModel)) throw new Error('Missing payment method for TransactionModel to domain object conversion.');
+			if (!isPaymentSchemaModel(paymentSchemaModel)) throw new Error('Missing payment schema for TransactionModel to domain object conversion');
+			if (!(Array.isArray(transactionDescriptionModels) &&
+			transactionDescriptionModels.every((description) => isTransactionDescriptionModel(description)))) 
+				throw new Error('Missing nested models for TransactionModel to domain object conversion.');
+
+			return this.transactionModelToDomainObject(
+				model,
+				paymentMethodModel,
+				paymentSchemaModel,
+				transactionDescriptionModels,
+			);			
 		}
 
 		throw new Error('Invalid input for mapping to domain object');

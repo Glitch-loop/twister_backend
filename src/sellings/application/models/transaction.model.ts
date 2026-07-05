@@ -6,7 +6,7 @@ export interface TransactionModel {
   id_invoice_concept: string | null;
   latitude: string | null;
   longitude: string | null;
-  created_at: Date;
+  created_at: string;
   id_location: string | null;
   id_client: string;
   id_work_day: string;
