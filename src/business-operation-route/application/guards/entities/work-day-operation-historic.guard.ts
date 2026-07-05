@@ -1,11 +1,17 @@
+// Enums
+import { DAY_OPERATIONS_ENUM } from '@/src/business-operation-route/core/enums/day-operations.enum';
+
+// Entities
 import type { WorkDayOperationHistoricEntity } from '@/src/business-operation-route/core/entities/work-day-operation-historic.entity';
+
+// Records
 import { isRecord } from '@/src/shared/application/guards/utils';
 
 export const isWorkDayOperationHistoricEntity = (value: unknown): value is WorkDayOperationHistoricEntity => {
   if (!isRecord(value)) return false;
   return (
     typeof value.id_work_day_operation === 'string' &&
-    typeof value.id_operation_type === 'string' &&
+    typeof value.id_operation_type === 'string' && Object.values(DAY_OPERATIONS_ENUM).includes(value.id_operation_type as DAY_OPERATIONS_ENUM) &&
     typeof value.id_work_day === 'string' &&
     (value.latitude === null || typeof value.latitude === 'string') &&
     (value.longitude === null || typeof value.longitude === 'string') &&

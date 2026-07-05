@@ -143,11 +143,11 @@ export class BusinessOperationDayAggregate {
 	}
 
 	private registerAttendTodaysClient(params: CreateBusinessOperationParams): void {
-		if (!params.id_location) {
+		if (params.id_location === null) {
 			throw new BusinessRuleException('id_location is required for route client attention operations.');
 		}
 
-		if (!this.dayOperations) {
+		if (this.dayOperations === null) {
 			this.dayOperations = [];
 		}
 

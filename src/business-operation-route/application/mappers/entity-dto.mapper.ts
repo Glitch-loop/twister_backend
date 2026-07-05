@@ -73,7 +73,7 @@ export class Mapper {
 			domainObject.id_note,
 			domainObject.note,
 			domainObject.id_owner,
-			domainObject.created_at,
+			domainObject.created_at.toISOString(),
 		);
 	}
 
@@ -81,7 +81,7 @@ export class Mapper {
 		return new WorkDayOperationHistoricDto(
 			domainObject.id_work_day_operation,
 			domainObject.id_operation_type,
-			domainObject.created_at,
+			domainObject.created_at.toISOString(),
 			domainObject.latitude,
 			domainObject.longitude,
 			domainObject.id_work_day,
@@ -96,13 +96,12 @@ export class Mapper {
 	private workDayDomainObjectToDto(domainObject: WorkDayEntity): WorkDayDto {
 		return new WorkDayDto(
 			domainObject.id_work_day,
-			domainObject.start_date,
-			domainObject.id_route,
+			domainObject.start_date.toISOString(),
 			domainObject.start_petty_cash,
 			domainObject.id_route_day,
 			domainObject.id_user,
 			domainObject.notes.map((note) => this.workDayNoteDomainObjectToDto(note)),
-			domainObject.finish_date,
+			domainObject.finish_date === null ? null : domainObject.finish_date.toISOString(),
 			domainObject.final_petty_cash,
 			domainObject.id_payment_stub,
 		);
@@ -114,7 +113,7 @@ export class Mapper {
 			dto.id_note,
 			dto.note,
 			dto.id_owner,
-			dto.created_at,
+			new Date(dto.created_at),
 		);
 	}
 
@@ -122,7 +121,7 @@ export class Mapper {
 		return new WorkDayOperationHistoricEntity(
 			dto.id_work_day_operation,
 			dto.id_operation_type,
-			dto.created_at,
+			new Date(dto.created_at),
 			dto.id_work_day,
 			dto.latitude,
 			dto.longitude,
@@ -137,13 +136,12 @@ export class Mapper {
 	private workDayDtoToDomainObject(dto: WorkDayDto): WorkDayEntity {
 		return new WorkDayEntity(
 			dto.id_work_day,
-			dto.start_date,
-			dto.id_route,
+			new Date(dto.start_date),
 			dto.start_petty_cash,
 			dto.id_route_day,
 			dto.id_user,
 			dto.notes.map((note) => this.workDayNoteDtoToDomainObject(note)),
-			dto.finish_date,
+			dto.finish_date === null ? null : new Date(dto.finish_date),
 			dto.final_petty_cash,
 			dto.id_payment_stub,
 		);

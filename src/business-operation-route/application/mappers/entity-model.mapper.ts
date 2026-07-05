@@ -19,6 +19,7 @@ import { isWorkDayModel } from '@/src/business-operation-route/application/guard
 import { isWorkDayOperationHistoricModel } from '@/src/business-operation-route/application/guards/models/work-day-operation-historic.guard';
 import { isWorkDayNoteModel } from '@/src/business-operation-route/application/guards/models/work-day-note.guard';
 import { isNoteObjectValue } from '@/src/business-operation-route/application/guards/object-values/note.guard';
+import { DAY_OPERATIONS_ENUM } from '../../core/enums/day-operations.enum';
 
 @Injectable()
 export class Mapper {
@@ -73,9 +74,8 @@ export class Mapper {
 	private workDayDomainObjectToModel(domainObject: WorkDayEntity): WorkDayModel {
 		return {
 			id_work_day: domainObject.id_work_day,
-			start_date: domainObject.start_date,
-			finish_date: domainObject.finish_date,
-			id_route: domainObject.id_route,
+			start_date: domainObject.start_date.toISOString(),
+			finish_date: domainObject.finish_date === null ? null : domainObject.finish_date.toISOString(),
 			start_petty_cash: domainObject.start_petty_cash,
 			final_petty_cash: domainObject.final_petty_cash,
 			id_route_day: domainObject.id_route_day,
@@ -88,7 +88,7 @@ export class Mapper {
 		return {
 			id_work_day_notes: domainObject.id_note,
 			note: domainObject.note,
-			created_at: domainObject.created_at ?? new Date(),
+			created_at: domainObject.created_at.toISOString(),
 			id_work_day: domainObject.id_owner,
 		};
 	}
@@ -103,7 +103,7 @@ export class Mapper {
 			latitude: domainObject.latitude,
 			longitude: domainObject.longitude,
 			id_operation_type: domainObject.id_operation_type,
-			created_at: domainObject.created_at,
+			created_at: domainObject.created_at.toISOString(),
 			id_day_operation_dependent: domainObject.id_day_operation_dependent,
 			id_work_day: domainObject.id_work_day,
 		};
@@ -113,8 +113,8 @@ export class Mapper {
 	private workDayOperationHistoricModelToDomainObject(model: WorkDayOperationHistoricModel): WorkDayOperationHistoricEntity {
 		return new WorkDayOperationHistoricEntity(
 			model.id_work_day_operation,
-			model.id_operation_type,
-			model.created_at instanceof Date ? model.created_at : new Date(model.created_at),
+			model.id_operation_type as DAY_OPERATIONS_ENUM,
+			new Date(model.created_at),
 			model.id_work_day,
 			model.latitude,
 			model.longitude,
@@ -131,22 +131,19 @@ export class Mapper {
 			model.id_work_day_notes,
 			model.note,
 			model.id_work_day,
-			model.created_at instanceof Date ? model.created_at : new Date(model.created_at),
+			new Date(model.created_at),
 		);
 	}
 
 	private workDayModelToDomainObject(model: WorkDayModel, workDayNoteModels: WorkDayNoteModel[]): WorkDayEntity {
     return new WorkDayEntity(
 			model.id_work_day,
-			model.start_date instanceof Date ? model.start_date : new Date(model.start_date),
-			model.id_route,
+			new Date(model.start_date),
 			model.start_petty_cash,
 			model.id_route_day,
 			model.id_user,
 			workDayNoteModels.map((noteModel) => this.workDayNoteModelToDomainObject(noteModel)),
-			model.finish_date instanceof Date || model.finish_date === undefined
-				? model.finish_date
-				: new Date(model.finish_date),
+			model.finish_date === null ? null : new Date(model.finish_date),
 			model.final_petty_cash,
 			model.id_payment_stub,
 		);

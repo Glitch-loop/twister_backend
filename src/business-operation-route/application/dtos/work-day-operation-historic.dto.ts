@@ -14,8 +14,8 @@ export class WorkDayOperationHistoricDto {
 	@ApiProperty({ enum: DAY_OPERATIONS_ENUM, example: DAY_OPERATIONS_ENUM.sales })
 	public readonly id_operation_type: DAY_OPERATIONS_ENUM;
 
-	@ApiProperty({ type: String, example: '2026-05-27T08:20:00.000Z' })
-	public readonly created_at: Date;
+	@ApiProperty({ type: String, format: 'date-time', example: '2026-05-27T08:20:00.000Z' })
+	public readonly created_at: string;
 
 	@ApiProperty({ type: String, example: '4c89ea4d-e54a-4dcf-8426-330e584f2e5f' })
 	public readonly id_location: string | null;
@@ -35,10 +35,20 @@ export class WorkDayOperationHistoricDto {
 	@ApiProperty({ type: String, example: '0e72ec26-0df4-4dc0-a204-b8f3223bb8f8' })
 	public readonly id_day_operation_dependent: string | null;
 
+	/*
+		Design Note (07-05-26)
+
+		Since work day operation historic is an important artifact that depends on other entities or
+		artifacts; clients, locations, transactions, business operations. 
+
+		Intead of letting undefined those fields that doesn't have a value, it was decided to explicitly 
+		set as null when there is not information in a field.
+	*/
+
 	constructor(
 		_id_work_day_operation: string,
 		_id_operation_type: DAY_OPERATIONS_ENUM,
-		_created_at: Date,
+		_created_at: string,
 		_latitude: string | null,
 		_longitude: string | null,
 		_id_work_day: string,

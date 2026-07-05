@@ -4,8 +4,8 @@ export class StartShiftWorkDayRequestDto {
 	@ApiPropertyOptional({ type: String, example: '5e8e8ad0-8a84-4326-95d5-84f4f2c13711' })
 	public readonly id_work_day: string;
 
-	@ApiProperty({ type: String, example: '2026-05-27T08:00:00.000Z' })
-	public readonly start_date: Date;
+	@ApiProperty({ type: String, format: 'date-time', example: '2026-05-27T08:00:00.000Z' })
+	public readonly start_date: string;
 
 	@ApiProperty({ type: Number, example: 2500 })
 	public readonly start_petty_cash: number;
@@ -18,7 +18,7 @@ export class StartShiftWorkDayRequestDto {
 
 	constructor(
 		private readonly _id_work_day: string,
-		private readonly _start_date: Date,
+		private readonly _start_date: string,
 		private readonly _start_petty_cash: number,
 		private readonly _id_route_day: string,
 		private readonly _id_user: string

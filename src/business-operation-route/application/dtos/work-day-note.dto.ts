@@ -11,14 +11,14 @@ export class WorkDayNoteDto {
 	@ApiProperty({ type: String, example: '5e8e8ad0-8a84-4326-95d5-84f4f2c13711' })
 	public readonly id_owner: string;
 
-	@ApiPropertyOptional({ type: String, example: '2026-05-27T13:10:00.000Z' })
-	public readonly created_at?: Date;
+	@ApiPropertyOptional({ type: String, format: 'date-time', example: '2026-05-27T13:10:00.000Z' })
+	public readonly created_at: string;
 
 	constructor(
 		_id_note: string,
 		_note: string,
 		_id_owner: string,
-		_created_at?: Date,
+		_created_at: string,
 	) {
 		this.id_note = _id_note;
 		this.note = _note;

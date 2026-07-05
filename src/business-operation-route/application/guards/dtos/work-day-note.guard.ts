@@ -10,6 +10,7 @@ export const isWorkDayNoteDto = (value: unknown): value is WorkDayNoteDto => {
   return (
     typeof value.id_note === 'string' &&
     typeof value.note === 'string' &&
-    typeof value.id_owner === 'string'
+    typeof value.id_owner === 'string' &&
+    typeof value.created_at === 'string'
   );
 };

@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class FinishWorkDayRequestDto {
-	@ApiProperty({ type: String, example: '2026-05-27T18:00:00.000Z' })
+	@ApiProperty({ type: String, format: 'date-time', example: '2026-05-27T18:00:00.000Z' })
 	public readonly finish_date?: Date;
 
 	@ApiProperty({ type: Number, example: 3180.75 })

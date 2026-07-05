@@ -7,10 +7,7 @@ export class WorkDayDto {
 	public readonly id_work_day: string;
 
 	@ApiProperty({ type: String, example: '2026-05-27T08:00:00.000Z' })
-	public readonly start_date: Date;
-
-	@ApiProperty({ type: String, example: '9aa5f773-f0cf-4d2f-a6d5-f11ff8e79fca' })
-	public readonly id_route: string;
+	public readonly start_date: string;
 
 	@ApiProperty({ type: Number, example: 2500 })
 	public readonly start_petty_cash: number;
@@ -24,30 +21,28 @@ export class WorkDayDto {
 	@ApiProperty({ type: [WorkDayNoteDto], example: [] })
 	public readonly notes: WorkDayNoteDto[];
 
-	@ApiPropertyOptional({ type: String, example: '2026-05-27T18:00:00.000Z' })
-	public readonly finish_date?: Date;
+	@ApiPropertyOptional({ type: String, format: 'date-time', example: '2026-05-27T18:00:00.000Z' })
+	public readonly finish_date: string | null;
 
 	@ApiPropertyOptional({ type: Number, example: 3180.75 })
-	public readonly final_petty_cash?: number;
+	public readonly final_petty_cash: number | null;
 
 	@ApiPropertyOptional({ type: String, example: 'ed046ff9-0845-43d4-bfc2-7a5a3d8dca2c' })
-	public readonly id_payment_stub?: string;
+	public readonly id_payment_stub: string | null;
 
 	constructor(
 		_id_work_day: string,
-		_start_date: Date,
-		_id_route: string,
+		_start_date: string,
 		_start_petty_cash: number,
 		_id_route_day: string,
 		_id_user: string,
 		_notes: WorkDayNoteDto[],
-		_finish_date?: Date,
-		_final_petty_cash?: number,
-		_id_payment_stub?: string,
+		_finish_date: string | null,
+		_final_petty_cash: number | null,
+		_id_payment_stub: string | null,
 	) {
 		this.id_work_day = _id_work_day;
 		this.start_date = _start_date;
-		this.id_route = _id_route;
 		this.start_petty_cash = _start_petty_cash;
 		this.id_route_day = _id_route_day;
 		this.id_user = _id_user;
