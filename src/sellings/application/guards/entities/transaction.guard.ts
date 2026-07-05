@@ -11,6 +11,7 @@ export const isTransactionEntity = (value: unknown): value is TransactionEntity 
     typeof value.state === 'number' &&
     typeof value.received_amount === 'number' &&
     typeof value.id_client === 'string' &&
+    typeof value.created_by === 'string' &&
     typeof value.id_work_day === 'string' &&
     (value.id_invoice_concept === null || typeof value.id_invoice_concept === 'string') &&
     (value.latitude === null || typeof value.latitude === 'string') &&

@@ -15,6 +15,7 @@ export const isTransactionDto = (value: unknown): value is TransactionDto => {
     (value.cfdi === null || typeof value.cfdi === 'string') &&
     typeof value.state === 'number' &&
     typeof value.received_amount === 'number' &&
+    typeof value.created_by === 'string' &&
     (value.id_invoice_concept === null || typeof value.id_invoice_concept === 'string') &&
     (value.latitude === null || typeof value.latitude === 'string') &&
     (value.longitude === null || typeof value.longitude === 'string') &&
