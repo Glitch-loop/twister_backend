@@ -97,23 +97,11 @@ export class TransactionAggregate {
         _id_transaction_operation_type,
         _id_product
       )
-    )
+    );
   }
 
   cancelTransaction(): void {
     if(this.transaction === null) throw new Error(`Transaction cannot be cancelled because transaction has not been initialized.`)
-    const transactionDescriptionsCopy = this.transaction.transaction_descriptions.map((description) => {
-      return new TransactionDescriptionObjectValue(
-        description.id_transaction_description,
-        description.price_at_moment,
-        description.cost_at_moment,
-        description.quantity,
-        description.created_at,
-        description.id_transaction,
-        description.id_transaction_operation_type,
-        description.id_product,
-      )
-    })
     this.transaction = new TransactionEntity(
       this.transaction.id_transaction,
       TRANSACTION_STATUS_ENUM.INACTIVE,
@@ -124,17 +112,48 @@ export class TransactionAggregate {
       this.transaction.id_work_day,
       this.transaction.payment_method,
       this.transaction.payment_schema,
-      transactionDescriptionsCopy,
+      this.createCopyOfTransactionDescriptions(this.transaction.transaction_descriptions),
       this.transaction.id_invoice_concept,
       this.transaction.latitude,
       this.transaction.longitude,
       this.transaction.cfdi,
       this.transaction.id_location,
-    )
+    );
   }
 
   getTransaction(): TransactionEntity {
     if(this.transaction === null) throw new Error(`Transaction has not been initialized.`)
-    return this.transaction; 
+    return new TransactionEntity(
+      this.transaction.id_transaction,
+      TRANSACTION_STATUS_ENUM.INACTIVE,
+      this.transaction.received_amount,
+      this.transaction.created_at,
+      this.transaction.id_client,
+      this.transaction.created_by,
+      this.transaction.id_work_day,
+      this.transaction.payment_method,
+      this.transaction.payment_schema,
+      this.createCopyOfTransactionDescriptions(this.transaction.transaction_descriptions),
+      this.transaction.id_invoice_concept,
+      this.transaction.latitude,
+      this.transaction.longitude,
+      this.transaction.cfdi,
+      this.transaction.id_location,
+    );
+  }
+
+  private createCopyOfTransactionDescriptions(_transactionDescription: TransactionDescriptionObjectValue[]): TransactionDescriptionObjectValue[] {
+    return _transactionDescription.map((description) => {
+      return new TransactionDescriptionObjectValue(
+        description.id_transaction_description,
+        description.price_at_moment,
+        description.cost_at_moment,
+        description.quantity,
+        description.created_at,
+        description.id_transaction,
+        description.id_transaction_operation_type,
+        description.id_product,
+      )
+    });
   }
 }

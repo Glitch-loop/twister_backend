@@ -44,43 +44,45 @@ export class RegisterTransactionCommand {
 	) {}
 
 	async execute(
-		received_amount: number,
-		id_work_day: string,
-		id_payment_method: string,
-		id_payment_schema: string,
-		transaction_descriptions: RegisterTransactionDescriptionInput[],
-		id_invoice_concept?: string,
-		latitude?: string,
-		longitude?: string,
-		id_client?: string,
-		id_transaction?: string,
-		created_at?: Date,
-		id_location?: string,
-		cfdi?: string,
+		_received_amount: number,
+		_id_work_day: string,
+		_id_payment_method: string,
+		_id_payment_schema: string,
+		_create_by: string,
+		_transaction_descriptions: RegisterTransactionDescriptionInput[],
+		_id_invoice_concept?: string,
+		_latitude?: string,
+		_longitude?: string,
+		_id_client?: string,
+		_id_transaction?: string,
+		_created_at?: Date,
+		_id_location?: string,
+		_cfdi?: string,
 	): Promise<void> {
-		const idTransactionToUse = id_transaction ?? this.integrityRepository.generateUUIDv4();
-		const createdAtToUse = created_at ?? new Date();
+		const idTransactionToUse = _id_transaction ?? this.integrityRepository.generateUUIDv4();
+		const createdAtToUse = _created_at ?? new Date();
 		const paymentMethods = await this.routeTransactionRepository.listPaymentMethods();
 		const paymentSchema = await this.routeTransactionRepository.listPaymentSchema();
 		const transactionAggregate = new TransactionAggregate(undefined, paymentMethods, paymentSchema);
-		const idClient:string = id_client ? id_client : GENERAL_PUBLIC_CLIENT.id_client
+		const idClient:string = _id_client ? _id_client : GENERAL_PUBLIC_CLIENT.id_client
 
 		transactionAggregate.createNewTransaction(
 			idTransactionToUse,
-			received_amount,
+			_received_amount,
 			createdAtToUse,
 			idClient,
-			id_work_day,
-			id_payment_method,
-			id_payment_schema,
-			id_invoice_concept ? id_invoice_concept : null,
-			latitude ? latitude : null,
-			longitude ? longitude : null,
-			cfdi ? cfdi : null,
-			id_location ? id_location : null,
+			_id_work_day,
+			_id_payment_method,
+			_id_payment_schema,
+			_create_by,
+			_id_invoice_concept ? _id_invoice_concept : null,
+			_latitude ? _latitude : null,
+			_longitude ? _longitude : null,
+			_cfdi ? _cfdi : null,
+			_id_location ? _id_location : null,
 		);
 
-		for (const description of transaction_descriptions) {
+		for (const description of _transaction_descriptions) {
 			if (!Object.values(ROUTE_TRANSACTION_OPERATION_TYPE).includes(description.id_transaction_operation_type as ROUTE_TRANSACTION_OPERATION_TYPE)) {
 				throw new Error('Invalid transaction operation type provided.');
 			}

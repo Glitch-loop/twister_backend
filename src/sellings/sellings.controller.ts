@@ -72,6 +72,7 @@ Considerations:
 			body.id_work_day,
 			body.id_payment_method,
 			body.id_payment_schema,
+			body.created_by,
 			(body.transaction_descriptions ?? []).map((description: CreateTransactionDescriptionRequestDto) => ({
 				id_transaction_description: description.id_transaction_description,
 				price_at_moment: description.price_at_moment,
