@@ -13,6 +13,9 @@ export class TransactionDto {
   @ApiProperty({ type: Number, example: 1 })
   public readonly state: number;
 
+  @ApiProperty({ type: String, example: '8b6ea998-b739-44f7-9c7e-0a58babd1b48' })
+  public readonly created_by: string;
+
   @ApiProperty({ type: Number, example: 456.25 })
   public readonly received_amount: number;
 
@@ -77,6 +80,7 @@ export class TransactionDto {
     state: number,
     received_amount: number,
     id_invoice_concept: string | null,
+    created_by: string,
     created_at: Date,
     id_work_day: string,
     payment_method: PaymentMethodDto,
@@ -92,6 +96,7 @@ export class TransactionDto {
     this.cfdi = cfdi;
     this.state = state;
     this.received_amount = received_amount;
+    this.created_by = created_by;
     this.id_invoice_concept = id_invoice_concept;
     this.created_at = created_at;
     this.latitude = latitude;

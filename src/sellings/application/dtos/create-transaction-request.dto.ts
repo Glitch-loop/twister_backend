@@ -82,10 +82,18 @@ export class CreateTransactionRequestDto {
   @ApiProperty({ type: Number, example: 456.25 })
   public readonly received_amount: number;
 
+  @ApiProperty({
+    type: String,
+    format: 'uuid',
+    example: 'c36327f6-10a2-4f12-8554-c6204771e869',
+    description: 'Created by.',
+  })
+  public readonly created_by: string;
+
   @ApiPropertyOptional({
     type: String,
     format: 'uuid',
-    example: '',
+    example: '9f2377c1-20ac-486c-8093-7154cf5322e5',
     description: 'Invoice concept ID. Leave blank if unknown and complete later.',
   })
   public readonly id_invoice_concept?: string;
@@ -115,7 +123,7 @@ export class CreateTransactionRequestDto {
   @ApiPropertyOptional({
     type: String,
     format: 'uuid',
-    example: '',
+    example: 'b8fdcf9c-25ba-4add-aad5-cb6497ffa21c',
     description: 'Location ID. Leave blank if unknown and complete later.',
   })
   public readonly id_location?: string;
@@ -123,7 +131,7 @@ export class CreateTransactionRequestDto {
   @ApiPropertyOptional({
     type: String,
     format: 'uuid',
-    example: '',
+    example: '2ab5ef91-6979-4885-a433-e1bd5bc1fa61',
     description: 'Client ID.',
   })
   public readonly id_client?: string;
@@ -131,7 +139,7 @@ export class CreateTransactionRequestDto {
   @ApiProperty({
     type: String,
     format: 'uuid',
-    example: '',
+    example: '29f9d888-91fe-45ed-982c-f91694b1196b',
     description: 'Work day ID.',
   })
   public readonly id_work_day: string;
@@ -156,13 +164,13 @@ export class CreateTransactionRequestDto {
     type: [CreateTransactionDescriptionRequestDto],
     example: [
       {
-        id_transaction_description: '',
+        id_transaction_description: 'fb04fbf2-5597-4594-9c0b-105f988f735a',
         price_at_moment: 125.5,
         cost_at_moment: 85.75,
         amount: 3,
         created_at: '2026-06-01T12:30:00.000Z',
         id_transaction_operation_type: ROUTE_TRANSACTION_OPERATION_TYPE.SALES,
-        id_product: '',
+        id_product: '96f04833-ad2b-487b-944a-ec3f9810177f',
       },
     ],
   })
@@ -174,6 +182,7 @@ export class CreateTransactionRequestDto {
     id_payment_method: string,
     id_payment_schema: string,
     transaction_descriptions: CreateTransactionDescriptionRequestDto[],
+    created_by: string,
     id_invoice_concept?: string,
     latitude?: string,
     longitude?: string,
@@ -190,6 +199,7 @@ export class CreateTransactionRequestDto {
     this.created_at = created_at;
     this.latitude = latitude;
     this.longitude = longitude;
+    this.created_by = created_by;
     this.id_location = id_location;
     this.id_client = id_client;
     this.id_work_day = id_work_day;
