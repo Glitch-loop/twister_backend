@@ -1,10 +1,17 @@
+// Enums
+import { TRANSACTION_STATUS_ENUM } from '@/src/sellings/core/enums/route-status.enum';
+import { ROUTE_TRANSACTION_OPERATION_TYPE } from '@/src/sellings/core/enums/route-transaction-operation-type.enum';
+
+// Object values
+import { PaymentMethodObjectValue } from '@/src/sellings/core/value-objects/payment-method.object-value';
+import { PaymentSchemaObjectValue } from '@/src/sellings/core/value-objects/payment-schema.object-value';
+import { TransactionDescriptionObjectValue } from '@/src/sellings/core/value-objects/transaction-description.object-value';
+
+// Entities
 import { TransactionEntity } from '@/src/sellings/core/entities/transaction.entity';
-import { PaymentMethodObjectValue } from '../value-objects/payment-method.object-value';
-import { PaymentSchemaObjectValue } from '../value-objects/payment-schema.object-value';
-import { TRANSACTION_STATUS_ENUM } from '../enums/route-status.enum';
+
+// Shared - errors
 import { BusinessRuleException } from '@/src/shared/errors/BusinessRuleException';
-import { ROUTE_TRANSACTION_OPERATION_TYPE } from '../enums/route-transaction-operation-type.enum';
-import { TransactionDescriptionObjectValue } from '../value-objects/transaction-description.object-value';
 
 export class TransactionAggregate {
   private transaction: TransactionEntity|null;
