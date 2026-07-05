@@ -29,6 +29,7 @@ export class TransactionAggregate {
 		_id_work_day: string,
 		_id_payment_method: string,
 		_id_payment_schema: string,
+		_created_by: string,
 		_id_invoice_concept: string | null,
 		_latitude: string | null,
 		_longitude: string | null,
@@ -48,6 +49,7 @@ export class TransactionAggregate {
       _received_amount,
       _created_at,
       _id_client,
+      _created_by,
       _id_work_day,
       new PaymentMethodObjectValue(
         paymentMethod.id_payment_method,
@@ -111,6 +113,7 @@ export class TransactionAggregate {
       this.transaction.received_amount,
       this.transaction.created_at,
       this.transaction.id_client,
+      this.transaction.created_by,
       this.transaction.id_work_day,
       this.transaction.payment_method,
       this.transaction.payment_schema,
