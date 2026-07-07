@@ -5,6 +5,7 @@ describe('isWorkDayOperationHistoricModel', () => {
   it('returns true for a valid historic model', () => {
     expect(isWorkDayOperationHistoricModel({
       id_work_day_operation: 'op-1',
+      created_at: '2024-01-01T09:00:00.000Z',
       id_location: null,
       id_route_transaction: null,
       id_route_day: 'rd-1',
@@ -17,13 +18,14 @@ describe('isWorkDayOperationHistoricModel', () => {
     })).toBe(true);
   });
 
-  it('returns false when id_operation_type is invalid', () => {
+  it('returns false when created_at is not a string', () => {
     expect(isWorkDayOperationHistoricModel({
       id_work_day_operation: 'op-1',
+      created_at: new Date('2024-01-01T09:00:00.000Z'),
       id_location: null,
       id_route_transaction: null,
       id_route_day: 'rd-1',
-      id_operation_type: 'invalid',
+      id_operation_type: DAY_OPERATIONS_ENUM.sales,
       id_day_operation_dependent: null,
       id_work_day: 'wd-1',
       latitude: '19.4',

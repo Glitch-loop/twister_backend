@@ -19,11 +19,14 @@ describe('BusinessOperationDayAggregate', () => {
     created_at: overrides?.created_at ?? new Date('2024-01-01T08:00:00.000Z'),
     latitude: '19.4',
     longitude: '-99.1',
-    id_location: overrides?.id_location ?? 'loc-1',
-    id_route_transaction: overrides?.id_route_transaction ?? null,
-    id_inventory_operation: overrides?.id_inventory_operation ?? null,
+    id_location: overrides && 'id_location' in overrides ? overrides.id_location! : 'loc-1',
+    id_route_transaction:
+      overrides && 'id_route_transaction' in overrides ? overrides.id_route_transaction! : null,
+    id_inventory_operation:
+      overrides && 'id_inventory_operation' in overrides ? overrides.id_inventory_operation! : null,
     id_route_day: 'rd-1',
-    id_day_operation_dependent: overrides?.id_day_operation_dependent ?? null,
+    id_day_operation_dependent:
+      overrides && 'id_day_operation_dependent' in overrides ? overrides.id_day_operation_dependent! : null,
   });
 
   it('registers route client attention and exposes new operations when initialized with null', () => {

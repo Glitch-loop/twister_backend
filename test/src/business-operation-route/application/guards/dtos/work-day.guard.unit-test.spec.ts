@@ -4,11 +4,12 @@ describe('isWorkDayDto', () => {
   it('returns true for a valid work day dto', () => {
     expect(isWorkDayDto({
       id_work_day: 'wd-1',
-      id_route: 'route-1',
+      start_date: '2024-01-01T08:00:00.000Z',
       start_petty_cash: 100,
       id_route_day: 'rd-1',
       id_user: 'user-1',
-      notes: [{ id_note: 'n-1', note: 'note', id_owner: 'wd-1' }],
+      notes: [{ id_note: 'n-1', note: 'note', id_owner: 'wd-1', created_at: '2024-01-01T09:00:00.000Z' }],
+      finish_date: null,
       final_petty_cash: null,
       id_payment_stub: null,
     })).toBe(true);
@@ -17,11 +18,12 @@ describe('isWorkDayDto', () => {
   it('returns false when one note is invalid', () => {
     expect(isWorkDayDto({
       id_work_day: 'wd-1',
-      id_route: 'route-1',
+      start_date: '2024-01-01T08:00:00.000Z',
       start_petty_cash: 100,
       id_route_day: 'rd-1',
       id_user: 'user-1',
       notes: [{ id_note: 'n-1', id_owner: 'wd-1' }],
+      finish_date: null,
       final_petty_cash: null,
       id_payment_stub: null,
     })).toBe(false);

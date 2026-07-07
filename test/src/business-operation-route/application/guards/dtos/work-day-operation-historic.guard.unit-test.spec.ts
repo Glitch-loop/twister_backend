@@ -5,6 +5,7 @@ describe('isWorkDayOperationHistoricDto', () => {
   it('returns true for a valid historic dto', () => {
     expect(isWorkDayOperationHistoricDto({
       id_work_day_operation: 'op-1',
+      created_at: '2024-01-01T09:00:00.000Z',
       id_location: null,
       id_route_transaction: null,
       id_inventory_operation: null,
@@ -20,6 +21,7 @@ describe('isWorkDayOperationHistoricDto', () => {
   it('returns false when id_operation_type is not a valid enum value', () => {
     expect(isWorkDayOperationHistoricDto({
       id_work_day_operation: 'op-1',
+      created_at: '2024-01-01T09:00:00.000Z',
       id_location: null,
       id_route_transaction: null,
       id_inventory_operation: null,

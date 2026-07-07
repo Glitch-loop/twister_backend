@@ -11,7 +11,7 @@ describe('BusinessOperationRoute Mapper (entity-dto)', () => {
   const mapper = new Mapper();
 
   it('maps note dto to domain object', () => {
-    const dto = new WorkDayNoteDto('n-1', 'text', 'wd-1', new Date('2024-01-01T00:00:00.000Z'));
+    const dto = new WorkDayNoteDto('n-1', 'text', 'wd-1', '2024-01-01T00:00:00.000Z');
 
     const result = mapper.toDomainObject(dto);
 
@@ -23,7 +23,7 @@ describe('BusinessOperationRoute Mapper (entity-dto)', () => {
     const dto = new WorkDayOperationHistoricDto(
       'op-1',
       DAY_OPERATIONS_ENUM.sales,
-      new Date('2024-01-01T00:00:00.000Z'),
+      '2024-01-01T00:00:00.000Z',
       '19.4',
       '-99.1',
       'wd-1',
@@ -43,15 +43,14 @@ describe('BusinessOperationRoute Mapper (entity-dto)', () => {
   it('maps work day dto to domain object with note conversion', () => {
     const dto = new WorkDayDto(
       'wd-1',
-      new Date('2024-01-01T08:00:00.000Z'),
-      'route-1',
+      '2024-01-01T08:00:00.000Z',
       100,
       'rd-1',
       'u-1',
-      [new WorkDayNoteDto('n-1', 'hello', 'wd-1')],
-      undefined,
-      undefined,
-      undefined,
+      [new WorkDayNoteDto('n-1', 'hello', 'wd-1', '2024-01-01T09:00:00.000Z')],
+      null,
+      null,
+      null,
     );
 
     const result = mapper.toDomainObject(dto);
@@ -78,14 +77,13 @@ describe('BusinessOperationRoute Mapper (entity-dto)', () => {
     const wd = new WorkDayEntity(
       'wd-1',
       new Date('2024-01-01T08:00:00.000Z'),
-      'route-1',
       100,
       'rd-1',
       'u-1',
       [note],
-      undefined,
-      undefined,
-      undefined,
+      null,
+      null,
+      null,
     );
 
     expect(mapper.toDto(note)).toBeInstanceOf(WorkDayNoteDto);

@@ -26,14 +26,13 @@ describe('BusinessOperationRoute Mapper (entity-model)', () => {
   const workDayEntity = new WorkDayEntity(
     'wd-1',
     new Date('2024-01-01T08:00:00.000Z'),
-    'route-1',
     100,
     'rd-1',
     'u-1',
     [note],
-    undefined,
-    undefined,
-    undefined,
+    null,
+    null,
+    null,
   );
 
   const noteModel: WorkDayNoteModel = {
@@ -60,13 +59,12 @@ describe('BusinessOperationRoute Mapper (entity-model)', () => {
   const workDayModel: WorkDayModel = {
     id_work_day: 'wd-1',
     start_date: '2024-01-01T08:00:00.000Z',
-    finish_date: undefined,
-    id_route: 'route-1',
+    finish_date: null,
     start_petty_cash: 100,
-    final_petty_cash: undefined,
+    final_petty_cash: null,
     id_route_day: 'rd-1',
     id_user: 'u-1',
-    id_payment_stub: undefined,
+    id_payment_stub: null,
   };
 
   it('converts workday note object value to workday note model', () => {
@@ -151,7 +149,6 @@ describe('BusinessOperationRoute Mapper (entity-model)', () => {
       id_work_day: 'wd-1',
       start_date: '2024-01-01T08:00:00.000Z',
       finish_date: '2024-01-01T18:00:00.000Z',
-      id_route: 'route-1',
       start_petty_cash: 100,
       final_petty_cash: 110,
       id_route_day: 'rd-1',

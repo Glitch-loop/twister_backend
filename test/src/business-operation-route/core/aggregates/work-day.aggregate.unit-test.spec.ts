@@ -7,7 +7,7 @@ describe('WorkDayAggregate', () => {
   it('starts a work day with provided initial date', () => {
     const aggregate = new WorkDayAggregate(null);
 
-    aggregate.startWorkDay('wd-1', 100, 'route-1', 'u-1', 'rd-1', baseDate);
+    aggregate.startWorkDay('wd-1', 100, 'u-1', 'rd-1', baseDate);
 
     const info = aggregate.getWorkDayInformation();
     expect(info).toBeInstanceOf(WorkDayEntity);
@@ -18,14 +18,14 @@ describe('WorkDayAggregate', () => {
   it('throws when starting with negative petty cash', () => {
     const aggregate = new WorkDayAggregate(null);
 
-    expect(() => aggregate.startWorkDay('wd-1', -1, 'route-1', 'u-1', 'rd-1', baseDate)).toThrow(
+    expect(() => aggregate.startWorkDay('wd-1', -1, 'u-1', 'rd-1', baseDate)).toThrow(
       'Petty cash cannot be negative.',
     );
   });
 
   it('finishes a work day with valid values', () => {
     const aggregate = new WorkDayAggregate(null);
-    aggregate.startWorkDay('wd-1', 100, 'route-1', 'u-1', 'rd-1', baseDate);
+    aggregate.startWorkDay('wd-1', 100, 'u-1', 'rd-1', baseDate);
 
     const finishDate = new Date('2024-01-01T18:00:00.000Z');
     aggregate.finishWorkDay(120, finishDate);
@@ -37,7 +37,7 @@ describe('WorkDayAggregate', () => {
 
   it('throws when finishing before start date', () => {
     const aggregate = new WorkDayAggregate(null);
-    aggregate.startWorkDay('wd-1', 100, 'route-1', 'u-1', 'rd-1', baseDate);
+    aggregate.startWorkDay('wd-1', 100, 'u-1', 'rd-1', baseDate);
 
     expect(() => aggregate.finishWorkDay(120, new Date('2024-01-01T07:00:00.000Z'))).toThrow(
       'Finish date must be after start date.',
@@ -52,7 +52,7 @@ describe('WorkDayAggregate', () => {
 
   it('returns true from isWorkDayFinished based on current implementation', () => {
     const aggregate = new WorkDayAggregate(null);
-    aggregate.startWorkDay('wd-1', 100, 'route-1', 'u-1', 'rd-1', baseDate);
+    aggregate.startWorkDay('wd-1', 100, 'u-1', 'rd-1', baseDate);
 
     expect(aggregate.isWorkDayFinished()).toBe(true);
   });
