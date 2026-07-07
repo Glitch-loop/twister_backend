@@ -8,9 +8,10 @@ import { dumpRecordType } from "../types/dump-record.types";
 * 
 */
 export async function createDumpRecordInDatabase(client: SupabaseClient, id: string, record_type: dumpRecordType, payload: object): Promise<dumpRecordInterface> {
+  console.log("Payload: ", payload)
   try {
     if (record_type === 'facilities') await client.from('facilities').insert(payload);
-    if (record_type === 'facility_types') await client.from('facility_types').insert(payload); 
+    if (record_type === 'facility_types') await client.from('facility_types').insert(payload);
     if (record_type === 'inventories') await client.from('inventories').insert(payload);
     if (record_type === 'inventories_balance') await client.from('inventories_balance').insert(payload);
     if (record_type === 'inventory_operation_descriptions') await client.from('inventory_operation_descriptions').insert(payload);

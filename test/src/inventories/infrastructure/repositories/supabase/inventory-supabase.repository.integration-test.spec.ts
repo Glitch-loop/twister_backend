@@ -8,6 +8,7 @@ import {
   createFacilityTypeModel,
   createInventoryBalance,
   createInventoryEntity,
+  createInventoryModel,
   createInventoryOperationEntity,
   createUserModel,
 } from '@/test/utils/test-creation-artifact.helper';
@@ -26,14 +27,14 @@ describe('Inventory supabase repository', () => {
 
   const trackDumpRecord = async <T extends object>(recordType: dumpRecordType, id: string, payload: T) => {
     const record = await createDumpRecordInDatabase(supabaseClient, id, recordType, payload);
-    dumpRecords.push(record);
     return record;
   };
 
   const seedInventoryDependencies = async () => {
     const userTest = createUserModel();
     const facilityTypeTest = createFacilityTypeModel();
-    const facilityTest = createFacilityModel({ id_facility_type: facilityTypeTest.id_facility_type });
+    const facilityTest = createFacilityModel({ id_facility_type: facilityTypeTest.id_facility_type});
+    const productTest = ({ id_facility_type: facilityTypeTest.id_facility_type});
 
     await trackDumpRecord('users', userTest.id_user, userTest);
     await trackDumpRecord('facility_types', facilityTypeTest.id_facility_type, facilityTypeTest);
@@ -103,15 +104,16 @@ describe('Inventory supabase repository', () => {
 
   it('updates an existing inventory and keeps the stored record in sync', async () => {
     const { userTest, facilityTest } = await seedInventoryDependencies();
-    const existingInventory = createInventoryEntity({
+    const existingInventory = createInventoryModel({
       inventory_name: 'Original warehouse name',
       assigned_facility: facilityTest.id_facility,
       assigned_to: null,
       created_by: userTest.id_user,
     });
-
+    console.log("Creating inventory")
     await trackDumpRecord('inventories', existingInventory.id_inventory, existingInventory);
 
+    console.log("Updating inventory")
     const updatedInventory = createInventoryEntity({
       id_inventory: existingInventory.id_inventory,
       inventory_name: 'Updated warehouse name',
@@ -130,13 +132,13 @@ describe('Inventory supabase repository', () => {
 
   it('creates an inventory operation without descriptions', async () => {
     const { userTest, facilityTest } = await seedInventoryDependencies();
-    const originInventory = createInventoryEntity({
+    const originInventory = createInventoryModel({
       inventory_name: 'Origin inventory',
       assigned_facility: facilityTest.id_facility,
       assigned_to: null,
       created_by: userTest.id_user,
     });
-    const targetInventory = createInventoryEntity({
+    const targetInventory = createInventoryModel({
       inventory_name: 'Target inventory',
       assigned_facility: facilityTest.id_facility,
       assigned_to: null,
@@ -162,33 +164,31 @@ describe('Inventory supabase repository', () => {
     expect(storedOperations[0].inventory_operation_descriptions).toHaveLength(0);
   });
 
-  // it('upserts an inventory balance and exposes it through inventory retrieval', async () => {
-  //   const { userTest, facilityTest } = await seedInventoryDependencies();
-  //   const inventory = createInventoryEntity({
-  //     inventory_name: 'Inventory with balance',
-  //     assigned_facility: facilityTest.id_facility,
-  //     assigned_to: null,
-  //     created_by: userTest.id_user,
-  //   });
+  it('upserts an inventory balance and exposes it through inventory retrieval', async () => {
+    const { userTest, facilityTest } = await seedInventoryDependencies();
+    const inventory = createInventoryModel({
+      inventory_name: 'Inventory with balance',
+      assigned_facility: facilityTest.id_facility,
+      assigned_to: null,
+      created_by: userTest.id_user,
+    });
 
-  //   await trackDumpRecord('inventories', inventory.id_inventory, inventory);
+    await trackDumpRecord('inventories', inventory.id_inventory, inventory);
 
-  //   const inventoryBalance = createInventoryBalance({
-  //     id_inventory: inventory.id_inventory,
-  //     id_inventory_balance: 'balance-1',
-  //     id_product: 'product-1',
-  //     min_quantity: 2,
-  //     max_quantity: 20,
-  //   });
+    const inventoryBalance = createInventoryBalance({
+      id_inventory: inventory.id_inventory,
+      min_quantity: 2,
+      max_quantity: 20,
+    });
 
-  //   await expect(repository.UpsertInventoryBalance(inventoryBalance)).resolves.toBeUndefined();
+    await expect(repository.UpsertInventoryBalance(inventoryBalance)).resolves.toBeUndefined();
 
-  //   const storedInventories = await repository.retrieveInventories([inventory.id_inventory]);
+    const storedInventories = await repository.retrieveInventories([inventory.id_inventory]);
 
-  //   expect(storedInventories).toHaveLength(1);
-  //   expect(storedInventories[0].inventory_balance).toHaveLength(1);
-  //   expect(storedInventories[0].inventory_balance[0].id_inventory_balance).toBe('balance-1');
-  //   expect(storedInventories[0].inventory_balance[0].min_quantity).toBe(2);
-  //   expect(storedInventories[0].inventory_balance[0].max_quantity).toBe(20);
-  // });
+    expect(storedInventories).toHaveLength(1);
+    expect(storedInventories[0].inventory_balance).toHaveLength(1);
+    expect(storedInventories[0].inventory_balance[0].id_inventory_balance).toBe(inventoryBalance.id_inventory_balance);
+    expect(storedInventories[0].inventory_balance[0].min_quantity).toBe(2);
+    expect(storedInventories[0].inventory_balance[0].max_quantity).toBe(20);
+  });
 });

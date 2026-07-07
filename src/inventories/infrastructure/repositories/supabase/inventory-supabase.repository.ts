@@ -39,7 +39,7 @@ export class InventorySupabaseRepository implements InventoryRepository {
       const inventoryModel = this.mapper.toModel(inventory);
 
       const { error } = await this.supabase.from('inventories').insert(inventoryModel);
-
+      console.log(error)
       if (error) {
         throw new Error(`Failed to create inventory: ${error.message}`);
       }

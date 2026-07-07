@@ -17,7 +17,7 @@ import { PRODUCT_STATUS_ENUM } from '@/src/products/core/enums/product-status.en
 import { ProductPriceObjectValue } from '@/src/products/core/value-objects/product-price.object-value';
 import { IntegrityNodeRepository } from '@/src/shared/infrastructure/repositories/node/integrity.repository';
 import { UserModel } from '@/src/users/application/models/user.model';
-
+import { ProductModel } from '@/src/products/application/models/product.model';
 // Inventories module
 type InventoryOverrides = Partial<InventoryEntity> & {
   inventory_balance?: InventoryBalanceObjectValue[];
@@ -33,11 +33,13 @@ type InventoryOperationModelOverrides = Partial<InventoryOperationModel>;
 type InventoryOperationDescriptionModelOverrides = Partial<InventoryOperationDescriptionModel>;
 type FacilityModelOverrides = Partial<FacilityModel>;
 type FacilityTypeModelOverrides = Partial<FacilityTypeModel>;
+type ProductModelOverrides = Partial<ProductModel>;
 
 // Products module
 type ProductOverrides = Partial<ProductEntity> & {
   product_price?: ProductPriceObjectValue[];
 };
+
 
 // Users module
 type UserModelOverrides = Partial<UserModel>;
@@ -134,13 +136,13 @@ export function createInventoryModel(
   return {
     id_inventory: overrides.id_inventory ?? integrityNode.generateUUIDv4(),
     inventory_context: overrides.inventory_context ?? INVENTORY_CONTEXT_ENUM.WAREHOUSE,
-    inventory_name: overrides.inventory_name ?? 'Main warehouse',
+    inventory_name: overrides.inventory_name ?? 'Main warehouse' + new Date().toISOString(),
     is_active: overrides.is_active ?? INVENTORY_STATE_ENUM.ACTIVE,
     stock_validation: overrides.stock_validation ?? STOCK_VALIDATION_ENUM.ENABLE,
     created_at: overrides.created_at ?? '2026-07-01T00:00:00.000Z',
     updated_at: overrides.updated_at ?? '2026-07-01T01:00:00.000Z',
     created_by: overrides.created_by ?? integrityNode.generateUUIDv4(),
-    assigned_to: overrides.assigned_to ?? integrityNode.generateUUIDv4(),
+    assigned_to: overrides.assigned_to ?? null,
     assigned_facility: overrides.assigned_facility ?? integrityNode.generateUUIDv4(),
   };
 }
@@ -198,6 +200,7 @@ export function createFacilityTypeModel(
   return {
     id_facility_type: overrides.id_facility_type ?? integrityNode.generateUUIDv4(),
     facility_type_name: overrides.facility_type_name ?? 'Warehouse',
+    created_at: overrides.created_at ?? '2026-07-01T00:00:00.000Z',
   };
 }
 
@@ -251,4 +254,21 @@ export function createUserModel(
     rfc: overrides.rfc,
     imss: overrides.imss,
   };
+}
+
+
+export function createProductModel (
+  overrides: ProductModelOverrides = {},
+) : ProductModel {
+  return {
+    id_product: overrides.id_product ?? integrityNode.generateUUIDv4(),
+    product_name: overrides.product_name ?? 'Test product' + new Date().toISOString(),
+    barcode: overrides.barcode ?? '123456',
+    cost: overrides.cost ?? 9.99,
+    product_status: overrides.product_status ?? 1,
+    quantity_presentation: overrides.product_status ?? 100,
+    order_to_show: overrides.product_status ?? 99,
+    id_measurement_unit: overrides.id_measurement_unit ?? integrityNode.generateUUIDv4(),
+    created_at: new Date('2026-07-01T01:00:00.000Z'),
+  }
 }
