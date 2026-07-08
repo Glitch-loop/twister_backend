@@ -18,6 +18,14 @@ import { TransactionDto } from "@/src/sellings/application/dtos/transaction.dto"
 import { DOMAIN_EVENT_ENUM } from "@/src/shared/core/enums/domain-event.enum";
 import { BusinessRuleException } from "@/src/shared/errors/BusinessRuleException";
 
+/**
+ * Register route transaction listener is a specialized listener for the 
+ * routes.
+ * 
+ * The intention of this listener is to reverse the inventory operation 
+ * that reference to the transaction that is being cancelled.
+ */
+
 @Injectable()
 export class CancelTransactionListener {
   constructor(
