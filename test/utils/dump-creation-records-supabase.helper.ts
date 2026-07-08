@@ -8,7 +8,6 @@ import { dumpRecordType } from "../types/dump-record.types";
 * 
 */
 export async function createDumpRecordInDatabase(client: SupabaseClient, id: string, record_type: dumpRecordType, payload: object): Promise<dumpRecordInterface> {
-  console.log("Payload: ", payload)
   try {
     if (record_type === 'facilities') await client.from('facilities').insert(payload);
     if (record_type === 'facility_types') await client.from('facility_types').insert(payload);
@@ -43,6 +42,17 @@ export async function deleteDumpRecordInDatabase(client: SupabaseClient, dumpRec
     if (record_type === 'products') await client.from('products').delete().eq('products', id);
     if (record_type === 'users') await client.from('users').delete().eq('id_user', id);
   }
+}
+
+export async function deleteRecordInDatabase(client: SupabaseClient, record_type: dumpRecordType, id: string):Promise<void> {
+  if (record_type === 'facilities') await client.from('facilities').delete().eq('id_facility', id);
+  if (record_type === 'facility_types') await client.from('facility_types').delete().eq('id_facility_type', id); 
+  if (record_type === 'inventories') await client.from('inventories').delete().eq('id_inventory', id);
+  if (record_type === 'inventories_balance') await client.from('inventories_balance').delete().eq('id_inventory_balance', id);
+  if (record_type === 'inventory_operation_descriptions') await client.from('inventory_operation_descriptions').delete().eq('id_inventory_operation_description', id);
+  if (record_type === 'inventory_operations') await client.from('inventory_operations').delete().eq('id_inventory_operation', id);
+  if (record_type === 'products') await client.from('products').delete().eq('products', id);
+  if (record_type === 'users') await client.from('users').delete().eq('id_user', id);
 }
 
 

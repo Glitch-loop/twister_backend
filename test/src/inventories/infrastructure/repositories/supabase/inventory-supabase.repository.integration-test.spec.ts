@@ -10,6 +10,7 @@ import {
   createInventoryEntity,
   createInventoryModel,
   createInventoryOperationEntity,
+  createProductModel,
   createUserModel,
 } from '@/test/utils/test-creation-artifact.helper';
 import { SupabaseClient } from '@supabase/supabase-js';
@@ -25,22 +26,36 @@ describe('Inventory supabase repository', () => {
   let supabaseClient: SupabaseClient;
   let dumpRecords: dumpRecordInterface[];
 
-  const trackDumpRecord = async <T extends object>(recordType: dumpRecordType, id: string, payload: T) => {
-    const record = await createDumpRecordInDatabase(supabaseClient, id, recordType, payload);
-    return record;
+  const trackDumpRecord = async <T extends object>(recordType: dumpRecordType, id: string, payload: T, createRecordInDB: boolean = true): Promise<dumpRecordInterface> => {
+    
+    if (createRecordInDB) {
+      const recordToTrack = await createDumpRecordInDatabase(supabaseClient, id, recordType, payload);
+      dumpRecords.push(recordToTrack);
+      return recordToTrack;
+    } else {
+      const recordToTrack = { 
+        id: id,
+        payload: payload,
+        record_type: recordType
+      }
+      dumpRecords.push(recordToTrack);
+      return recordToTrack;
+    }
+    
   };
 
   const seedInventoryDependencies = async () => {
     const userTest = createUserModel();
     const facilityTypeTest = createFacilityTypeModel();
     const facilityTest = createFacilityModel({ id_facility_type: facilityTypeTest.id_facility_type});
-    const productTest = ({ id_facility_type: facilityTypeTest.id_facility_type});
+    const productTest = createProductModel();
 
     await trackDumpRecord('users', userTest.id_user, userTest);
     await trackDumpRecord('facility_types', facilityTypeTest.id_facility_type, facilityTypeTest);
     await trackDumpRecord('facilities', facilityTest.id_facility, facilityTest);
+    await trackDumpRecord('products', productTest.id_product, productTest);
 
-    return { userTest, facilityTypeTest, facilityTest };
+    return { userTest, facilityTypeTest, facilityTest, productTest };
   };
 
   beforeEach(async () => {
@@ -89,7 +104,7 @@ describe('Inventory supabase repository', () => {
       created_by: userTest.id_user,
     });
 
-    await trackDumpRecord('inventories', createInventory.id_inventory, createInventory);
+    await trackDumpRecord('inventories', createInventory.id_inventory, createInventory, false);
 
     await expect(repository.CreateInventory(createInventory)).resolves.toBeUndefined();
 
@@ -105,18 +120,17 @@ describe('Inventory supabase repository', () => {
   it('updates an existing inventory and keeps the stored record in sync', async () => {
     const { userTest, facilityTest } = await seedInventoryDependencies();
     const existingInventory = createInventoryModel({
-      inventory_name: 'Original warehouse name',
+      inventory_name: 'Original warehouse name ' + new Date().toISOString(),
       assigned_facility: facilityTest.id_facility,
       assigned_to: null,
       created_by: userTest.id_user,
     });
-    console.log("Creating inventory")
-    await trackDumpRecord('inventories', existingInventory.id_inventory, existingInventory);
 
-    console.log("Updating inventory")
+    await trackDumpRecord('inventories', existingInventory.id_inventory, existingInventory, false);
+
     const updatedInventory = createInventoryEntity({
       id_inventory: existingInventory.id_inventory,
-      inventory_name: 'Updated warehouse name',
+      inventory_name: 'Updated warehouse name ' + new Date().toISOString(),
       assigned_facility: facilityTest.id_facility,
       assigned_to: null,
       created_by: userTest.id_user,
@@ -155,8 +169,10 @@ describe('Inventory supabase repository', () => {
       inventory_operation_descriptions: [],
     });
 
+    await trackDumpRecord('inventory_operations', inventoryOperation.id_inventory_operation, inventoryOperation, false);
+    
     await expect(repository.CreateInventoryOperation(inventoryOperation)).resolves.toBeUndefined();
-
+    
     const storedOperations = await repository.retrieveInventoryOperations([inventoryOperation.id_inventory_operation]);
 
     expect(storedOperations).toHaveLength(1);
@@ -165,7 +181,7 @@ describe('Inventory supabase repository', () => {
   });
 
   it('upserts an inventory balance and exposes it through inventory retrieval', async () => {
-    const { userTest, facilityTest } = await seedInventoryDependencies();
+    const { userTest, facilityTest,  } = await seedInventoryDependencies();
     const inventory = createInventoryModel({
       inventory_name: 'Inventory with balance',
       assigned_facility: facilityTest.id_facility,
@@ -173,13 +189,18 @@ describe('Inventory supabase repository', () => {
       created_by: userTest.id_user,
     });
 
+    const testProduct = createProductModel();
+
     await trackDumpRecord('inventories', inventory.id_inventory, inventory);
+    await trackDumpRecord('products', testProduct.id_product, testProduct);
 
     const inventoryBalance = createInventoryBalance({
       id_inventory: inventory.id_inventory,
       min_quantity: 2,
       max_quantity: 20,
+      id_product: testProduct.id_product
     });
+    await trackDumpRecord('products', inventoryBalance.id_inventory, inventoryBalance, false);
 
     await expect(repository.UpsertInventoryBalance(inventoryBalance)).resolves.toBeUndefined();
 
