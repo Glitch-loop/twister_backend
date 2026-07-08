@@ -13,13 +13,10 @@ import { ClientAggregate } from '@/src/clients/core/aggregates/client.aggregate'
 import { LocationEntity } from '@/src/clients/core/entities/location.entity';
 import { TaxClientInformationEntity } from '@/src/clients/core/entities/tax-client-information.entity';
 
-
 // Enums
 import { DOMAIN_EVENT_ENUM } from '@/src/shared/core/enums/domain-event.enum';
-import type { ConfirmedClientEvent } from '@/src/shared/events/interfaces/confirmed-client-event.interface';
 import { BusinessRuleException } from '@/src/shared/errors/BusinessRuleException';
-
-console.log("LISTENER ENUM CHECK:", DOMAIN_EVENT_ENUM.CONFIRMED_CLIENT_EVENT);
+import type { ConfirmedClientEvent } from '@/src/shared/events/interfaces/confirmed-client-event.interface';
 
 @Injectable()
 export class CreateNewLocationListener {
@@ -30,8 +27,6 @@ export class CreateNewLocationListener {
 
   @OnEvent(DOMAIN_EVENT_ENUM.CONFIRMED_CLIENT_EVENT, { async: true })
   private async handleClientConfirmed(payload: ConfirmedClientEvent) {
-    console.log("MODIFYING LOCATION DOMAIN EVENT LISTENER.")
-    console.log(payload)
     try {
       const idLocation  = payload.idLocation;
       const locations: LocationEntity[] = await this.locationRepository.retrieveLocationById([

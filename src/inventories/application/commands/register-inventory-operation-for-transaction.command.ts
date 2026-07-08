@@ -37,7 +37,7 @@ import { IntegrityRepository } from '@/src/shared/core/interfaces/integrity.repo
 // Errors
 import { BusinessRuleException } from '@/src/shared/errors/BusinessRuleException';
 
-interface InventoryOperationDescriptionInput {
+export interface InventoryOperationDescriptionInput {
 	id_inventory_operation_description?: string;
 	price_at_moment: number;
 	cost_at_moment: number;

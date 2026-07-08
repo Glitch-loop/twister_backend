@@ -36,7 +36,7 @@ export class CancelTransactionCommand {
 		await this.routeTransactionRepository.updateTransaction(transactionAggregate.getTransaction());
 
 		this.eventEmitter.emit(
-			DOMAIN_EVENT_ENUM.TRANSACTIONS_OPERATION_EVENT,
+			DOMAIN_EVENT_ENUM.CANCEL_TRANSACTION_OPERATION_EVENT,
 			this.mapper.toDto(transactionAggregate.getTransaction()),
 		);
 	}

@@ -107,7 +107,7 @@ export class RegisterTransactionCommand {
 		await this.routeTransactionRepository.createTransaction(transactionAggregate.getTransaction());
 
 		this.eventEmitter.emit(
-			DOMAIN_EVENT_ENUM.TRANSACTIONS_OPERATION_EVENT,
+			DOMAIN_EVENT_ENUM.CREATE_TRANSACTION_OPERATION_EVENT,
 			this.mapper.toDto(transactionAggregate.getTransaction()),
 		);
 	}
