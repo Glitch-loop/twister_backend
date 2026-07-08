@@ -22,6 +22,8 @@ import { EntityModelMapper } from '@/src/inventories/application/mappers/entity-
 
 // Shared
 import { SupabaseDataSource } from '@/src/shared/infrastructure/datasources/supabase-data-source';
+import { InventoryConfigurationForOperationEntity } from '@/src/inventories/core/entities/inventory-configuration-for-operation.entity';
+import { InventoryConfigurationForOperationModel } from '@/src/inventories/application/models/inventory-configuration-for-operation.model';
 
 @Injectable()
 export class InventorySupabaseRepository implements InventoryRepository {
@@ -278,6 +280,26 @@ export class InventorySupabaseRepository implements InventoryRepository {
       }
 
       return this.composeInventories(data as InventoryModel[]);
+    } catch (error) {
+      throw new Error(
+        `Failed to retrieve inventories: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+  }
+
+  async listInventoryConfigurationForOperations(): Promise<InventoryConfigurationForOperationEntity[]> {
+    try {
+      const { data, error } = await this.supabase
+        .from('inventory_configuration_for_operations')
+        .select();
+
+      if (error) {
+        throw new Error(`Failed to retrieve inventories: ${error.message}`);
+      }
+
+      return (data as InventoryConfigurationForOperationModel[]).map((invConfig) =>
+        this.mapper.toDomainObject(invConfig)
+      )
     } catch (error) {
       throw new Error(
         `Failed to retrieve inventories: ${error instanceof Error ? error.message : String(error)}`,

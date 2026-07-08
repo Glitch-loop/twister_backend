@@ -6,6 +6,7 @@ import { MOVEMENT_TYPE_ENUM } from '@/src/inventories/core/enums/movement-type.e
 // Entities
 import { InventoryEntity } from '@/src/inventories/core/entities/inventory.entity';
 import { InventoryOperationEntity } from '@/src/inventories/core/entities/inventory-operation.entity';
+import { InventoryConfigurationForOperationEntity } from '@/src/inventories/core/entities/inventory-configuration-for-operation.entity';
 
 // Object values
 import { InventoryBalanceObjectValue } from '@/src/inventories/core/value-objects/inventory-balance.object-value';
@@ -16,10 +17,12 @@ import type { InventoryModel } from '@/src/inventories/application/models/invent
 import type { InventoryOperationModel } from '@/src/inventories/application/models/inventory-operation.model';
 import type { InventoryBalanceModel } from '@/src/inventories/application/models/inventory-balance.model';
 import type { InventoryOperationDescriptionModel } from '@/src/inventories/application/models/inventory-operation-description.model';
+import type { InventoryConfigurationForOperationModel } from '@/src/inventories/application/models/inventory-configuration-for-operation.model';
 
 // Entity guards
 import { isInventoryEntity } from '@/src/inventories/application/guards/entities/inventory.guard';
 import { isInventoryOperationEntity } from '@/src/inventories/application/guards/entities/inventory-operation.guard';
+import { isInventoryConfigurationForOperationModel as isInventoryConfigurationForOperationEntity } from '@/src/inventories/application/guards/entities/inventory-configuration-for-operation.guard';
 
 // Object value guards
 import { isInventoryBalanceObjectValue } from '@/src/inventories/application/guards/object-values/inventory-balance.guard';
@@ -30,6 +33,7 @@ import { isInventoryModel } from '@/src/inventories/application/guards/models/in
 import { isInventoryOperationModel } from '@/src/inventories/application/guards/models/inventory-operation.guard';
 import { isInventoryBalanceModel } from '@/src/inventories/application/guards/models/inventory-balance.guard';
 import { isInventoryOperationDescriptionModel } from '@/src/inventories/application/guards/models/inventory-operation-description.guard';
+import { isInventoryConfigurationForOperationModel } from '@/src/inventories/application/guards/models/inventory-configuration-for-operation.guard';
 import { INVENTORY_CONTEXT_ENUM } from '../../core/enums/inventory-context.enum';
 import { INVENTORY_STATE_ENUM } from '../../core/enums/inventory-state-enum';
 import { STOCK_VALIDATION_ENUM } from '../../core/enums/stock-validation.enum';
@@ -42,6 +46,7 @@ export class EntityModelMapper {
 	toDomainObject(model: InventoryBalanceModel): InventoryBalanceObjectValue;
 	toDomainObject(model: InventoryOperationDescriptionModel): InventoryOperationDescriptionObjectValue;
 	toDomainObject(model: InventoryModel, inventoryBalanceModels: InventoryBalanceModel[]): InventoryEntity;
+	toDomainObject(model: InventoryConfigurationForOperationModel): InventoryConfigurationForOperationEntity;
 	toDomainObject(
 		model: InventoryOperationModel,
 		inventoryOperationDescriptionModels: InventoryOperationDescriptionModel[],
@@ -51,7 +56,8 @@ export class EntityModelMapper {
 			| InventoryBalanceModel
 			| InventoryOperationDescriptionModel
 			| InventoryModel
-			| InventoryOperationModel,
+			| InventoryOperationModel
+			| InventoryConfigurationForOperationModel,
 		nestedModels?: InventoryBalanceModel[] | InventoryOperationDescriptionModel[],
 	): any {
 		if (isInventoryBalanceModel(model)) {
@@ -59,6 +65,9 @@ export class EntityModelMapper {
 		}
 		if (isInventoryOperationDescriptionModel(model)) {
 			return this.inventoryOperationDescriptionModelToDomainObject(model);
+		}
+		if (isInventoryConfigurationForOperationModel(model)) {
+			return this.inventoryConfigurationForOperationModelToDomainObject(model);
 		}
 		if (isInventoryModel(model)) {
 			if (nestedModels === undefined) throw new Error('Missing inventory balance models for InventoryModel to domain object conversion');
@@ -86,18 +95,23 @@ export class EntityModelMapper {
 	toModel(domainObject: InventoryOperationDescriptionObjectValue): InventoryOperationDescriptionModel;
 	toModel(domainObject: InventoryEntity): InventoryModel;
 	toModel(domainObject: InventoryOperationEntity): InventoryOperationModel;
+	toModel(domainObject: InventoryConfigurationForOperationEntity): InventoryConfigurationForOperationModel;
 	toModel(
 		domainObject:
 			| InventoryBalanceObjectValue
 			| InventoryOperationDescriptionObjectValue
 			| InventoryEntity
-			| InventoryOperationEntity,
+			| InventoryOperationEntity
+			| InventoryConfigurationForOperationEntity,
 	): any {
 		if (isInventoryEntity(domainObject)) {
 			return this.inventoryEntityToModel(domainObject);
 		}
 		if (isInventoryOperationEntity(domainObject)) {
 			return this.InventoryOperationEntityToModel(domainObject);
+		}
+		if (isInventoryConfigurationForOperationEntity(domainObject)) {
+			return this.inventoryConfigurationForOperationEntityToModel(domainObject);
 		}
 		if (isInventoryBalanceObjectValue(domainObject)) {
 			return this.inventoryBalanceObjectValueToModel(domainObject);
@@ -166,6 +180,20 @@ export class EntityModelMapper {
 			created_by: domainObject.created_by,
 			id_inventory_origin: domainObject.id_inventory_origin,
 			id_inventory_target: domainObject.id_inventory_target,
+		};
+	}
+
+	private inventoryConfigurationForOperationEntityToModel(
+		domainObject: InventoryConfigurationForOperationEntity,
+	): InventoryConfigurationForOperationModel {
+		return {
+			id_inventory_configuration: domainObject.id_inventory_configuration,
+			inventory_operation: domainObject.inventory_operation,
+			origin_inventory: domainObject.origin_inventory,
+			target_inventory: domainObject.target_inventory,
+			created_at: domainObject.created_at.toISOString(),
+			user_assigned_to: domainObject.user_assigned_to,
+			facility_assigned_to: domainObject.facility_assigned_to,
 		};
 	}
 
@@ -263,6 +291,25 @@ export class EntityModelMapper {
 			),
 			model.inventory_operation_reference,
 			model.document_reference,
+		);
+	}
+
+	private inventoryConfigurationForOperationModelToDomainObject(
+		model: InventoryConfigurationForOperationModel,
+	): InventoryConfigurationForOperationEntity {
+		const createdAt = this.toDate(
+			model.created_at,
+			'InventoryConfigurationForOperationModel.created_at',
+		);
+
+		return new InventoryConfigurationForOperationEntity(
+			model.id_inventory_configuration,
+			model.inventory_operation,
+			model.origin_inventory,
+			model.target_inventory,
+			createdAt,
+			model.user_assigned_to,
+			model.facility_assigned_to,
 		);
 	}
 
