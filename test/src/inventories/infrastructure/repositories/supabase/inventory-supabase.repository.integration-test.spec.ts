@@ -27,7 +27,6 @@ describe('Inventory supabase repository', () => {
   let dumpRecords: dumpRecordInterface[];
 
   const trackDumpRecord = async <T extends object>(recordType: dumpRecordType, id: string, payload: T, createRecordInDB: boolean = true): Promise<dumpRecordInterface> => {
-    
     if (createRecordInDB) {
       const recordToTrack = await createDumpRecordInDatabase(supabaseClient, id, recordType, payload);
       dumpRecords.push(recordToTrack);
@@ -41,7 +40,6 @@ describe('Inventory supabase repository', () => {
       dumpRecords.push(recordToTrack);
       return recordToTrack;
     }
-    
   };
 
   const seedInventoryDependencies = async () => {

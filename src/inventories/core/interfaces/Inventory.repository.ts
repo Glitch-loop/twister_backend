@@ -1,6 +1,7 @@
 import { InventoryOperationEntity } from "@/src/inventories/core/entities/inventory-operation.entity";
 import { InventoryEntity } from "@/src/inventories/core/entities/inventory.entity";
 import { InventoryBalanceObjectValue } from "@/src/inventories/core/value-objects/inventory-balance.object-value";
+import { InventoryConfigurationForOperationEntity } from "@/src/inventories/core/entities/inventory-configuration-for-operation.entity";
 
 
 export abstract class InventoryRepository {
@@ -32,4 +33,5 @@ export abstract class InventoryRepository {
     assigned_facility?: string[],
   ): Promise<InventoryEntity[]>;
   abstract retrieveInventories(idInventories: string[]): Promise<InventoryEntity[]>;
+  abstract listInventoryConfigurationForOperations: Promise<InventoryConfigurationForOperationEntity[]>;
 }
