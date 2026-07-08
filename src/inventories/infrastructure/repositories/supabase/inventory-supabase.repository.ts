@@ -287,19 +287,37 @@ export class InventorySupabaseRepository implements InventoryRepository {
     }
   }
 
-  async listInventoryConfigurationForOperations(): Promise<InventoryConfigurationForOperationEntity[]> {
+  async listInventoryConfigurationForOperations(
+    idInventoryOperation: string[],
+    userAssignedTo: string[],
+    facilityAssignedTo: string[],
+  ): Promise<InventoryConfigurationForOperationEntity[]> {
     try {
-      const { data, error } = await this.supabase
+      const query = this.supabase
         .from('inventory_configuration_for_operations')
         .select();
+
+      if (idInventoryOperation.length > 0) {
+        query.in('inventory_operation', idInventoryOperation);
+      }
+
+      if (userAssignedTo.length > 0) {
+        query.in('user_assigned_to', userAssignedTo);
+      }
+
+      if (facilityAssignedTo.length > 0) {
+        query.in('facility_assigned_to', facilityAssignedTo);
+      }
+
+      const { data, error } = await query;
 
       if (error) {
         throw new Error(`Failed to retrieve inventories: ${error.message}`);
       }
 
       return (data as InventoryConfigurationForOperationModel[]).map((invConfig) =>
-        this.mapper.toDomainObject(invConfig)
-      )
+        this.mapper.toDomainObject(invConfig),
+      );
     } catch (error) {
       throw new Error(
         `Failed to retrieve inventories: ${error instanceof Error ? error.message : String(error)}`,

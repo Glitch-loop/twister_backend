@@ -33,5 +33,5 @@ export abstract class InventoryRepository {
     assigned_facility?: string[],
   ): Promise<InventoryEntity[]>;
   abstract retrieveInventories(idInventories: string[]): Promise<InventoryEntity[]>;
-  abstract listInventoryConfigurationForOperations(): Promise<InventoryConfigurationForOperationEntity[]>;
+  abstract listInventoryConfigurationForOperations(idInventoryOperation: string[], userAssignedTo: string[], facilityAssignedTo: string[]): Promise<InventoryConfigurationForOperationEntity[]>;
 }
