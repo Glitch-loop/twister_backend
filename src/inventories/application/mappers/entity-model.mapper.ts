@@ -87,7 +87,7 @@ export class EntityModelMapper {
 			);
 		}
 
-		throw new Error('Invalid input for mapping to domain object');
+		throw new Error('Invalid input for mapping from model to domain object');
 	}
 
 	// toModel overloads
@@ -122,7 +122,7 @@ export class EntityModelMapper {
 			);
 		}
 
-		throw new Error('Invalid input for mapping to model');
+		throw new Error('Invalid input for mapping from business object to model');
 	}
 
 	// ==================== MAPPER METHODS DOMAIN OBJECT to MODEL ====================
@@ -188,7 +188,7 @@ export class EntityModelMapper {
 	): InventoryConfigurationForOperationModel {
 		return {
 			id_inventory_configuration: domainObject.id_inventory_configuration,
-			inventory_operation: domainObject.inventory_operation,
+			inventory_operation_type: domainObject.inventory_operation_type,
 			origin_inventory: domainObject.origin_inventory,
 			target_inventory: domainObject.target_inventory,
 			created_at: domainObject.created_at.toISOString(),
@@ -276,7 +276,7 @@ export class EntityModelMapper {
 		if (!Object.values(MOVEMENT_TYPE_ENUM).includes(model.movement_type)) {
 			throw new Error('Invalid movement_type in InventoryOperationModel');
 		}
-
+		console.log("From model to domain object: ", model)
 		return new InventoryOperationEntity(
 			model.id_inventory_operation,
 			model.latitude,
@@ -304,7 +304,7 @@ export class EntityModelMapper {
 
 		return new InventoryConfigurationForOperationEntity(
 			model.id_inventory_configuration,
-			model.inventory_operation,
+			model.inventory_operation_type,
 			model.origin_inventory,
 			model.target_inventory,
 			createdAt,

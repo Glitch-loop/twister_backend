@@ -72,7 +72,7 @@ date at moment of the creation.`,
 	@Post('/work-days')
 	async startWorkDay(@Body() body: StartShiftWorkDayRequestDto): Promise<httpControllerResponse> {
 		await this.startWorkDayCommand.execute(
-			body.start_date,
+			new Date(body.start_date),
 			body.start_petty_cash,
 			body.id_route_day,
 			body.id_user,
@@ -118,7 +118,7 @@ date at moment of the creation.`,
 		await this.createWorkDayNoteCommand.execute(
 			id_work_day,
 			body.note,
-			body.created_at,
+			new Date(body.created_at),
 		);
 
 		const httpResponseFormatter = new httpFormatter();

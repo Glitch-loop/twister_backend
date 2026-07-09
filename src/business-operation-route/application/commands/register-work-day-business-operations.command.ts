@@ -1,6 +1,6 @@
 // Libraries
 import { Inject, Injectable } from '@nestjs/common';
-import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 // Repository
 import { WorkDayRepository } from '@/src/business-operation-route/core/interfaces/work-day.repository';
@@ -34,7 +34,6 @@ import { OrganizeRouteDayCommand } from '@/src/route-organization/application/co
 import { DOMAIN_EVENT_ENUM } from '@/src/shared/core/enums/domain-event.enum';
 import { ConfirmedClientEvent } from '@/src/shared/events/interfaces/confirmed-client-event.interface';
 
-console.log("EMITTER ENUM CHECK:", DOMAIN_EVENT_ENUM.CONFIRMED_CLIENT_EVENT);
 @Injectable()
 export class RegisterWorkDayBusinessOperationsCommand {
 	constructor(
@@ -46,29 +45,23 @@ export class RegisterWorkDayBusinessOperationsCommand {
 		private readonly mapper: Mapper
 	) {}
 
-	@OnEvent(DOMAIN_EVENT_ENUM.CONFIRMED_CLIENT_EVENT, { async: true })
-	private handleClientConfirmed(payload: ConfirmedClientEvent) {
-		console.log("This is an event: ", payload)
-	}
-
 	async execute(
 		id_work_day: string,
-		operations: Array<{
-			id_operation_type: DAY_OPERATIONS_ENUM;
-			created_at?: Date;
-			latitude: string;
-			longitude: string;
-			id_location?: string;
-			id_route_transaction?: string;
-			id_inventory_operation?: string;
-			id_route_day: string;
-			id_day_operation_dependent?: string;
-			id_work_day_operation?: string;
+		new_operations: Array<{
+		id_operation_type: DAY_OPERATIONS_ENUM;
+		created_at?: Date;
+		latitude: string;
+		longitude: string;
+		id_location?: string;
+		id_route_transaction?: string;
+		id_inventory_operation?: string;
+		id_route_day: string;
+		id_day_operation_dependent?: string;
+		id_work_day_operation?: string;
 		}>,
 	): Promise<void> {
 		const workDays: WorkDayEntity[] = await this.workDayRepository.retrieveWorkDayByWorkDayId([ id_work_day ])
 		if (workDays.length === 0) throw new BusinessRuleException(`Work day with id ${id_work_day} which you are trying to register the route business operations doesn't exist.`);
-
 		const { id_route_day } = workDays[0];
 		const workDayToAdd:WorkDayAggregate = new WorkDayAggregate(workDays[0]);
 		if(!workDayToAdd.isWorkDayFinished()) throw new BusinessRuleException(`Work day with id ${id_work_day} is already finished. You cannot add business operation to a finished work day.`)
@@ -82,7 +75,7 @@ export class RegisterWorkDayBusinessOperationsCommand {
 			currentOperations.length > 0 ? currentOperations : null,
 		);
 
-		for (const operation of operations) {
+		for (const operation of new_operations) {
 			businessOperationDay.createBusinessOperation({
 				id_work_day_operation: operation.id_work_day_operation ?? this.integrityRepository.generateUUIDv4(),
 				id_work_day,
@@ -104,8 +97,8 @@ export class RegisterWorkDayBusinessOperationsCommand {
 			return;
 		}
 		
-		const newClientLocationOperation = newOperations.filter((operation) => operation.id_operation_type === DAY_OPERATIONS_ENUM.prospect_registration);
 		// Process for integrating a new client 
+		const newClientLocationOperation = newOperations.filter((operation) => operation.id_operation_type === DAY_OPERATIONS_ENUM.prospect_registration);
 		if (newClientLocationOperation.length > 0) {
 			newClientLocationOperation.forEach((newClientRegistry) => {
 				if (newClientRegistry.id_work_day !== id_work_day) throw new BusinessRuleException(`The business operation with id ${newClientRegistry.id_work_day_operation} (type of operation: register new client) is invalid. Work days differ. Work day that belongs the new client record: ${newClientRegistry.id_work_day}. Work day of the request ${id_work_day}`)

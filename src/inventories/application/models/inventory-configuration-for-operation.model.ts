@@ -1,6 +1,6 @@
 export interface InventoryConfigurationForOperationModel {
   id_inventory_configuration: string;
-  inventory_operation: string;
+  inventory_operation_type: string;
   origin_inventory: string;
   target_inventory: string;
   created_at: string;

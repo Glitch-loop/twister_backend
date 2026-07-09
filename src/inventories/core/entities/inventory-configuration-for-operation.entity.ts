@@ -1,7 +1,7 @@
 export class InventoryConfigurationForOperationEntity {
   constructor(
     public readonly id_inventory_configuration: string,
-    public readonly inventory_operation: string,
+    public readonly inventory_operation_type: string,
     public readonly origin_inventory: string,
     public readonly target_inventory: string,
     public readonly created_at: Date,

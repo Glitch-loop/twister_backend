@@ -29,7 +29,6 @@ import { BusinessRuleException } from "@/src/shared/errors/BusinessRuleException
  * The intention of this listener is to create the proper inventory operation
  * for the "route" transaction.
  */
-
 @Injectable()
 export class RegisterTransactionListener {
   constructor(

@@ -59,7 +59,6 @@ export class StartWorkDayCommand {
 		workDayAggregate.startWorkDay( 
 			workDayId,
 			start_petty_cash,
-			id_route,
 			id_user,
 			id_route_day,
 			start_date

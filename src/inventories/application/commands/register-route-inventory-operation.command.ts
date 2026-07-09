@@ -3,9 +3,6 @@ import { Inject, Injectable } from '@nestjs/common';
 
 // Commands
 import { RegisterInventoryOperatonBetweenInventoriesCommand } from '@/src/inventories/application/commands/register-inventory-operaton-between-inventories.command';
-import { RegisterProductDevolutionCommand } from '@/src/inventories/application/commands/register-product-devolution.command';
-import { RegisterWasteInventoryOperationCommand } from '@/src/inventories/application/commands/register-waste-inventory-operation.command';
-import { ReverseInventoryMovementCommand } from '@/src/inventories/application/commands/reverse-inventory-movement.command';
 
 // Dtos
 import { RouteInventoryOperationDescriptionDto } from '@/src/inventories/application/dtos/route-inventory-operation-description.dto';
@@ -14,11 +11,9 @@ import { RouteInventoryOperationDescriptionDto } from '@/src/inventories/applica
 import { EntityDtoMapper } from '@/src/inventories/application/mappers/entity-dto.mapper';
 
 // Entities
-import { InventoryEntity } from '@/src/inventories/core/entities/inventory.entity';
-import { InventoryOperationEntity } from '@/src/inventories/core/entities/inventory-operation.entity';
+import { InventoryConfigurationForOperationEntity } from '@/src/inventories/core/entities/inventory-configuration-for-operation.entity';
 
 // Enums
-import { INVENTORY_CONTEXT_ENUM } from '@/src/inventories/core/enums/inventory-context.enum';
 import { ROUTE_INVENTORY_OPERATION_TYPE } from '@/src/inventories/core/enums/route-inventory-operation-type.enum';
 
 // Repository
@@ -29,7 +24,6 @@ import { InventoryOperationDescriptionObjectValue } from '@/src/inventories/core
 
 // Errors
 import { BusinessRuleException } from '@/src/shared/errors/BusinessRuleException';
-import { InventoryConfigurationForOperationEntity } from '../../core/entities/inventory-configuration-for-operation.entity';
 
 
 @Injectable()
@@ -37,10 +31,7 @@ export class RegisterRouteInventoryOperationCommand {
   constructor(
     @Inject(InventoryRepository) private readonly inventoryRepository: InventoryRepository,
     private readonly mapper: EntityDtoMapper,
-    private readonly registerInventoryOperatonBetweenInventoriesCommand: RegisterInventoryOperatonBetweenInventoriesCommand,
-    private readonly registerProductDevolutionCommand: RegisterProductDevolutionCommand,
-    private readonly registerWasteInventoryOperationCommand: RegisterWasteInventoryOperationCommand,
-    private readonly reverseInventoryMovementCommand: ReverseInventoryMovementCommand,
+    private readonly registerInventoryOperatonBetweenInventoriesCommand: RegisterInventoryOperatonBetweenInventoriesCommand
   ) {}
 
   async executeUseCase(
@@ -50,128 +41,31 @@ export class RegisterRouteInventoryOperationCommand {
     id_user: string,
     inventory_operation_descriptions: InventoryOperationDescriptionObjectValue[]
   ): Promise<void> {
-    console.log("Registering route information")
+    let inventoryConfigurationErrorMessage: string = 'An error has been occured while registering route inventory operation. Verify the inventory configuration is set properly'
     if (inventory_operation_descriptions.length === 0) {
       throw new BusinessRuleException('Inventory operation descriptions are required.');
     }
 
     const createdAtDate = this.toDate(created_at, 'RouteInventoryOperationDto.date');
-
-    const inventoryConfigurations: InventoryConfigurationForOperationEntity[] = await this.inventoryRepository.listInventoryConfigurationForOperations([], [ id_user ], []);
-
-    if (id_inventory_operation_type === ROUTE_INVENTORY_OPERATION_TYPE.start_shift_inventory) {
-      console.log("Start shift inventory")
-      const inventoryConfig = inventoryConfigurations
-        .find((invConfig) => invConfig.inventory_operation as ROUTE_INVENTORY_OPERATION_TYPE === ROUTE_INVENTORY_OPERATION_TYPE.start_shift_inventory);
-
-      // const reservationInventory = await this.retrieveInventoryByContextForUser(
-      //   INVENTORY_CONTEXT_ENUM.PRODUCT_RESERVATION,
-      //   id_user,
-      // );
-      // const availableInventory = await this.retrieveInventoryByContextForUser(
-      //   INVENTORY_CONTEXT_ENUM.AVAILABLE_FOR_SALE,
-      //   id_user,
-      // );
-      if (inventoryConfig === undefined) throw new BusinessRuleException(
-        `There is not an inventory designed for the user ${id_user} to handle the inventory operation ${ROUTE_INVENTORY_OPERATION_TYPE.start_shift_inventory}`,
-      ); 
       
-      await this.registerInventoryOperatonBetweenInventoriesCommand.execute(
-        inventoryConfig.origin_inventory,
-        inventoryConfig.target_inventory,
-        id_user,
-        inventory_operation_descriptions,
-        id_inventory_operation,
-        createdAtDate,
-      );
-      return;
-    }
+    const inventoryConfigurations: InventoryConfigurationForOperationEntity[] = await this.inventoryRepository.listInventoryConfigurationForOperations([], [ id_user ], []);
+    const inventoryConfig = inventoryConfigurations
+      .find((invConfig) => invConfig.inventory_operation_type as ROUTE_INVENTORY_OPERATION_TYPE === id_inventory_operation_type);
 
-    if (id_inventory_operation_type === ROUTE_INVENTORY_OPERATION_TYPE.restock_inventory) {
-      const inventoryConfig = inventoryConfigurations
-        .find((invConfig) => invConfig.inventory_operation as ROUTE_INVENTORY_OPERATION_TYPE === ROUTE_INVENTORY_OPERATION_TYPE.restock_inventory);
-      // const warehouseInventory = await this.retrieveUniqueInventoryByContext(
-      //   INVENTORY_CONTEXT_ENUM.WAREHOUSE,
-      // );
-      // const availableInventory = await this.retrieveInventoryByContextForUser(
-      //   INVENTORY_CONTEXT_ENUM.AVAILABLE_FOR_SALE,
-      //   id_user,
-      // );
-      if (inventoryConfig === undefined) throw new BusinessRuleException(
-        `There is not an inventory designed for the user ${id_user} to handle the inventory operation ${ROUTE_INVENTORY_OPERATION_TYPE.restock_inventory}`,
-      ); 
-
-      await this.registerInventoryOperatonBetweenInventoriesCommand.execute(
-        inventoryConfig.origin_inventory,
-        inventoryConfig.target_inventory,
-        id_user,
-        inventory_operation_descriptions,
-        id_inventory_operation,
-        createdAtDate,
-      );
-      return;
-    }
-
-    if (id_inventory_operation_type === ROUTE_INVENTORY_OPERATION_TYPE.product_devolution_inventory) {
-      const inventoryConfig = inventoryConfigurations
-        .find((invConfig) => invConfig.inventory_operation as ROUTE_INVENTORY_OPERATION_TYPE === ROUTE_INVENTORY_OPERATION_TYPE.product_devolution_inventory);
-      // const availableInventory = await this.retrieveInventoryByContextForUser(
-      //   INVENTORY_CONTEXT_ENUM.SHRINKAGE,
-      //   id_user,
-      // );
-      if (inventoryConfig === undefined) throw new BusinessRuleException(
-        `There is not an inventory designed for the user ${id_user} to handle the inventory operation ${ROUTE_INVENTORY_OPERATION_TYPE.product_devolution_inventory}`,
-      ); 
-      await this.registerProductDevolutionCommand.execute(
-        inventoryConfig.origin_inventory,
-        id_user,
-        inventory_operation_descriptions,
-        undefined,
-        id_inventory_operation,
-        createdAtDate,
-      );
-
-      // const shrinkageInventory = await this.retrieveUniqueInventoryByContext(
-      //   INVENTORY_CONTEXT_ENUM.SHRINKAGE,
-      // );
-
-      // await this.registerWasteInventoryOperationCommand.execute(
-      //   shrinkageInventory.id_inventory,
-      //   id_user,
-      //   inventory_operation_descriptions,
-      //   undefined,
-      //   createdAtDate,
-      // );
-      return;
-    }
-
-    if (id_inventory_operation_type === ROUTE_INVENTORY_OPERATION_TYPE.end_shift_inventory) {
-      const inventoryConfig = inventoryConfigurations
-        .find((invConfig) => invConfig.inventory_operation as ROUTE_INVENTORY_OPERATION_TYPE === ROUTE_INVENTORY_OPERATION_TYPE.end_shift_inventory);
-      // const availableInventory = await this.retrieveInventoryByContextForUser(
-      //   INVENTORY_CONTEXT_ENUM.AVAILABLE_FOR_SALE,
-      //   id_user,
-      // );
-      // const warehouseInventory = await this.retrieveUniqueInventoryByContext(
-      //   INVENTORY_CONTEXT_ENUM.WAREHOUSE,
-      // );
-
-      if (inventoryConfig === undefined) throw new BusinessRuleException(
-        `There is not an inventory designed for the user ${id_user} to handle the inventory operation ${ROUTE_INVENTORY_OPERATION_TYPE.end_shift_inventory}`,
-      ); 
-      await this.registerInventoryOperatonBetweenInventoriesCommand.execute(
-        inventoryConfig.origin_inventory,
-        inventoryConfig.target_inventory,
-        id_user,
-        inventory_operation_descriptions,
-        id_inventory_operation,
-        createdAtDate,
-      );
-      return;
-    }
-
-    throw new BusinessRuleException(
-      `Route inventory operation type ${id_inventory_operation_type} is not supported.`,
+    if (id_inventory_operation_type === ROUTE_INVENTORY_OPERATION_TYPE.start_shift_inventory) inventoryConfigurationErrorMessage = `Error at moment of registering start shift inventory (${ROUTE_INVENTORY_OPERATION_TYPE.start_shift_inventory}). There is not an inventory configuration for the user: ${id_user} to handle this case.`;
+    if (id_inventory_operation_type === ROUTE_INVENTORY_OPERATION_TYPE.restock_inventory) inventoryConfigurationErrorMessage = `Error at moment of registering restock inventory (${ROUTE_INVENTORY_OPERATION_TYPE.restock_inventory}). There is not an inventory configuration for the user: ${id_user} to handle this case.`;
+    if (id_inventory_operation_type === ROUTE_INVENTORY_OPERATION_TYPE.product_devolution_inventory) inventoryConfigurationErrorMessage = `Error at moment of registering product devolution inventory (${ROUTE_INVENTORY_OPERATION_TYPE.product_devolution_inventory}). There is not an inventory configuration for the user: ${id_user} to handle this case.`;
+    if (id_inventory_operation_type === ROUTE_INVENTORY_OPERATION_TYPE.end_shift_inventory) inventoryConfigurationErrorMessage = `Error at moment of registering end shift inventory  (${ROUTE_INVENTORY_OPERATION_TYPE.end_shift_inventory}). There is not an inventory configuration for the user: ${id_user} to handle this case.`;
+    
+    if (inventoryConfig === undefined) throw new BusinessRuleException(inventoryConfigurationErrorMessage); 
+    
+    await this.registerInventoryOperatonBetweenInventoriesCommand.execute(
+      inventoryConfig.origin_inventory,
+      inventoryConfig.target_inventory,
+      id_user,
+      inventory_operation_descriptions,
+      id_inventory_operation,
+      createdAtDate,
     );
   }
 
@@ -190,75 +84,6 @@ export class RegisterRouteInventoryOperationCommand {
       inventory_operation_descriptions.map((desc) => this.mapper.toDomainObject(desc))
     );
 
-  }
-
-  private async retrieveInventoryByContextForUser(
-    inventory_context: INVENTORY_CONTEXT_ENUM,
-    id_user: string,
-  ): Promise<InventoryEntity> {
-    const inventories = await this.inventoryRepository.listInventories(
-      2,
-      undefined,
-      undefined,
-      [inventory_context],
-      undefined,
-      undefined,
-      undefined,
-      [id_user],
-    );
-    
-    if (inventories.length === 0) {
-      throw new BusinessRuleException(
-        `Expected one inventory with context ${inventory_context} assigned to user ${id_user}, but none was found.`,
-      );
-    }
-
-    if (inventories.length > 1) {
-      throw new BusinessRuleException(
-        `Expected one inventory with context ${inventory_context} assigned to user ${id_user}, but found ${inventories.length}.`,
-      );
-    }
-
-    return inventories[0];
-  }
-
-  private async retrieveUniqueInventoryByContext(
-    inventory_context: INVENTORY_CONTEXT_ENUM,
-  ): Promise<InventoryEntity> {
-    const inventories = await this.inventoryRepository.listInventories(
-      2,
-      undefined,
-      undefined,
-      [inventory_context],
-    );
-
-    if (inventories.length === 0) {
-      throw new BusinessRuleException(
-        `Expected one inventory with context ${inventory_context}, but none was found.`,
-      );
-    }
-
-    if (inventories.length > 1) {
-      throw new BusinessRuleException(
-        `Expected one inventory with context ${inventory_context}, but found ${inventories.length}.`,
-      );
-    }
-
-    return inventories[0];
-  }
-
-  private async retrieveInventoryOperationById(id_inventory_operation: string): Promise<InventoryOperationEntity> {
-    const inventoryOperations = await this.inventoryRepository.retrieveInventoryOperations([
-      id_inventory_operation,
-    ]);
-
-    if (inventoryOperations.length === 0) {
-      throw new BusinessRuleException(
-        `Inventory operation with id ${id_inventory_operation} does not exist and cannot be reversed.`,
-      );
-    }
-
-    return inventoryOperations[0];
   }
 
   private toDate(value: Date | string, fieldName: string): Date {

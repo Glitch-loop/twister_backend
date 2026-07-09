@@ -78,7 +78,7 @@ export class RegisterProductDevolutionCommand {
 		if (inventory_operation_descriptions.length === 0) {
 			throw new BusinessRuleException('Inventory operation descriptions are required.');
 		}
-		console.log("Inventory")
+
 		const originInventory = await this.retrieveInventoryById(id_inventory_origin);
 		console.log("originInventory: ", originInventory)
 		const shrinkageInventory = await this.retrieveUniqueInventoryByContext(
@@ -190,4 +190,6 @@ export class RegisterProductDevolutionCommand {
 			}
 		}
 	}
+
+	
 }

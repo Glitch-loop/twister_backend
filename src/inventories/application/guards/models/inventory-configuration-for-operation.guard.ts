@@ -11,11 +11,12 @@ export const isInventoryConfigurationForOperationModel = (value: unknown): value
 
   return (
     typeof value.id_inventory_configuration === "string" &&
-    typeof value.inventory_operation === "string" &&
+    typeof value.created_at === "string" &&
+    typeof value.inventory_operation_type === "string" &&
     typeof value.origin_inventory === "string" &&
     typeof value.target_inventory === "string" &&
-    typeof value.created_at === "string" &&
-    typeof value.user_assigned_to === "string" &&
-    typeof value.facility_assigned_to === "string"
+    typeof value.created_by === "string" &&
+    (value.user_assigned_to === null || typeof value.user_assigned_to === "string") &&
+    (value.facility_assigned_to === null || typeof value.facility_assigned_to === "string")
   )
 }

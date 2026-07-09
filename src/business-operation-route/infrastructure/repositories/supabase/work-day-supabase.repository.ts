@@ -63,7 +63,6 @@ export class WorkDaySupabaseRepository implements WorkDayRepository {
 			const payload: Partial<WorkDayModel> = {
 				start_date: workDayModel.start_date,
 				finish_date: workDayModel.finish_date,
-				id_route: workDayModel.id_route,
 				start_petty_cash: workDayModel.start_petty_cash,
 				final_petty_cash: workDayModel.final_petty_cash,
 				id_route_day: workDayModel.id_route_day,

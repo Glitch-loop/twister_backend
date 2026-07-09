@@ -42,8 +42,6 @@ export class HttpInterceptor implements NestInterceptor {
       .handle()
       .pipe(
         map(((value: httpControllerResponse|httpResponseLoginInterface) => {
-          console.log(value)
-
           if (isHttpResponseLogin(value)) {
             return value
           } else {

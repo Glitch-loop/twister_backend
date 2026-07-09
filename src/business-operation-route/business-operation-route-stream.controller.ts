@@ -14,7 +14,8 @@ import { DOMAIN_EVENT_ENUM } from '@/src/shared/core/enums/domain-event.enum';
 export class BusinessOperationRouteStreamController {
   private readonly businessOperation$ = new Subject<unknown>();
   private readonly inventoryOperation$ = new Subject<unknown>();
-  private readonly transaction$ = new Subject<unknown>();
+  private readonly registerTransaction$ = new Subject<unknown>();
+  private readonly cancelTransaction$ = new Subject<unknown>();
 
   @Sse('stream/manager')
   sse(): Observable<MessageEvent> {
@@ -35,20 +36,27 @@ export class BusinessOperationRouteStreamController {
           };
         }),
       ),
-      this.transaction$.asObservable().pipe(
+      this.registerTransaction$.asObservable().pipe(
         map((payload) => {
           return {
-            source: DOMAIN_EVENT_ENUM.TRANSACTIONS_OPERATION_EVENT,
+            source: DOMAIN_EVENT_ENUM.CREATE_TRANSACTION_OPERATION_EVENT,
             payload,
           };
         }),
       ),
-    ).pipe(map((eventPayload) => ({ data: eventPayload } as MessageEvent)));
+      this.cancelTransaction$.asObservable().pipe(
+        map((payload) => {
+          return {
+            source: DOMAIN_EVENT_ENUM.CREATE_TRANSACTION_OPERATION_EVENT,
+            payload,
+          };
+        }),
+      ),
+    ).pipe(map((eventPayload) => ({ data: eventPayload } as MessageEvent)))
   }
 
   @OnEvent(DOMAIN_EVENT_ENUM.BUSINESS_OPERATION_EVENT, { async: true })
   handleBusinessOperationEvent(payload: unknown): void {
-    console.log("Business operation generated: ", payload)
     this.businessOperation$.next(payload);
   }
 
@@ -57,8 +65,12 @@ export class BusinessOperationRouteStreamController {
     this.inventoryOperation$.next(payload);
   }
 
-  @OnEvent(DOMAIN_EVENT_ENUM.TRANSACTIONS_OPERATION_EVENT, { async: true })
-  handleTransactionOperationEvent(payload: unknown): void {
-    this.transaction$.next(payload);
+  @OnEvent(DOMAIN_EVENT_ENUM.CREATE_TRANSACTION_OPERATION_EVENT, { async: true })
+  handleRegisterTransactionOperationEvent(payload: unknown): void {
+    this.registerTransaction$.next(payload);
+  }
+  @OnEvent(DOMAIN_EVENT_ENUM.CANCEL_TRANSACTION_OPERATION_EVENT, { async: true })
+  handleCancelTransactionOperationEvent(payload: unknown): void {
+    this.cancelTransaction$.next(payload);
   }
 }
