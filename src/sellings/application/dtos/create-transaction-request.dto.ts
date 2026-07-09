@@ -19,7 +19,7 @@ export class CreateTransactionDescriptionRequestDto {
 
   @ApiProperty({ type: Number, example: 85.75 })
   public readonly cost_at_moment: number;
-
+  
   @ApiProperty({ type: Number, example: 3 })
   public readonly amount: number;
 
@@ -29,7 +29,7 @@ export class CreateTransactionDescriptionRequestDto {
     example: '2026-06-01T12:30:00.000Z',
     description: 'Optional creation date. If not provided, server uses current date.',
   })
-  public readonly created_at?: Date;
+  public readonly created_at?: string;
 
   @ApiProperty({
     type: String,
@@ -55,7 +55,7 @@ export class CreateTransactionDescriptionRequestDto {
     id_transaction_operation_type: string,
     id_product: string,
     id_transaction_description?: string,
-    created_at?: Date,
+    created_at?: string,
   ) {
     this.id_transaction_description = id_transaction_description;
     this.price_at_moment = price_at_moment;
@@ -104,7 +104,7 @@ export class CreateTransactionRequestDto {
     example: '2026-06-01T12:30:00.000Z',
     description: 'Optional creation date. If not provided, server uses current date.',
   })
-  public readonly created_at?: Date;
+  public readonly created_at?: string;
 
   @ApiPropertyOptional({
     type: String,
@@ -188,7 +188,7 @@ export class CreateTransactionRequestDto {
     longitude?: string,
     id_client?: string,
     id_transaction?: string,
-    created_at?: Date,
+    created_at?: string,
     id_location?: string,
     cfdi?: string,
   ) {

@@ -27,7 +27,8 @@ interface RegisterTransactionDescriptionInput {
 	cost_at_moment: number;
 	quantity?: number;
 	amount?: number;
-	created_at?: Date;
+	created_at?: string;
+	id_transaction?: string;
 	id_transaction_operation_type: string;
 	id_product: string;
 }
@@ -55,17 +56,17 @@ export class RegisterTransactionCommand {
 		_longitude?: string,
 		_id_client?: string,
 		_id_transaction?: string,
-		_created_at?: Date,
+		_created_at?: string,
 		_id_location?: string,
 		_cfdi?: string,
 	): Promise<void> {
 		const idTransactionToUse = _id_transaction ?? this.integrityRepository.generateUUIDv4();
-		const createdAtToUse = _created_at ?? new Date();
+		const createdAtToUse = _created_at === undefined ? new Date() : new Date(_created_at);
 		const paymentMethods = await this.routeTransactionRepository.listPaymentMethods();
 		const paymentSchema = await this.routeTransactionRepository.listPaymentSchema();
 		const transactionAggregate = new TransactionAggregate(undefined, paymentMethods, paymentSchema);
 		const idClient:string = _id_client ? _id_client : GENERAL_PUBLIC_CLIENT.id_client
-
+		
 		transactionAggregate.createNewTransaction(
 			idTransactionToUse,
 			_received_amount,
@@ -92,18 +93,21 @@ export class RegisterTransactionCommand {
 				throw new Error('Transaction description quantity is required.');
 			}
 
+			if (description.created_at)
+
 			transactionAggregate.addRouteDescription(
 				description.id_transaction_description ?? this.integrityRepository.generateUUIDv4(),
 				description.price_at_moment,
 				description.cost_at_moment,
 				quantityToUse,
-				description.created_at ?? createdAtToUse,
+				description.created_at === undefined ? createdAtToUse : new Date(description.created_at),
 				idTransactionToUse,
 				description.id_transaction_operation_type as ROUTE_TRANSACTION_OPERATION_TYPE,
 				description.id_product,
 			);
 		}
 
+		console.log("To persist: ", transactionAggregate.getTransaction())
 		await this.routeTransactionRepository.createTransaction(transactionAggregate.getTransaction());
 
 		this.eventEmitter.emit(

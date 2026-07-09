@@ -41,6 +41,7 @@ export class RegisterTransactionListener {
   private async registerRouteTransaction(payload: TransactionDto) {
     const { created_by, id_transaction } = payload;
 
+    // Retrieving possible inventories
     const availableForSaleInventory = await this.inventoryRepository.listInventories(
       1,
       undefined,
