@@ -27,7 +27,7 @@ import { BusinessRuleException } from "@/src/shared/errors/BusinessRuleException
  */
 
 @Injectable()
-export class CancelTransactionListener {
+export class CancelRouteTransactionListener {
   constructor(
     @Inject(InventoryRepository) private readonly inventoryRepository: InventoryRepository,
     private readonly reverseInventoryMovementCommand: ReverseInventoryMovementCommand,
@@ -35,7 +35,7 @@ export class CancelTransactionListener {
 
   @OnEvent(DOMAIN_EVENT_ENUM.CANCEL_TRANSACTION_OPERATION_EVENT, { async: true})
   private async cancelRouteTransaction(payload: TransactionDto) {
-    const { id_transaction } = payload;
+    const { id_transaction, created_by } = payload;
 
     const inventoryOperations:InventoryOperationEntity[] = await this.inventoryRepository.listInventoryOperations(
       1,
@@ -57,7 +57,8 @@ export class CancelTransactionListener {
 
     await this.reverseInventoryMovementCommand.execute(
       inventoryOperationToCancel.id_inventory_operation,
-      new Date().toISOString()
+      created_by,
+      new Date(),
     )
   }
 }

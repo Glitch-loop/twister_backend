@@ -38,6 +38,8 @@ import { SupabaseDataSource } from '@/src/shared/infrastructure/datasources/supa
 // Modules
 import { ProductsModule } from '@/src/products/products.module';
 import { SharedModule } from '@/src/shared/shared.module';
+import { RegisterRouteTransactionListener } from './application/listeners/register-route-transaction.listener';
+import { CancelRouteTransactionListener } from './application/listeners/cancel-route-transaction.listener';
 
 @Module({
   imports: [SharedModule, ProductsModule],
@@ -66,6 +68,8 @@ import { SharedModule } from '@/src/shared/shared.module';
       provide: InventoryRepository,
       useExisting: InventorySupabaseRepository,
     },
+    RegisterRouteTransactionListener,
+    CancelRouteTransactionListener
   ],
 })
 export class InventoriesModule {}

@@ -57,7 +57,7 @@ export class RegisterInventoryOperationForTransactionCommand {
 	) {}
 
 	async execute(
-		id_inventory_origin: string,
+		id_inventory_from_seller: string,
 		movement_type: MOVEMENT_TYPE_ENUM,
 		document_reference: string,
 		created_by: string,
@@ -70,28 +70,75 @@ export class RegisterInventoryOperationForTransactionCommand {
 		if (inventory_operation_descriptions.length === 0) {
 			throw new BusinessRuleException('Inventory operation descriptions are required.');
 		}
+    // Retrieving inventories
+    const userInventory = await this.inventoryRepository.listInventories(
+      1,
+      undefined,
+      undefined,
+      [
+				movement_type === MOVEMENT_TYPE_ENUM.PRODUCT_DEVOLUTUION ?
+				INVENTORY_CONTEXT_ENUM.SHRINKAGE :
+				INVENTORY_CONTEXT_ENUM.AVAILABLE_FOR_SALE
+			],
+      undefined,
+      undefined,
+      undefined,
+      [created_by]
+    );
 
-		const originInventory = await this.retrieveInventoryById(id_inventory_origin);
-		const clientVirtualInventory = await this.retrieveUniqueInventoryByContext(
-			INVENTORY_CONTEXT_ENUM.CLIENT_VIRTUAL,
-		);
+		const clientInventory = await this.inventoryRepository.listInventories(
+      1,
+      undefined,
+      undefined,
+      [ INVENTORY_CONTEXT_ENUM.CLIENT_VIRTUAL ],
+      undefined,
+      undefined,
+      undefined,
+      undefined
+    );
 
+
+		const physicalInventory: InventoryEntity|undefined = userInventory.pop()
+		const virtualInventory: InventoryEntity|undefined = clientInventory.pop()
+
+		if (physicalInventory === undefined) {			
+			throw new Error(`Error during creation of inventory operation for route transaction. The user with id ${created_by} doesn't have assigned an inventory of type ${
+				movement_type === MOVEMENT_TYPE_ENUM.PRODUCT_DEVOLUTUION ? "SHRINKAGE" : "AVAILABLE FOR SALE"} to complete the operation. Type of movement ${movement_type}`);
+		}
+
+		if(virtualInventory === undefined) throw new Error(`Error during creation of inventory operation for route transaction. There is not an CLIENT_VIRTUAL inventory in the system for complete the inventory operation.`)
+
+			
 		await this.assertProductsValid(inventory_operation_descriptions);
 
 		const createdAtToUse = created_at ?? new Date();
 		const inventoryOperationIdToUse = id_inventory_operation ?? this.integrityRepository.generateUUIDv4();
-
-		const aggregate = new InventoryOperationAggregate(originInventory, clientVirtualInventory);
-
-		aggregate.createInventoryOperationForTransaction(
-			inventoryOperationIdToUse,
-			movement_type,
-			created_by,
-			createdAtToUse,
-			document_reference,
-			latitude ? latitude : null,
-			longitude ? longitude : null,
+		
+		const aggregate = new InventoryOperationAggregate(
+			movement_type === MOVEMENT_TYPE_ENUM.PRODUCT_DEVOLUTUION ? virtualInventory : physicalInventory, 
+			movement_type === MOVEMENT_TYPE_ENUM.PRODUCT_DEVOLUTUION ? physicalInventory: virtualInventory
 		);
+
+		if (movement_type === MOVEMENT_TYPE_ENUM.PRODUCT_DEVOLUTUION) {
+			aggregate.createProductDevolutionForTransaction(
+				inventoryOperationIdToUse,
+				created_by,
+				createdAtToUse,
+				document_reference,
+				latitude ? latitude : null,
+				longitude ? longitude : null,
+			);
+ 		} else {
+			aggregate.createInventoryOperationForTransaction(
+				inventoryOperationIdToUse,
+				movement_type,
+				created_by,
+				createdAtToUse,
+				document_reference,
+				latitude ? latitude : null,
+				longitude ? longitude : null,
+			);
+		}
 
 		for (const description of inventory_operation_descriptions) {
 			aggregate.addInventoryOperationDescription(
@@ -119,21 +166,12 @@ export class RegisterInventoryOperationForTransactionCommand {
 		);
 	}
 
-	private async retrieveInventoryById(id_inventory: string): Promise<InventoryEntity> {
-		const inventories = await this.inventoryRepository.retrieveInventories([id_inventory]);
-
-		if (inventories.length === 0) {
-			throw new BusinessRuleException(`Inventory with id ${id_inventory} does not exist.`);
-		}
-
-		return inventories[0];
-	}
 
 	private async retrieveUniqueInventoryByContext(
 		inventory_context: INVENTORY_CONTEXT_ENUM,
 	): Promise<InventoryEntity> {
 		const inventories = await this.inventoryRepository.listInventories(
-			2,
+			1,
 			undefined,
 			undefined,
 			[inventory_context],

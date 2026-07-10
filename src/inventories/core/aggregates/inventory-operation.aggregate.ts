@@ -129,14 +129,14 @@ export class InventoryOperationAggregate {
     _idInventoryOperation: string,
     _CreatedBy: string,
     _createdAt: Date,
+    _documentReference: string | null,
     _latitude: string | null, 
     _longitude: string | null,
-    _documentReference?: string,
   ) {
     this.assertionOriginInventoryAndTargetInventoryAreNotTheSame();
     this.assertionInventoryInvolvedActive();
 
-    if (_documentReference === undefined) 
+    if (_documentReference === null) 
       throw new BusinessRuleException(`For creating a PRODUCT_DEVOLUTION, you have to provide the id of the transaction that originated the movement.`);
 
     if (!(this.originInventory.inventory_context === INVENTORY_CONTEXT_ENUM.CLIENT_VIRTUAL)) 
@@ -573,6 +573,7 @@ export class InventoryOperationAggregate {
       created_by,
       id_inventory_origin,
       id_inventory_target,
+      inventory_operation_reference,
       document_reference,
     } = this.inventoryOperation!;
 
@@ -605,7 +606,7 @@ export class InventoryOperationAggregate {
           id_product,
         );
       }),
-      null,
+      inventory_operation_reference,
       document_reference,
     );
   }

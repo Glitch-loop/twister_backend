@@ -125,7 +125,7 @@ export class TransactionAggregate {
     if(this.transaction === null) throw new Error(`Transaction has not been initialized.`)
     return new TransactionEntity(
       this.transaction.id_transaction,
-      TRANSACTION_STATUS_ENUM.INACTIVE,
+      this.transaction.state,
       this.transaction.received_amount,
       this.transaction.created_at,
       this.transaction.id_client,

@@ -21,6 +21,7 @@ import { TransactionDto } from "@/src/sellings/application/dtos/transaction.dto"
 // Shared
 import { DOMAIN_EVENT_ENUM } from "@/src/shared/core/enums/domain-event.enum";
 import { BusinessRuleException } from "@/src/shared/errors/BusinessRuleException";
+import { ROUTE_TRANSACTION_OPERATION_TYPE } from "@/src/sellings/core/enums/route-transaction-operation-type.enum";
 
 /**
  * Register route transaction listener is a specialized listener for the 
@@ -30,7 +31,7 @@ import { BusinessRuleException } from "@/src/shared/errors/BusinessRuleException
  * for the "route" transaction.
  */
 @Injectable()
-export class RegisterTransactionListener {
+export class RegisterRouteTransactionListener {
   constructor(
     @Inject(InventoryRepository) private readonly inventoryRepository: InventoryRepository,
     private readonly registerInventoryOperationForRouteTransaction: RegisterInventoryOperationForTransactionCommand,
@@ -39,6 +40,8 @@ export class RegisterTransactionListener {
 
   @OnEvent(DOMAIN_EVENT_ENUM.CREATE_TRANSACTION_OPERATION_EVENT, { async: true})
   private async registerRouteTransaction(payload: TransactionDto) {
+    console.log("EVENT")
+    console.log(payload)
     const { created_by, id_transaction } = payload;
 
     // Retrieving possible inventories
@@ -74,25 +77,26 @@ export class RegisterTransactionListener {
       `There is not an inventory with context SHRINKAGE for the user ${created_by} to record the inventory operations for the route transaction with id ${id_transaction}`
     );
     
-    await this.registerInventoryMovement(userProductDevolutionInventory, payload, MOVEMENT_TYPE_ENUM.PRODUCT_DEVOLUTUION);
-    await this.registerInventoryMovement(userAvailableForSaleInventory, payload, MOVEMENT_TYPE_ENUM.PRODUCT_REPOSITION);
-    await this.registerInventoryMovement(userAvailableForSaleInventory, payload, MOVEMENT_TYPE_ENUM.SELLING);
-    await this.registerInventoryMovement(userAvailableForSaleInventory, payload, MOVEMENT_TYPE_ENUM.COURTESY);
+    await this.registerInventoryMovement(userProductDevolutionInventory, payload, MOVEMENT_TYPE_ENUM.PRODUCT_DEVOLUTUION, ROUTE_TRANSACTION_OPERATION_TYPE.PRODUCT_DEVOLUTION);
+    await this.registerInventoryMovement(userAvailableForSaleInventory, payload, MOVEMENT_TYPE_ENUM.PRODUCT_REPOSITION, ROUTE_TRANSACTION_OPERATION_TYPE.PRODUCT_REPOSITION);
+    await this.registerInventoryMovement(userAvailableForSaleInventory, payload, MOVEMENT_TYPE_ENUM.SELLING, ROUTE_TRANSACTION_OPERATION_TYPE.SALES);
+    await this.registerInventoryMovement(userAvailableForSaleInventory, payload, MOVEMENT_TYPE_ENUM.COURTESY, ROUTE_TRANSACTION_OPERATION_TYPE.COURTESY);
   }
-
+  
   private async registerInventoryMovement(
     _inventory: InventoryEntity,
     _transaction: TransactionDto,
-    _movementType: MOVEMENT_TYPE_ENUM) {
+    _movementType: MOVEMENT_TYPE_ENUM,
+    _route_transaction_operation_type: ROUTE_TRANSACTION_OPERATION_TYPE) {
     const { created_by, transaction_descriptions, id_transaction, created_at, latitude, longitude } = _transaction;
     const { id_inventory } = _inventory;
     const movementTypeTransaction = transaction_descriptions
-      .filter((transactionDesc) => transactionDesc.id_transaction_operation_type as unknown as MOVEMENT_TYPE_ENUM === _movementType); 
-
+      .filter((transactionDesc) => transactionDesc.id_transaction_operation_type as unknown as ROUTE_TRANSACTION_OPERATION_TYPE === _route_transaction_operation_type); 
+    console.log("Type of movement: ", _movementType, " - length: ", movementTypeTransaction.length)
     if (movementTypeTransaction.length > 0) {
       await this.registerInventoryOperationForRouteTransaction.execute(
         id_inventory,
-        MOVEMENT_TYPE_ENUM.PRODUCT_DEVOLUTUION,
+        _movementType,
         id_transaction,
         created_by,
         movementTypeTransaction.map((desc) => { 
