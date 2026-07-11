@@ -49,7 +49,7 @@ export class RegisterWorkDayBusinessOperationsCommand {
 		id_work_day: string,
 		new_operations: Array<{
 		id_operation_type: DAY_OPERATIONS_ENUM;
-		created_at?: Date;
+		created_at?: string;
 		latitude: string;
 		longitude: string;
 		id_location?: string;
@@ -72,7 +72,7 @@ export class RegisterWorkDayBusinessOperationsCommand {
 		]);
 
 		const businessOperationDay = new BusinessOperationDayAggregate(
-			currentOperations.length > 0 ? currentOperations : null,
+			currentOperations
 		);
 
 		for (const operation of new_operations) {
@@ -80,7 +80,7 @@ export class RegisterWorkDayBusinessOperationsCommand {
 				id_work_day_operation: operation.id_work_day_operation ?? this.integrityRepository.generateUUIDv4(),
 				id_work_day,
 				id_operation_type: operation.id_operation_type,
-				created_at: operation.created_at ?? new Date(),
+				created_at: operation.created_at === undefined ? new Date() : new Date(operation.created_at),
 				latitude: operation.latitude,
 				longitude: operation.longitude,
 				id_location: operation.id_location ? operation.id_location : null,

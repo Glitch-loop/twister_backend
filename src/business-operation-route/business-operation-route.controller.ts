@@ -220,7 +220,7 @@ new_client_confirmation
 			id_work_day: string;
 			operations: Array<{
 				id_operation_type: DAY_OPERATIONS_ENUM;
-				created_at?: Date;
+				created_at?: string;
 				latitude: string;
 				longitude: string;
 				id_location?: string;

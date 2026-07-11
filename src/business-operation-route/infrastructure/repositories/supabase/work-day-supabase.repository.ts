@@ -111,7 +111,7 @@ export class WorkDaySupabaseRepository implements WorkDayRepository {
 			if (work_day_operations_historic.length === 0) {
 				return;
 			}
-
+			console.log("Model to insert: ", work_day_operations_historic)
 			const historicModel: WorkDayOperationHistoricModel[] = work_day_operations_historic.map((historic) =>
 				this.mapper.toModel(historic),
 			);

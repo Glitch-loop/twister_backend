@@ -98,7 +98,7 @@ export class ReverseInventoryMovementCommand {
 				description.created_at ?? createdAtToUse,
 			);
 		}
-
+		
 		await this.inventoryRepository.CreateInventoryOperation(aggregate.getInventoryOperation());
 
 		const affectedBalanceRecords = aggregate.getAffectedInventoryBalanceRecords();
