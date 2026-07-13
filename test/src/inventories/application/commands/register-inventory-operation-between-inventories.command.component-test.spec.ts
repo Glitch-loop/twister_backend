@@ -1,6 +1,6 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
-import { RegisterInventoryOperatonBetweenInventoriesCommand } from '@/src/inventories/application/commands/register-inventory-operaton-between-inventories.command';
+import { RegisterInventoryOperationBetweenInventoriesCommand } from '@/src/inventories/application/commands/register-inventory-operation-between-inventories.command';
 import { EntityDtoMapper } from '@/src/inventories/application/mappers/entity-dto.mapper';
 import { INVENTORY_CONTEXT_ENUM } from '@/src/inventories/core/enums/inventory-context.enum';
 import { MOVEMENT_TYPE_ENUM } from '@/src/inventories/core/enums/movement-type.enum';
@@ -19,7 +19,7 @@ describe('RegisterInventoryOperatonBetweenInventoriesCommand', () => {
   let generateUUIDv4: jest.Mock;
   let emit: jest.Mock;
   let mapperToDto: jest.Mock;
-  let command: RegisterInventoryOperatonBetweenInventoriesCommand;
+  let command: RegisterInventoryOperationBetweenInventoriesCommand;
 
   beforeEach(() => {
     retrieveInventories = jest.fn();
@@ -34,7 +34,7 @@ describe('RegisterInventoryOperatonBetweenInventoriesCommand', () => {
     emit = jest.fn();
     mapperToDto = jest.fn().mockReturnValue({ id_inventory_operation: 'generated-operation-id' });
 
-    command = new RegisterInventoryOperatonBetweenInventoriesCommand(
+    command = new RegisterInventoryOperationBetweenInventoriesCommand(
       {
         retrieveInventories,
         CreateInventoryOperation: createInventoryOperation,

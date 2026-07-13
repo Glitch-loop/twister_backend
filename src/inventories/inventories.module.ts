@@ -6,7 +6,7 @@ import { CreateInventoryCommand } from '@/src/inventories/application/commands/c
 import { DeactiveInventoryCommand } from '@/src/inventories/application/commands/deactive-inventory.command';
 import { RegisterInventoryAdjustmentCommand } from '@/src/inventories/application/commands/register-inventory-adjustment.command';
 import { RegisterInventoryOperationForTransactionCommand } from '@/src/inventories/application/commands/register-inventory-operation-for-transaction.command';
-import { RegisterInventoryOperatonBetweenInventoriesCommand } from '@/src/inventories/application/commands/register-inventory-operaton-between-inventories.command';
+import { RegisterInventoryOperationBetweenInventoriesCommand } from '@/src/inventories/application/commands/register-inventory-operation-between-inventories.command';
 import { RegisterProductDevolutionCommand } from '@/src/inventories/application/commands/register-product-devolution.command';
 import { RegisterSupplierReciptCommand } from '@/src/inventories/application/commands/register-supplier-recipt.command';
 import { RegisterWasteInventoryOperationCommand } from '@/src/inventories/application/commands/register-waste-inventory-operation.command';
@@ -50,7 +50,7 @@ import { CancelRouteTransactionListener } from './application/listeners/cancel-r
     DeactiveInventoryCommand,
     RegisterInventoryOperationForTransactionCommand,
     RegisterProductDevolutionCommand,
-    RegisterInventoryOperatonBetweenInventoriesCommand,
+    RegisterInventoryOperationBetweenInventoriesCommand,
     RegisterInventoryAdjustmentCommand,
     RegisterSupplierReciptCommand,
     RegisterWasteInventoryOperationCommand,

@@ -40,7 +40,7 @@ interface InventoryOperationDescriptionInput {
 }
 
 @Injectable()
-export class RegisterInventoryOperatonBetweenInventoriesCommand {
+export class RegisterInventoryOperationBetweenInventoriesCommand {
 	constructor(
 		@Inject(InventoryRepository) private readonly inventoryRepository: InventoryRepository,
 		@Inject(ProductRepository) private readonly productRepository: ProductRepository,

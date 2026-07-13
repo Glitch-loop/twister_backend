@@ -14,7 +14,7 @@ import { CreateInventoryCommand } from '@/src/inventories/application/commands/c
 import { DeactiveInventoryCommand } from '@/src/inventories/application/commands/deactive-inventory.command';
 import { RegisterInventoryAdjustmentCommand } from '@/src/inventories/application/commands/register-inventory-adjustment.command';
 import { RegisterInventoryOperationForTransactionCommand } from '@/src/inventories/application/commands/register-inventory-operation-for-transaction.command';
-import { RegisterInventoryOperatonBetweenInventoriesCommand } from '@/src/inventories/application/commands/register-inventory-operaton-between-inventories.command';
+import { RegisterInventoryOperationBetweenInventoriesCommand } from '@/src/inventories/application/commands/register-inventory-operation-between-inventories.command';
 import { RegisterProductDevolutionCommand } from '@/src/inventories/application/commands/register-product-devolution.command';
 import { RegisterSupplierReciptCommand } from '@/src/inventories/application/commands/register-supplier-recipt.command';
 import { RegisterWasteInventoryOperationCommand } from '@/src/inventories/application/commands/register-waste-inventory-operation.command';
@@ -55,7 +55,7 @@ export class InventoriesController {
     private readonly deactiveInventoryCommand: DeactiveInventoryCommand,
     private readonly registerInventoryOperationForTransactionCommand: RegisterInventoryOperationForTransactionCommand,
     private readonly registerProductDevolutionCommand: RegisterProductDevolutionCommand,
-    private readonly registerInventoryOperatonBetweenInventoriesCommand: RegisterInventoryOperatonBetweenInventoriesCommand,
+    private readonly registerInventoryOperationBetweenInventoriesCommand: RegisterInventoryOperationBetweenInventoriesCommand,
     private readonly registerInventoryAdjustmentCommand: RegisterInventoryAdjustmentCommand,
     private readonly registerSupplierReciptCommand: RegisterSupplierReciptCommand,
     private readonly registerWasteInventoryOperationCommand: RegisterWasteInventoryOperationCommand,
@@ -208,7 +208,7 @@ ENABLE stock validation.`,
   async registerInventoryOperationBetweenInventories(
     @Body() body: RegisterInventoryOperationBetweenInventoriesRequestDto,
   ): Promise<httpControllerResponse> {
-    await this.registerInventoryOperatonBetweenInventoriesCommand.execute(
+    await this.registerInventoryOperationBetweenInventoriesCommand.execute(
       body.id_inventory_origin,
       body.id_inventory_target,
       body.created_by,

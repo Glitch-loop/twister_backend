@@ -2,7 +2,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 
 // Commands
-import { RegisterInventoryOperatonBetweenInventoriesCommand } from '@/src/inventories/application/commands/register-inventory-operaton-between-inventories.command';
+import { RegisterInventoryOperationBetweenInventoriesCommand } from '@/src/inventories/application/commands/register-inventory-operation-between-inventories.command';
 
 // Dtos
 import { RouteInventoryOperationDescriptionDto } from '@/src/inventories/application/dtos/route-inventory-operation-description.dto';
@@ -31,7 +31,7 @@ export class RegisterRouteInventoryOperationCommand {
   constructor(
     @Inject(InventoryRepository) private readonly inventoryRepository: InventoryRepository,
     private readonly mapper: EntityDtoMapper,
-    private readonly registerInventoryOperatonBetweenInventoriesCommand: RegisterInventoryOperatonBetweenInventoriesCommand
+    private readonly registerInventoryOperationBetweenInventoriesCommand: RegisterInventoryOperationBetweenInventoriesCommand
   ) {}
 
   async executeUseCase(
@@ -59,7 +59,7 @@ export class RegisterRouteInventoryOperationCommand {
     
     if (inventoryConfig === undefined) throw new BusinessRuleException(inventoryConfigurationErrorMessage); 
     
-    await this.registerInventoryOperatonBetweenInventoriesCommand.execute(
+    await this.registerInventoryOperationBetweenInventoriesCommand.execute(
       inventoryConfig.origin_inventory,
       inventoryConfig.target_inventory,
       id_user,
