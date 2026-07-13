@@ -25,8 +25,7 @@ interface RegisterTransactionDescriptionInput {
 	id_transaction_description?: string;
 	price_at_moment: number;
 	cost_at_moment: number;
-	quantity?: number;
-	amount?: number;
+	quantity: number;
 	created_at?: string;
 	id_transaction?: string;
 	id_transaction_operation_type: string;
@@ -88,7 +87,7 @@ export class RegisterTransactionCommand {
 				throw new Error('Invalid transaction operation type provided.');
 			}
 
-			const quantityToUse = description.quantity ?? description.amount;
+			const quantityToUse = description.quantity;
 			if (quantityToUse === undefined) {
 				throw new Error('Transaction description quantity is required.');
 			}
@@ -107,7 +106,6 @@ export class RegisterTransactionCommand {
 			);
 		}
 
-		console.log("To persist: ", transactionAggregate.getTransaction())
 		await this.routeTransactionRepository.createTransaction(transactionAggregate.getTransaction());
 
 		this.eventEmitter.emit(

@@ -77,7 +77,7 @@ Considerations:
 				id_transaction_description: description.id_transaction_description,
 				price_at_moment: description.price_at_moment,
 				cost_at_moment: description.cost_at_moment,
-				amount: description.amount,
+				quantity: description.quantity,
 				created_at: description.created_at,
 				id_transaction_operation_type: description.id_transaction_operation_type,
 				id_product: description.id_product,
@@ -88,7 +88,6 @@ Considerations:
 			body.id_client,
 			body.id_transaction,
 			body.created_at,
-
 			body.id_location,
 			body.cfdi,
 		);

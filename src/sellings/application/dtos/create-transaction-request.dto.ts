@@ -21,7 +21,7 @@ export class CreateTransactionDescriptionRequestDto {
   public readonly cost_at_moment: number;
   
   @ApiProperty({ type: Number, example: 3 })
-  public readonly amount: number;
+  public readonly quantity: number;
 
   @ApiPropertyOptional({
     type: String,
@@ -51,7 +51,7 @@ export class CreateTransactionDescriptionRequestDto {
   constructor(
     price_at_moment: number,
     cost_at_moment: number,
-    amount: number,
+    quantity: number,
     id_transaction_operation_type: string,
     id_product: string,
     id_transaction_description?: string,
@@ -60,7 +60,7 @@ export class CreateTransactionDescriptionRequestDto {
     this.id_transaction_description = id_transaction_description;
     this.price_at_moment = price_at_moment;
     this.cost_at_moment = cost_at_moment;
-    this.amount = amount;
+    this.quantity = quantity;
     this.created_at = created_at;
     this.id_transaction_operation_type = id_transaction_operation_type;
     this.id_product = id_product;
@@ -167,7 +167,7 @@ export class CreateTransactionRequestDto {
         id_transaction_description: 'fb04fbf2-5597-4594-9c0b-105f988f735a',
         price_at_moment: 125.5,
         cost_at_moment: 85.75,
-        amount: 3,
+        quantity: 3,
         created_at: '2026-06-01T12:30:00.000Z',
         id_transaction_operation_type: ROUTE_TRANSACTION_OPERATION_TYPE.SALES,
         id_product: '96f04833-ad2b-487b-944a-ec3f9810177f',
