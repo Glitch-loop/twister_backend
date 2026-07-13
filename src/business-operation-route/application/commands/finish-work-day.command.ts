@@ -13,7 +13,7 @@ export class UpdateWorkDayCommand {
 
 	async execute(
 		id_work_day: string,
-		finish_date?: Date,
+		finish_date?: string,
 		final_petty_cash?: number,
 	): Promise<void> {
 		const workDays: WorkDayEntity[] = await this.workDayRepository.retrieveWorkDayByWorkDayId([id_work_day]);
@@ -28,7 +28,7 @@ export class UpdateWorkDayCommand {
 
 		workDayAggregate.finishWorkDay(
 			final_petty_cash ?? workDays[0].start_petty_cash,
-			finish_date ?? new Date(),
+			finish_date === undefined ? new Date() : new Date(finish_date),
 		);
 
 		const workDay: WorkDayEntity = workDayAggregate.getWorkDayInformation();
