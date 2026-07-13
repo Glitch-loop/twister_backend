@@ -59,9 +59,28 @@ export class RegisterInventoryOperatonBetweenInventoriesCommand {
 		latitude?: string,
 		longitude?: string,
 	): Promise<void> {
-		if (inventory_operation_descriptions.length === 0) {
-			throw new BusinessRuleException('Inventory operation descriptions are required.');
-		}
+		/*
+			Note (13-07-26)
+			According with the operational process of the business, it is possible
+			to make an inventory operation which doesn't have inventory operation 
+			descriptions.
+
+			This is possible because there are 2 cases on which this is true:
+
+			- Product devolution (routes):
+				It's possible that after a work day the user (vendor) didn't have the 
+				necessity of make any product devolution.
+
+			- Final shift inventory (routes):
+				It's possible the user (vendor) sold out the product.
+
+			Both cases share they need to be registered in the database as proper 
+			inventory operations as part of the end of the shift.
+		*/
+
+		// if (inventory_operation_descriptions.length === 0) {
+		// 	throw new BusinessRuleException('Inventory operation descriptions are required.');
+		// }
 
 		const [originInventory, destinationInventory] = await Promise.all([
 			this.retrieveInventoryById(id_inventory_origin),
