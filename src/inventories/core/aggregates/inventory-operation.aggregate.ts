@@ -431,7 +431,7 @@ export class InventoryOperationAggregate {
       Notes about when _quantity is negative:
       This case is only allowed when:
        1. Inventory operation is reversed. The user wants to undo an operation.
-       2. When there is an adjustment. The user saw a discrepancy that might imply a decrease the amount of a quantity.
+       2. When there is an adjustment. The user saw a discrepancy that might imply a decrease in the quantity.
     */
     /*
       Note about special inventories (06-05-26)
