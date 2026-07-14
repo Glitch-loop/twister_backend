@@ -75,6 +75,7 @@ export class RegisterWorkDayBusinessOperationsCommand {
 			currentOperations
 		);
 
+		// Registering new day operations
 		for (const operation of new_operations) {
 			businessOperationDay.createBusinessOperation({
 				id_work_day_operation: operation.id_work_day_operation ?? this.integrityRepository.generateUUIDv4(),
@@ -97,94 +98,110 @@ export class RegisterWorkDayBusinessOperationsCommand {
 			return;
 		}
 		
-		// Process for integrating a new client 
-		const newClientLocationOperation = newOperations.filter((operation) => operation.id_operation_type === DAY_OPERATIONS_ENUM.prospect_registration);
-		if (newClientLocationOperation.length > 0) {
-			newClientLocationOperation.forEach((newClientRegistry) => {
-				if (newClientRegistry.id_work_day !== id_work_day) throw new BusinessRuleException(`The business operation with id ${newClientRegistry.id_work_day_operation} (type of operation: register new client) is invalid. Work days differ. Work day that belongs the new client record: ${newClientRegistry.id_work_day}. Work day of the request ${id_work_day}`)
+		// Process for integrating prospect of clients 
+		const prospectOfClientOperations = newOperations.filter((operation) => operation.id_operation_type === DAY_OPERATIONS_ENUM.prospect_registration);
+
+		if (prospectOfClientOperations.length > 0) {
+			prospectOfClientOperations.forEach((newClientRegistry) => {
+				if (newClientRegistry.id_work_day !== id_work_day) throw new BusinessRuleException(`The business operation with id ${newClientRegistry.id_work_day_operation} (type of operation: prospect registration) is invalid. Work days differ. Work day that belongs the prospect of client record: ${newClientRegistry.id_work_day}. Work day of the request: ${id_work_day}`)
 			})
 			
 			const routeDay: RouteDayEntity[] = await this.routeRepository.retrieveRouteDay([ id_route_day ]);
-			if (routeDay.length === 0) throw new BusinessRuleException(`Route day with id ${id_route_day} which you are trying to place a new location (through a business operation) doesn't exist.`);
-			
+			if (routeDay.length === 0) throw new BusinessRuleException(`Route day with id ${id_route_day} which you are trying to place the new location (through a business operation) doesn't exist.`);
+			const { locations } = routeDay[0];
+
 			const routeOrganizationStrategies: OrganizationStrategyEntity[] = await this.routeRepository.listOrganizationStrategies();
 			const routeOrganizationStrategyAggregate: RouteOrganizationStrategyAggregate = new RouteOrganizationStrategyAggregate(routeOrganizationStrategies)
 
 			const organizationStrategy:OrganizationStrategyEntity|undefined = routeOrganizationStrategyAggregate.getActiveStrategy();
-
 			if(!organizationStrategy) throw new BusinessRuleException(`Error at moment of organizing the locations with business operation. There is not a selected route organization strategy`);
-
 			const { id_organization_strategy } = organizationStrategy;
 
-			newClientLocationOperation.sort((firstLocation, secondLocation) => firstLocation.created_at.getDate() - secondLocation.created_at.getDate());
-			
-			const { locations } = routeDay[0];
-
+			// Organizing prospect of client chronologically 
+			prospectOfClientOperations.sort((firstLocation, secondLocation) => firstLocation.created_at.getDate() - secondLocation.created_at.getDate());
 			const currentLocationsInRouteSet = new Set<string>(locations.map((loc) => {return loc.id_location}))
 
-			newClientLocationOperation.forEach((newclientOp) => {
-				const { id_work_day_operation } = newclientOp;
-				if (newclientOp.id_location === undefined || newclientOp.id_location === null) throw new BusinessRuleException(`The new 'client business operation' with the id: ${id_work_day_operation} doesn't have it's id location.`);
-				if (currentLocationsInRouteSet.has(newclientOp.id_location)) throw new BusinessRuleException(`The location (store) that is trying to add to the route has been added previously to the route day.`);
+			prospectOfClientOperations.forEach((prospectClientOp) => {
+				const { id_work_day_operation } = prospectClientOp;
+				if (prospectClientOp.id_location === undefined || prospectClientOp.id_location === null) throw new BusinessRuleException(`The business operation register prospect of client (with id: ${id_work_day_operation}) doesn't have id location.`);
+				if (currentLocationsInRouteSet.has(prospectClientOp.id_location)) throw new BusinessRuleException(`The location (store) that is trying to add the route has been added previously to the route day.`);
 			});
 
 			if (id_organization_strategy === ROUTE_ORGANIZATION_STRATEGIES_ENUM.AFTER_LAST_VISIT_OPERATION) {
-				const operationDays = new Set<DAY_OPERATIONS_ENUM>([DAY_OPERATIONS_ENUM.client_visited, DAY_OPERATIONS_ENUM.new_client_confirmation, DAY_OPERATIONS_ENUM.prospect_registration]);
+				const operationDays:Set<DAY_OPERATIONS_ENUM> = new Set<DAY_OPERATIONS_ENUM>([DAY_OPERATIONS_ENUM.client_visited, DAY_OPERATIONS_ENUM.new_client_confirmation, DAY_OPERATIONS_ENUM.prospect_registration]);
+				const routeDayLocationSet: Map<string, RouteDayLocationObjectValue> = new Map<string, RouteDayLocationObjectValue>();
 
-				for (const newClientOp of newClientLocationOperation) { 
+				// Creating map of the locations
+				for (const location of locations) {
+					const { id_route_day_location } = location;
+					routeDayLocationSet.set(id_route_day_location, location)
+				}
+
+				for (const newClientOp of prospectOfClientOperations) { 
 					const { id_location, id_work_day_operation  } = newClientOp;
 					const lastOperation:WorkDayOperationHistoricEntity | undefined = businessOperationDay.getLastOperationByTypeBeforeCurrentOperation(id_work_day_operation, operationDays)
-					
-					if (lastOperation) {
+					if (lastOperation) { // The prospect of client it's between current
 						if (!lastOperation.id_location) {
 							throw new BusinessRuleException(
 								`Last operation with id ${lastOperation.id_work_day_operation} does not have an id_location to locate insertion point.`,
 							);
 						}
+						
+						// Find the position of the last visited location
+						const lastVisitedLocation:RouteDayLocationObjectValue | undefined = routeDayLocationSet.get(lastOperation.id_location);
 
-						const lastLocationIndex = locations.findIndex((loc) => loc.id_location === lastOperation.id_location);
-						if (lastLocationIndex === -1) {
-							throw new BusinessRuleException(
-								`Location with id ${lastOperation.id_location} was not found in route day ${id_route_day}.`,
-							);
+						if (lastVisitedLocation === undefined) throw new BusinessRuleException(`Error while locating the new prospect of client within the route. Location with id ${lastOperation.id_location} doesn't not belongs to this day.`);
+
+						const positionInRouteDayOfLastVisit: number = lastVisitedLocation.position_in_route;
+
+						// Updating position of locations
+						for (const [idRouteLocation, routeDaylocation] of routeDayLocationSet) {
+							const { id_location, id_owner, id_route_day_location, position_in_route} = routeDaylocation;
+							if(routeDaylocation.position_in_route > positionInRouteDayOfLastVisit) {
+								routeDayLocationSet[idRouteLocation] = new RouteDayLocationObjectValue(
+									position_in_route + 1,
+									id_location,
+									id_owner, // Route day
+									id_route_day_location,
+								);	
+							}
 						}
 
-						const insertIndex = lastLocationIndex + 1;
-						locations.splice(
-							insertIndex,
-							0,
+						// Inserting new location
+						const idNewRouteDayLocation = this.integrityRepository.generateUUIDv4();
+						routeDayLocationSet.set(
+							idNewRouteDayLocation,
 							new RouteDayLocationObjectValue(
-								insertIndex + 1,
-								id_location!,
-								id_route_day,
-								this.integrityRepository.generateUUIDv4(),
-							),
+									positionInRouteDayOfLastVisit + 1,
+									id_location!,
+									id_route_day, // Route day
+									idNewRouteDayLocation,
+							)
 						);
-
-						for (let position = 0; position < locations.length; position += 1) {
-							const location = locations[position];
-							locations[position] = new RouteDayLocationObjectValue(
-								position + 1,
-								location.id_location,
-								location.id_owner,
-								location.id_route_day_location,
-							);
-						}
 					} else {
-						const currentPosition = locations.length + 1;
-						locations.push(
+						const positionOfnewProspectOfClient = routeDayLocationSet.size + 1;
+						const idNewRouteDayLocation = this.integrityRepository.generateUUIDv4();
+						routeDayLocationSet.set(
+							idNewRouteDayLocation,
 							new RouteDayLocationObjectValue(
-								currentPosition,
-								id_location!,
-								id_route_day,
-								this.integrityRepository.generateUUIDv4(),
-							),
+									positionOfnewProspectOfClient,
+									id_location!,
+									id_route_day, // Route day
+									idNewRouteDayLocation,
+							)
 						);
 					}
 				}
+
+				// Persist changes
+				await this.organizeRouteDayCommand.execute(
+					id_route_day, 
+					Array.from(routeDayLocationSet.values()).sort((a, b) => a.position_in_route - b.position_in_route)
+				);
+
 			} else { // Default route organization: Place new clients at the end of the day.
 				let currentPosition = locations.length + 1; // From 0-base index to 1-base index.
-				for (const newClientOp of newClientLocationOperation) { 
+				for (const newClientOp of prospectOfClientOperations) { 
 					const { id_location  } = newClientOp;
 					locations.push(
 						new RouteDayLocationObjectValue(
@@ -196,28 +213,21 @@ export class RegisterWorkDayBusinessOperationsCommand {
 					)
 					currentPosition += 1;
 				}	
-			}
 
-			await this.organizeRouteDayCommand.execute(id_route_day, locations);
+				await this.organizeRouteDayCommand.execute(id_route_day, locations);
+			}
 		}
 		
 		await this.workDayRepository.insertWorkDayHistoric(newOperations);
 
-
 		newOperations.forEach((newOperation) => {
 			const { id_operation_type, id_location } = newOperation;
-			console.log("NEW CLIENT EVENT EMIT: ", id_operation_type === DAY_OPERATIONS_ENUM.new_client_confirmation)
 			if (id_operation_type === DAY_OPERATIONS_ENUM.new_client_confirmation) {
-				if (!id_location) {
-					throw new BusinessRuleException(
-						`Cannot emit confirmed client event for operation ${newOperation.id_work_day_operation} because id_location is missing.`,
-					);
-				}
-				console.log("Event emitted")
+				if (!id_location) throw new BusinessRuleException(`Cannot emit confirmed client event for operation ${newOperation.id_work_day_operation} because id_location is missing.`);
 				this.eventEmitter.emit(
 					DOMAIN_EVENT_ENUM.CONFIRMED_CLIENT_EVENT,
 					new ConfirmedClientEvent(id_location)
-				)
+				);
 			}
 		})
 

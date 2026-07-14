@@ -128,14 +128,23 @@ export class BusinessOperationDayAggregate {
 
 		if (currentOperationIndex === -1) {
 			throw new BusinessRuleException(
-				`Current operation with id ${idCurrentOperation} does not exist in this work day flow.`,
+				`Current operation with id ${idCurrentOperation} does not exist in this work day history.`,
 			);
 		}
 
 		for (let index = currentOperationIndex - 1; index >= 0; index -= 1) {
-			const { id_operation_type } = orderedOperations[index];
+			const { id_operation_type, id_work_day_operation } = orderedOperations[index];
 			if (targetOperationType.has(id_operation_type)) {
-				return orderedOperations[index];
+				const isLocationInRoute: WorkDayOperationHistoricEntity | undefined = orderedOperations.find((ordOperation) => { 
+					return ordOperation.id_work_day_operation === id_work_day_operation && ordOperation.id_operation_type === DAY_OPERATIONS_ENUM.route_client_attention
+				});
+
+				if (isLocationInRoute !== undefined) {
+					/*
+						Ensuring the work day operation belongs to a client that actually belongs to the current route day. 
+					*/
+					return orderedOperations[index];
+				}
 			}
 		}
 

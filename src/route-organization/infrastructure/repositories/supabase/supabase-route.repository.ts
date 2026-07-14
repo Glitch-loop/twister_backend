@@ -69,7 +69,7 @@ export class SupabaseRouteRepository implements RouteRepository {
     if (routeDayLocations.length === 0) {
       return;
     }
-
+    
     try {
       const routeDayLocationsToInsert = routeDayLocations.map((location) => {
         if (!location.id_route_day_location && !location.id_owner) {
