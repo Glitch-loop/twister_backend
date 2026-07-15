@@ -40,8 +40,6 @@ export class RegisterRouteTransactionListener {
 
   @OnEvent(DOMAIN_EVENT_ENUM.CREATE_TRANSACTION_OPERATION_EVENT, { async: true})
   private async registerRouteTransaction(payload: TransactionDto) {
-    console.log("EVENT")
-    console.log(payload)
     const { created_by, id_transaction } = payload;
 
     // Retrieving possible inventories
@@ -92,8 +90,8 @@ export class RegisterRouteTransactionListener {
     const { id_inventory } = _inventory;
     const movementTypeTransaction = transaction_descriptions
       .filter((transactionDesc) => transactionDesc.id_transaction_operation_type as unknown as ROUTE_TRANSACTION_OPERATION_TYPE === _route_transaction_operation_type); 
-    console.log("Type of movement: ", _movementType, " - length: ", movementTypeTransaction.length)
-    if (movementTypeTransaction.length > 0) {
+
+      if (movementTypeTransaction.length > 0) {
       await this.registerInventoryOperationForRouteTransaction.execute(
         id_inventory,
         _movementType,

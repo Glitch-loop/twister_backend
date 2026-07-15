@@ -137,7 +137,7 @@ export class Mapper {
       created_at: domainObject.created_at,
       updated_at: domainObject.updated_at,
       notes: notes.map((note) => { return this.noteObjectValueToLocationNoteDto(note); }),
-      address_reference: domainObject.address_reference ?? undefined,
+      address_reference: domainObject.address_reference,
     };
   }
 

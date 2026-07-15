@@ -4,7 +4,7 @@ export interface LocationModel {
   ext_number: string;
   colony: string;
   postal_code: string;
-  address_reference?: string;
+  address_reference: string | null;
   location_name: string;
   latitude: string;
   longitude: string;

@@ -12,7 +12,7 @@ export const isLocationDto = (value: unknown): value is LocationDto => {
     typeof value.ext_number === 'string' &&
     typeof value.colony === 'string' &&
     typeof value.postal_code === 'string' &&
-    (value.address_reference === undefined || typeof value.address_reference === 'string') &&
+    (value.address_reference === null || value.address_reference === undefined || typeof value.address_reference === 'string') &&
     typeof value.location_name === 'string' &&
     typeof value.latitude === 'string' &&
     typeof value.longitude === 'string' &&

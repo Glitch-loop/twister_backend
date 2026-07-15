@@ -146,7 +146,7 @@ export class EntityModelMapper {
 		if (isTransactionEntity(domainObject)) {
 			return this.transactionEntityToModel(domainObject);
 		}
-		console.log(domainObject)
+
 		throw new Error('Invalid input for mapping to model');
 	}
 

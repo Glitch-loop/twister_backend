@@ -127,7 +127,7 @@ export class Mapper {
       ext_number: domainObject.ext_number,
       colony: domainObject.colony,
       postal_code: domainObject.postal_code,
-      address_reference: domainObject.address_reference || undefined,
+      address_reference: domainObject.address_reference,
       location_name: domainObject.location_name,
       latitude: domainObject.latitude,
       longitude: domainObject.longitude,
@@ -221,7 +221,7 @@ export class Mapper {
       new Date(model.updated_at),
       this.locationTypeModelToDomainObject(locationTypeModel),
       locationNotesModel.map(note => this.locationNoteModelToDomainObject(note)),
-      model.address_reference || null,
+      model.address_reference,
     );
   }
 

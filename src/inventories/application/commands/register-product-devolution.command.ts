@@ -80,13 +80,11 @@ export class RegisterProductDevolutionCommand {
 		}
 
 		const originInventory = await this.retrieveInventoryById(id_inventory_origin);
-		console.log("originInventory: ", originInventory)
 		const shrinkageInventory = await this.retrieveUniqueInventoryByContext(
 			INVENTORY_CONTEXT_ENUM.SHRINKAGE,
 			'f2a31d77-7124-4103-b320-4b7ab5babbb4'
 		);
 
-		console.log("shrinkageInventory: ", shrinkageInventory)
 		await this.assertProductsValid(inventory_operation_descriptions);
 
 		const createdAtToUse = created_at ?? new Date();
@@ -115,7 +113,7 @@ export class RegisterProductDevolutionCommand {
 				description.created_at ?? createdAtToUse,
 			);
 		}
-		console.log("Inventory operation to create: ", aggregate.getInventoryOperation())
+
 		await this.inventoryRepository.CreateInventoryOperation(aggregate.getInventoryOperation());
 
 		const affectedBalanceRecords = aggregate.getAffectedInventoryBalanceRecords();

@@ -57,7 +57,7 @@ export class LocationDto {
   public readonly notes: LocationNoteDto[];
 
   @ApiPropertyOptional({ type: String, example: 'Near the rear entrance' })
-  public readonly address_reference?: string;
+  public readonly address_reference?: string | null;
 
   constructor(
     id_location: string,
@@ -75,7 +75,7 @@ export class LocationDto {
     created_at: Date,
     updated_at: Date,
     notes: LocationNoteDto[],
-    address_reference?: string,
+    address_reference?: string | null,
   ) {
     this.id_location = id_location;
     this.street = street;

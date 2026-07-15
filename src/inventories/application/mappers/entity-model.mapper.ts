@@ -276,7 +276,7 @@ export class EntityModelMapper {
 		if (!Object.values(MOVEMENT_TYPE_ENUM).includes(model.movement_type)) {
 			throw new Error('Invalid movement_type in InventoryOperationModel');
 		}
-		console.log("From model to domain object: ", model)
+
 		return new InventoryOperationEntity(
 			model.id_inventory_operation,
 			model.latitude,
