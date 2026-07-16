@@ -109,6 +109,8 @@ export class RegisterWorkDayBusinessOperationsCommand {
 			const routeDay: RouteDayEntity[] = await this.routeRepository.retrieveRouteDay([ id_route_day ]);
 			if (routeDay.length === 0) throw new BusinessRuleException(`Route day with id ${id_route_day} which you are trying to place the new location (through a business operation) doesn't exist.`);
 			const { locations } = routeDay[0];
+				console.log("register work day business operation command. locations from database*********************************")
+				console.log(locations)
 
 			const routeOrganizationStrategies: OrganizationStrategyEntity[] = await this.routeRepository.listOrganizationStrategies();
 			const routeOrganizationStrategyAggregate: RouteOrganizationStrategyAggregate = new RouteOrganizationStrategyAggregate(routeOrganizationStrategies)
@@ -136,11 +138,15 @@ export class RegisterWorkDayBusinessOperationsCommand {
 					const { id_route_day_location } = location;
 					routeDayLocationSet.set(id_route_day_location, location)
 				}
+				console.log("register work day business operation command. Current route day*********************************")
+				console.log(routeDayLocationSet)
+
 
 				for (const newClientOp of prospectOfClientOperations) { 
 					const { id_location, id_work_day_operation  } = newClientOp;
-					const lastOperation:WorkDayOperationHistoricEntity | undefined = businessOperationDay.getLastOperationByTypeBeforeCurrentOperation(id_work_day_operation, operationDays)
-					if (lastOperation) { // The prospect of client it's between current
+					const lastOperation:WorkDayOperationHistoricEntity | undefined = businessOperationDay.getLastOperationByTypeBeforeCurrentOperation(id_work_day_operation, operationDays);
+
+					if (lastOperation) { // The prospect of client is in the middle of the route day.
 						if (!lastOperation.id_location) {
 							throw new BusinessRuleException(
 								`Last operation with id ${lastOperation.id_work_day_operation} does not have an id_location to locate insertion point.`,
@@ -155,6 +161,7 @@ export class RegisterWorkDayBusinessOperationsCommand {
 						const positionInRouteDayOfLastVisit: number = lastVisitedLocation.position_in_route;
 
 						// Updating position of locations
+						console.log("At the middle of the route day")
 						for (const [idRouteLocation, routeDaylocation] of routeDayLocationSet) {
 							const { id_location, id_owner, id_route_day_location, position_in_route} = routeDaylocation;
 							if(routeDaylocation.position_in_route > positionInRouteDayOfLastVisit) {
@@ -179,7 +186,9 @@ export class RegisterWorkDayBusinessOperationsCommand {
 							)
 						);
 					} else {
-						const positionOfnewProspectOfClient = routeDayLocationSet.size + 1;
+						console.log("At the end of the route day")
+						const positionOfnewProspectOfClient = routeDayLocationSet.size + 1; // + 1 For transforming from 0-base to 1-base.
+						console.log("Postion of the last location: ", positionOfnewProspectOfClient)
 						const idNewRouteDayLocation = this.integrityRepository.generateUUIDv4();
 						routeDayLocationSet.set(
 							idNewRouteDayLocation,
@@ -194,6 +203,8 @@ export class RegisterWorkDayBusinessOperationsCommand {
 				}
 
 				// Persist changes
+				console.log("Changes to persist****************")
+				console.log(routeDayLocationSet)
 				await this.organizeRouteDayCommand.execute(
 					id_route_day, 
 					Array.from(routeDayLocationSet.values()).sort((a, b) => a.position_in_route - b.position_in_route)

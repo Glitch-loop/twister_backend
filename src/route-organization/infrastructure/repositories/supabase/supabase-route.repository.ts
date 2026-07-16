@@ -50,6 +50,7 @@ export class SupabaseRouteRepository implements RouteRepository {
 
   async deleteRouteDayLocations(id_route_day: string): Promise<void> {
     try {
+      console.log("Route day to delete: ", id_route_day)
       const { error } = await this.supabase
         .from('route_day_locations')
         .delete()
@@ -86,6 +87,9 @@ export class SupabaseRouteRepository implements RouteRepository {
         };
       });
 
+      console.log("Route day locations to insert")
+      console.log("Locations: ", routeDayLocationsToInsert)
+      console.log("++++++++++++++++++++++++++++++++++++++++")
       const { error } = await this.supabase
         .from('route_day_locations')
         .insert(routeDayLocationsToInsert);
