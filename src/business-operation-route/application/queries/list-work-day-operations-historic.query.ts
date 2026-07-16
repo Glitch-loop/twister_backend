@@ -34,7 +34,7 @@ export class ListWorkDayOperationsHistoricQuery {
 		if (limit !== undefined && limit > 0 && limit <= 1000) {
 			limit_to_use = limit + 1;
 		}
-
+		console.log("In COMMAND: ", id_work_day)
 		const records: WorkDayOperationHistoricEntity[] = await this.workDayRepository.listWorkDaysHistoric(
 			limit_to_use,
 			start_date_created_at,

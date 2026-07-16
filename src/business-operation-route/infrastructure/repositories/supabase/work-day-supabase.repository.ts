@@ -295,6 +295,7 @@ export class WorkDaySupabaseRepository implements WorkDayRepository {
 				.order('id_work_day_operation', { ascending: false })
 				.limit(limit);
 
+			console.log("filter param id_work_day: ", id_work_day)
 			if (start_date_created_at) query = query.gte('created_at', start_date_created_at.toISOString());
 			if (end_date_created_at) query = query.lte('created_at', end_date_created_at.toISOString());
 			if (id_location !== undefined) query = query.eq('id_client', id_location);

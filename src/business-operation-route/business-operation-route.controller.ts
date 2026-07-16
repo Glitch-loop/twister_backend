@@ -262,11 +262,20 @@ new_client_confirmation
 		@Query('id_vendor') id_vendor?: string[],
 		@Query('id_pay_stub') id_pay_stub?: string[],
 	): Promise<httpControllerResponse> {
-
 		const toDate = (value?: string): Date | undefined => {
 			if (!value) return undefined;
 			const parsed = new Date(value);
 			return Number.isNaN(parsed.getTime()) ? undefined : parsed;
+		};
+
+		const toArray = (value?: string | string[]): string[] | undefined => {
+			if (!value) return undefined;
+			if (Array.isArray(value)) return value.filter((item) => item.length > 0);
+
+			return value
+				.split(',')
+				.map((item) => item.trim())
+				.filter((item) => item.length > 0);
 		};
 
 		let next_id: string | undefined;
@@ -276,9 +285,9 @@ new_client_confirmation
 		const parsedFinalPettyCash = final_pretty_cash ? Number.parseFloat(final_pretty_cash) : undefined;
 		const startDate = toDate(start_date_start_work_day);
 		const endDate = toDate(end_date_end_work_day);
-		const idRouteDay = id_route_day;
-		const idVendor = id_vendor;
-		const idPayStub = id_pay_stub;
+		const idRouteDay = toArray(id_route_day);
+		const idVendor = toArray(id_vendor);
+		const idPayStub = toArray(id_pay_stub);
 		const httpRequestFormatter = new httpFormatter();
 
 		if (next_item) {
@@ -288,7 +297,6 @@ new_client_confirmation
 		}
 
 		if (limit) parsedLimit = Number.parseInt(limit, 10);
-
 		const data: WorkDayDto[] = await this.listWorkDayQuery.execute(
 			parsedLimit,
 			startDate,
