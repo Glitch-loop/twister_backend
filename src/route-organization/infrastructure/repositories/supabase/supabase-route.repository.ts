@@ -90,6 +90,7 @@ export class SupabaseRouteRepository implements RouteRepository {
       console.log("Route day locations to insert")
       console.log("Locations: ", routeDayLocationsToInsert)
       console.log("++++++++++++++++++++++++++++++++++++++++")
+
       const { error } = await this.supabase
         .from('route_day_locations')
         .insert(routeDayLocationsToInsert);

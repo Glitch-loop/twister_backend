@@ -69,6 +69,7 @@ export class BusinessOperationRouteStreamController {
   handleRegisterTransactionOperationEvent(payload: unknown): void {
     this.registerTransaction$.next(payload);
   }
+  
   @OnEvent(DOMAIN_EVENT_ENUM.CANCEL_TRANSACTION_OPERATION_EVENT, { async: true })
   handleCancelTransactionOperationEvent(payload: unknown): void {
     this.cancelTransaction$.next(payload);

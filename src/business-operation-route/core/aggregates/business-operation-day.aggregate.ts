@@ -110,41 +110,73 @@ export class BusinessOperationDayAggregate {
 		return this.dayOperations[indexCurrentOperation];
 	}
 
-	getLastOperationByTypeBeforeCurrentOperation(
-		idCurrentOperation: string,
-		targetOperationType: Set<DAY_OPERATIONS_ENUM>,
-	): WorkDayOperationHistoricEntity | undefined {
-		if (!this.dayOperations || this.dayOperations.length === 0) {
+	getLastOperationByTypeBeforeCurrentOperation(idCurrentOperation: string): WorkDayOperationHistoricEntity | undefined {
+		const clientToAttendInTheRouteSet:Set<string> = new Set<string>();
+		
+		if (this.dayOperations === null) {
 			return undefined;
 		}
 
-		const orderedOperations = [...this.dayOperations].sort(
-			(a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
-		);
-
-		const currentOperationIndex = orderedOperations.findIndex(
+		// Retrieve prospect of client to determine its location.
+		const dayOperationToDetermineLocation = [...this.dayOperations].find(
 			(operation) => operation.id_work_day_operation === idCurrentOperation,
 		);
 
-		if (currentOperationIndex === -1) {
+		if (dayOperationToDetermineLocation === undefined) {
 			throw new BusinessRuleException(
 				`Current operation with id ${idCurrentOperation} does not exist in this work day history.`,
 			);
 		}
 
-		for (let index = currentOperationIndex - 1; index >= 0; index -= 1) {
-			const { id_operation_type, id_work_day_operation } = orderedOperations[index];
-			if (targetOperationType.has(id_operation_type)) {
-				const isLocationInRoute: WorkDayOperationHistoricEntity | undefined = orderedOperations.find((ordOperation) => { 
-					return ordOperation.id_work_day_operation === id_work_day_operation && ordOperation.id_operation_type === DAY_OPERATIONS_ENUM.route_client_attention
-				});
+		// Retrieve visits of clients to attend in the route to determine the position which the prospect of client will be located.
+		console.log("Full ops")
+		console.log(this.dayOperations)
+		console.log("################################")
+		const clientsToAttendInTheRoute: WorkDayOperationHistoricEntity[] = [...this.dayOperations].filter((dayOperation) => {
+			return dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.route_client_attention || dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.prospect_registration
+			&& dayOperation.id_location !== null
+		});
 
-				if (isLocationInRoute !== undefined) {
-					/*
-						Ensuring the work day operation belongs to a client that actually belongs to the current route day. 
-					*/
-					return orderedOperations[index];
-				}
+		console.log("Clientes in the route")
+		console.log(clientsToAttendInTheRoute)
+
+		clientsToAttendInTheRoute.forEach((clientToAttend) => {
+			const { id_location } = clientToAttend;
+			if (id_location !== null) clientToAttendInTheRouteSet.add(id_location);
+		})
+		console.log("SET:  SET:  SET: ")
+		console.log(clientToAttendInTheRouteSet)
+		const visitClientsToAttendInTheRoute: WorkDayOperationHistoricEntity[] = [...this.dayOperations].filter((clientToAttend) => {
+			const { id_operation_type, id_location } = clientToAttend
+			console.log("id_operation_type === DAY_OPERATIONS_ENUM.client_visited: ", id_operation_type === DAY_OPERATIONS_ENUM.client_visited)
+			console.log("id_operation_type: ", id_operation_type, " - ", DAY_OPERATIONS_ENUM.client_visited)
+			console.log("id_location !== null: ", id_location !== null)
+			console.log("clientToAttendInTheRouteSet.has(id_location): ", clientToAttendInTheRouteSet.has(id_location!))
+			return id_operation_type === DAY_OPERATIONS_ENUM.client_visited && id_location !== null && clientToAttendInTheRouteSet.has(id_location)
+		});
+
+		console.log("&&&&&&&&&&&&&&&&&&&")
+		console.log("visitClientsToAttendInTheRoute")
+		console.log(visitClientsToAttendInTheRoute)
+
+		const visitOfClientsToAttendInRouteOrdered = visitClientsToAttendInTheRoute.sort(
+			(a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+		);
+
+		console.log("Ordered list of visit operaions")
+		console.log(visitOfClientsToAttendInRouteOrdered)
+		
+		console.log("Determining")
+		while (visitOfClientsToAttendInRouteOrdered.length > 0) {
+			console.log("Lenght: ", visitOfClientsToAttendInRouteOrdered.length)
+			const currentVisitOfClientToAttendInRoute = visitOfClientsToAttendInRouteOrdered.pop();
+			console.log("candidate: ", currentVisitOfClientToAttendInRoute)
+			if (currentVisitOfClientToAttendInRoute === undefined) return undefined;
+
+			const { created_at } = currentVisitOfClientToAttendInRoute;
+			if (dayOperationToDetermineLocation.created_at > created_at && dayOperationToDetermineLocation.id_work_day_operation !== idCurrentOperation) {
+				console.log("finishing: ", dayOperationToDetermineLocation)
+				return dayOperationToDetermineLocation;
 			}
 		}
 

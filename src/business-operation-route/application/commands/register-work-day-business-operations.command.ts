@@ -130,7 +130,6 @@ export class RegisterWorkDayBusinessOperationsCommand {
 			});
 
 			if (id_organization_strategy === ROUTE_ORGANIZATION_STRATEGIES_ENUM.AFTER_LAST_VISIT_OPERATION) {
-				const operationDays:Set<DAY_OPERATIONS_ENUM> = new Set<DAY_OPERATIONS_ENUM>([DAY_OPERATIONS_ENUM.client_visited, DAY_OPERATIONS_ENUM.new_client_confirmation, DAY_OPERATIONS_ENUM.prospect_registration]);
 				const routeDayLocationSet: Map<string, RouteDayLocationObjectValue> = new Map<string, RouteDayLocationObjectValue>();
 
 				// Creating map of the locations
@@ -144,7 +143,8 @@ export class RegisterWorkDayBusinessOperationsCommand {
 
 				for (const newClientOp of prospectOfClientOperations) { 
 					const { id_location, id_work_day_operation  } = newClientOp;
-					const lastOperation:WorkDayOperationHistoricEntity | undefined = businessOperationDay.getLastOperationByTypeBeforeCurrentOperation(id_work_day_operation, operationDays);
+					const lastOperation:WorkDayOperationHistoricEntity | undefined = businessOperationDay
+						.getLastOperationByTypeBeforeCurrentOperation(id_work_day_operation);
 
 					if (lastOperation) { // The prospect of client is in the middle of the route day.
 						if (!lastOperation.id_location) {
@@ -154,8 +154,9 @@ export class RegisterWorkDayBusinessOperationsCommand {
 						}
 						
 						// Find the position of the last visited location
+						console.log("Last location: ", lastOperation)
 						const lastVisitedLocation:RouteDayLocationObjectValue | undefined = routeDayLocationSet.get(lastOperation.id_location);
-
+						console.log("Last visited location: ", lastVisitedLocation)
 						if (lastVisitedLocation === undefined) throw new BusinessRuleException(`Error while locating the new prospect of client within the route. Location with id ${lastOperation.id_location} doesn't not belongs to this day.`);
 
 						const positionInRouteDayOfLastVisit: number = lastVisitedLocation.position_in_route;

@@ -37,6 +37,7 @@ export class LocationSupabaseRepository implements LocationRepository {
 
   async createLocation(location: LocationEntity): Promise<void> {
     const locationModel = this.mapper.toModel(location);
+    console.log("Current location: ", locationModel)
     const locationRecord = {
       ...locationModel,
       id_location_type: location.location_type.id_location_type,
@@ -45,7 +46,12 @@ export class LocationSupabaseRepository implements LocationRepository {
     const { error } = await this.supabase.from('locations').insert(locationRecord);
 
     if (error) {
-      throw new Error('Failed to create location');
+      console.log("Location creation")
+      console.log("Error message: ", error.message)
+      console.log("Error details: ", error.details)
+      console.log("Error hints: ", error.hint)
+      throw new Error('Failed to create location: ' + error.message);
+
     }
 
     if (location.notes.length > 0) {
