@@ -303,29 +303,26 @@ export class ClientsController {
     @Query('colony') colony?: string,
     @Query('postal_code') postal_code?: string,
     @Query('location_name') location_name?: string,
-    @Query('status_location') status_location?: string | string[],
-    @Query('id_creator') id_creator?: string | string[],
-    @Query('id_client') id_client?: string | string[],
-    @Query('id_location_type') id_location_type?: string | string[],
+    @Query('status_location') status_location?: string,
+    @Query('id_creator') id_creator?: string,
+    @Query('id_client') id_client?: string,
+    @Query('id_location_type') id_location_type?: string,
   ): Promise<httpControllerResponse> {
     let next_id: string | undefined = undefined;
     let next_date: string | undefined = undefined;
     let parsedLimit: number | undefined = undefined;
 
-    const toArray = (value?: string | string[]): string[] | undefined => {
-      if (!value) return undefined;
-      if (Array.isArray(value)) return value.filter((item) => item.length > 0);
+    /*
+      Patch (07-17-26)
 
-      return value
-        .split(',')
-        .map((item) => item.trim())
-        .filter((item) => item.length > 0);
+      Make safet the parsing of parameters.
+    */
+    const toArray = (value?: string): any[] | undefined => {
+      if (typeof value === 'string') return JSON.parse(value)
+      else return undefined;
     };
 
-    const statusLocationValues = toArray(status_location);
-    const statusLocationParsed = statusLocationValues?.map((value) => Number.parseInt(value, 10))
-      .filter((value) => Number.isInteger(value));
-
+    const statusLocationParsed = toArray(status_location);
     const idCreatorValues = toArray(id_creator);
     const idClientValues = toArray(id_client);
     const idLocationTypeValues = toArray(id_location_type);

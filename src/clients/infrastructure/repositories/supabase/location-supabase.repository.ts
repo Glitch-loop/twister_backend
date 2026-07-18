@@ -14,9 +14,9 @@ import { LocationTypeObjectValue } from '@/src/clients/core/object-values/locati
 
 // Models
 import { LocationModel } from '@/src/clients/application/models/location.model';
+import { FurnitureModel } from '@/src/clients/application/models/furniture.model';
 import { LocationNoteModel } from '@/src/clients/application/models/location-note.model';
 import { LocationTypeModel } from '@/src/clients/application/models/location-type.model';
-import { FurnitureModel } from '@/src/clients/application/models/furniture.model';
 
 // Datasource
 import { SupabaseDataSource } from '@/src/shared/infrastructure/datasources/supabase-data-source';
@@ -37,7 +37,7 @@ export class LocationSupabaseRepository implements LocationRepository {
 
   async createLocation(location: LocationEntity): Promise<void> {
     const locationModel = this.mapper.toModel(location);
-    console.log("Current location: ", locationModel)
+    
     const locationRecord = {
       ...locationModel,
       id_location_type: location.location_type.id_location_type,
@@ -46,10 +46,6 @@ export class LocationSupabaseRepository implements LocationRepository {
     const { error } = await this.supabase.from('locations').insert(locationRecord);
 
     if (error) {
-      console.log("Location creation")
-      console.log("Error message: ", error.message)
-      console.log("Error details: ", error.details)
-      console.log("Error hints: ", error.hint)
       throw new Error('Failed to create location: ' + error.message);
 
     }
@@ -233,7 +229,7 @@ export class LocationSupabaseRepository implements LocationRepository {
     if (location_name) query.ilike('location_name', `%${location_name}%`);
 
     if (status_location) 
-      if(status_location.length > 0) query.in('id_creator', status_location);
+      if(status_location.length > 0) query.in('status_location', status_location);
     
 
     if (id_creator)
@@ -260,7 +256,7 @@ export class LocationSupabaseRepository implements LocationRepository {
     const { data, error } = await query;
 
     if (error) {
-      throw new Error('Failed to list locations');
+      throw new Error('Failed to list locations: ' + error.message);
     }
 
     const locationModels = data as LocationModel[];
