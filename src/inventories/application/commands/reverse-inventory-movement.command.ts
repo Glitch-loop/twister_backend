@@ -26,6 +26,7 @@ import { EntityDtoMapper } from '@/src/inventories/application/mappers/entity-dt
 import { IntegrityRepository } from '@/src/shared/core/interfaces/integrity.repository';
 import { ProductRepository } from '@/src/products/core/interfaces/ProductRepository.repository';
 import { DOMAIN_EVENT_ENUM } from '@/src/shared/core/enums/domain-event.enum';
+import { INVENTORY_CONTEXT_ENUM } from '../../core/enums/inventory-context.enum';
 
 interface InventoryOperationDescriptionInput {
 	id_inventory_operation_description?: string;
@@ -66,11 +67,11 @@ export class ReverseInventoryMovementCommand {
 			idInventoryTargetOfOperationToReverse,
 		);
 
-		await this.assertInventoryOperationToReverseIsLastForInvolvedInventories(inventoryOperationToReverse);
 		await this.assertProductsValid(inventory_operation_descriptions);
 
 		const originInventoryOfOperationToReverse = await this.retrieveInventoryById(idInventoryOriginOfOperationToReverse);
 		const targetInventoryOfOperationToReverse = await this.retrieveInventoryById(idInventoryTargetOfOperationToReverse);
+		await this.assertInventoryOperationToReverseIsLastForInvolvedInventories(inventoryOperationToReverse, originInventoryOfOperationToReverse, targetInventoryOfOperationToReverse);
 
 		const createdAtToUse = created_at ?? new Date();
 		const inventoryOperationIdToUse = id_inventory_operation ?? this.integrityRepository.generateUUIDv4();
@@ -172,7 +173,25 @@ export class ReverseInventoryMovementCommand {
 
 	private async assertInventoryOperationToReverseIsLastForInvolvedInventories(
 		inventoryOperationToReverse: InventoryOperationEntity,
+		originInventory: InventoryEntity, 
+		targetInventory: InventoryEntity
 	): Promise<void> {
+
+		if (originInventory.inventory_context === INVENTORY_CONTEXT_ENUM.AVAILABLE_FOR_SALE 
+		&& targetInventory.inventory_context === INVENTORY_CONTEXT_ENUM.CLIENT_VIRTUAL) {
+			/*
+				Design notes (07-18-26)
+
+				This is valid at any time because the user has the freedom for go back to the user
+				once the user has been visted previously.
+
+				The unique constraint should be that if the user tries to cancel a inventory 
+				operation of a finished workday. This is not possible since that workday has been
+				completed.
+			*/
+			return;
+		}
+
 		const { id_inventory_origin, id_inventory_target, id_inventory_operation } = inventoryOperationToReverse;
 
 		const involvedInventoryIds = new Set<string>([id_inventory_origin, id_inventory_target]);

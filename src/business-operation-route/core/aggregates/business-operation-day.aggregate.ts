@@ -111,6 +111,7 @@ export class BusinessOperationDayAggregate {
 	}
 
 	getLastOperationByTypeBeforeCurrentOperation(idCurrentOperation: string): WorkDayOperationHistoricEntity | undefined {
+		console.log("START finding last operation type.%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 		const clientToAttendInTheRouteSet:Set<string> = new Set<string>();
 		
 		if (this.dayOperations === null) {
@@ -179,7 +180,7 @@ export class BusinessOperationDayAggregate {
 				return dayOperationToDetermineLocation;
 			}
 		}
-
+		console.log("FINISH finding last operation type.%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 		return undefined;
 	}
 
