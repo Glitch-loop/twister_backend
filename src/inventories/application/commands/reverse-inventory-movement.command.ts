@@ -17,16 +17,17 @@ import { InventoryRepository } from '@/src/inventories/core/interfaces/Inventory
 import { BusinessRuleException } from '@/src/shared/errors/BusinessRuleException';
 
 // Enum
-import { PRODUCT_STATUS_ENUM } from '@/src/products/core/enums/product-status.enum';
+import { INVENTORY_CONTEXT_ENUM } from '@/src/inventories/core/enums/inventory-context.enum';
 
 // Mappers
 import { EntityDtoMapper } from '@/src/inventories/application/mappers/entity-dto.mapper'
 
 // Shared
 import { IntegrityRepository } from '@/src/shared/core/interfaces/integrity.repository';
-import { ProductRepository } from '@/src/products/core/interfaces/ProductRepository.repository';
 import { DOMAIN_EVENT_ENUM } from '@/src/shared/core/enums/domain-event.enum';
-import { INVENTORY_CONTEXT_ENUM } from '../../core/enums/inventory-context.enum';
+import { ProductRepository } from '@/src/products/core/interfaces/ProductRepository.repository';
+import { PRODUCT_STATUS_ENUM } from '@/src/products/core/enums/product-status.enum';
+
 
 interface InventoryOperationDescriptionInput {
 	id_inventory_operation_description?: string;

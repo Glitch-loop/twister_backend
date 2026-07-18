@@ -1,7 +1,7 @@
 export interface ProductModel {
   id_product: string;
   product_name: string;
-  barcode?: string;
+  barcode: string | null;
   cost: number;
   product_status: number;
   quantity_presentation: number;

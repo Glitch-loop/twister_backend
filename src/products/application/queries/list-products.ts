@@ -63,7 +63,7 @@ export class ListProductsQuery {
 			product.order_to_show,
 			product.id_measurement_unit,
 			prices,
-			product.barcode,
+			product.barcode === null ? undefined : product.barcode,
 		);
 	}
 
@@ -72,9 +72,9 @@ export class ListProductsQuery {
 			price.id_product_price,
 			price.price,
 			price.created_at,
-			price.id_facility,
-			price.id_location,
-			price.id_route_day,
+			price.id_facility === null ? undefined : price.id_facility,
+			price.id_location === null ? undefined : price.id_location,
+			price.id_route_day === null ? undefined : price.id_route_day,
 		);
 	}
 }

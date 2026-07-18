@@ -10,7 +10,7 @@ export const isProductModel = (value: unknown): value is ProductModel => {
   return (
     typeof value.id_product === 'string' &&
     typeof value.product_name === 'string' &&
-    (value.barcode === undefined || typeof value.barcode === 'string') &&
+    (value.barcode === null || typeof value.barcode === 'string') &&
     typeof value.cost === 'number' &&
     typeof value.product_status === 'number' &&
     typeof value.quantity_presentation === 'number' &&

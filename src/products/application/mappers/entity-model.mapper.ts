@@ -40,6 +40,7 @@ export class Mapper {
     model: ProductModel | ProductPriceModel,
     prices?: ProductPriceModel[],
   ): ProductEntity | ProductPriceObjectValue {
+    console.log(model)
     if (isProductModel(model)) {
       return this.productModelToEntity(model, prices ?? []);
     }

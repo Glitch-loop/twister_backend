@@ -12,6 +12,6 @@ export class ProductEntity {
     public readonly id_measurement_unit: string,
     public readonly product_price: ProductPriceObjectValue[],
     public readonly created_at: Date,
-    public readonly barcode?: string,
+    public readonly barcode: string | null,
   ) {}
 }

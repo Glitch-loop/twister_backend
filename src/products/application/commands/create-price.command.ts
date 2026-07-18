@@ -30,9 +30,9 @@ export class CreatePriceCommand {
       this.integrityRepository.generateUUIDv4(),
       price,
       new Date(),
-      id_client,
-      id_location,
-      id_route_day,
+      id_client === undefined ? null : id_client,
+      id_location === undefined ? null : id_location,
+      id_route_day === undefined ? null : id_route_day,
     );
 
     const productAggregate = new ProductAggregate(products[0]);

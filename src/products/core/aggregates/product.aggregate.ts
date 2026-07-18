@@ -77,7 +77,7 @@ export class ProductAggregate {
     base_price: number,
     barcode?: string,
   ): ProductEntity {
-    const basePrice = new ProductPriceObjectValue(base_price_id, base_price, new Date());
+    const basePrice = new ProductPriceObjectValue(base_price_id, base_price, new Date(), null, null, null);
     this._prices = [basePrice];
     this._product = new ProductEntity(
       id_product,
@@ -89,7 +89,7 @@ export class ProductAggregate {
       id_measurement_unit,
       this._prices,
       new Date(),
-      barcode,
+      barcode === undefined ? null : barcode,
     );
 
     return this._product;
@@ -117,7 +117,7 @@ export class ProductAggregate {
       id_measurement_unit ?? this._product.id_measurement_unit,
       [...this._prices],
       this._product.created_at,
-      barcode == undefined ? barcode : this._product.barcode,
+      barcode === undefined ? this._product.barcode : barcode,
     );
 
     return this._product;

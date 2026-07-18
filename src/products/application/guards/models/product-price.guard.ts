@@ -12,8 +12,8 @@ export const isProductPriceModel = (value: unknown): value is ProductPriceModel 
     typeof value.price === 'number' &&
     (value.created_at instanceof Date || typeof value.created_at === 'string') &&
     typeof value.id_product === 'string' &&
-    (value.id_client === undefined || typeof value.id_client === 'string') &&
-    (value.id_location === undefined || typeof value.id_location === 'string') &&
-    (value.id_route_day === undefined || typeof value.id_route_day === 'string')
+    (value.id_client === null || typeof value.id_client === 'string') &&
+    (value.id_location === null || typeof value.id_location === 'string') &&
+    (value.id_route_day === null || typeof value.id_route_day === 'string')
   );
 };
