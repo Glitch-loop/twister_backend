@@ -75,9 +75,18 @@ export class RegisterProductDevolutionCommand {
 			The target inventory will always be the facility shirnkage. 
 		*/
 
-		if (inventory_operation_descriptions.length === 0) {
-			throw new BusinessRuleException('Inventory operation descriptions are required.');
-		}
+		/*
+			Design Note (07-17-26)
+			This was commented since it is possible to make an product devolution with any product devoled at all.
+
+			Some workflow i.e; Routes, must declare at the end of the day a product devolution which is possible
+			that for that day the user doesn't return any product devolution, having this document as 
+			a way to say that he accomplish with the workflow.
+		*/
+
+		// if (inventory_operation_descriptions.length === 0) {
+		// 	throw new BusinessRuleException('Inventory operation descriptions are required.');
+		// }
 
 		const originInventory = await this.retrieveInventoryById(id_inventory_origin);
 		const shrinkageInventory = await this.retrieveUniqueInventoryByContext(

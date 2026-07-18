@@ -42,9 +42,19 @@ export class RegisterRouteInventoryOperationCommand {
     inventory_operation_descriptions: InventoryOperationDescriptionObjectValue[]
   ): Promise<void> {
     let inventoryConfigurationErrorMessage: string = 'An error has been occured while registering route inventory operation. Verify the inventory configuration is set properly'
-    if (inventory_operation_descriptions.length === 0) {
-      throw new BusinessRuleException('Inventory operation descriptions are required.');
-    }
+    
+    /*
+      Design note (07-17-26)
+
+      At least for produc devoution and final shift inventory operation it's possible to make an inventory 
+      operation on which it's not presented a product devoled at all. 
+
+      In this sense, this document work as evidence that the user did all the workflow that the user must
+      make to accomplish successfully the day.
+    */
+    // if (inventory_operation_descriptions.length === 0) {
+    //   throw new BusinessRuleException('Inventory operation descriptions are required.');
+    // }
 
     const createdAtDate = this.toDate(created_at, 'RouteInventoryOperationDto.date');
       
