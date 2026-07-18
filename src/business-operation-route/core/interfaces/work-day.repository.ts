@@ -33,4 +33,5 @@ export abstract class WorkDayRepository {
   ): Promise<WorkDayOperationHistoricEntity[]>;
   abstract retrieveWorkDayByWorkDayId(work_day_id: string[]): Promise<WorkDayEntity[]>;
   abstract retrieveWorkDayOperationsHistoricByWorkDayId(work_day_id: string[]): Promise<WorkDayOperationHistoricEntity[]>;
+  abstract retrieveWorkDayOperationsHistoricByWorkDayOperationId(work_day_operation_id: string[]): Promise<WorkDayOperationHistoricEntity[]>;
 }

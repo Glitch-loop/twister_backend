@@ -228,6 +228,30 @@ export class WorkDaySupabaseRepository implements WorkDayRepository {
 		}
 	}
 
+	async retrieveWorkDayOperationsHistoricByWorkDayOperationId(work_day_operation_id: string[]): Promise<WorkDayOperationHistoricEntity[]> {
+		if (work_day_operation_id.length === 0) {
+			return [];
+		}
+
+		try {
+			const { data, error } = await this.supabase
+				.from('work_day_operations_historic')
+				.select('*')
+				.in('id_work_day_operation', work_day_operation_id);
+
+			if (error) {
+				throw new Error(`Failed to retrieve work day operations historic by work day id: ${error.message}`);
+			}
+
+			return ((data ?? []) as WorkDayOperationHistoricModel[])
+				.map((model) => this.mapper.toDomainObject(model));
+		} catch (error) {
+			throw new Error(
+				`Failed to retrieve work day operations historic by work day id: ${error instanceof Error ? error.message : String(error)}`,
+			);
+		}
+	}
+
 	private async executeListWorkDays(
 		limit: number,
 		start_date_start_work_day?: Date,

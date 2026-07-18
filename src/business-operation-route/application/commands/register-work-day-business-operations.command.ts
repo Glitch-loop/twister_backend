@@ -62,21 +62,37 @@ export class RegisterWorkDayBusinessOperationsCommand {
 	): Promise<void> {
 		const workDays: WorkDayEntity[] = await this.workDayRepository.retrieveWorkDayByWorkDayId([ id_work_day ])
 		if (workDays.length === 0) throw new BusinessRuleException(`Work day with id ${id_work_day} which you are trying to register the route business operations doesn't exist.`);
+		
 		const { id_route_day } = workDays[0];
 		const workDayToAdd:WorkDayAggregate = new WorkDayAggregate(workDays[0]);
-		if(!workDayToAdd.isWorkDayFinished()) throw new BusinessRuleException(`Work day with id ${id_work_day} is already finished. You cannot add business operation to a finished work day.`)
+		if (!workDayToAdd.isWorkDayFinished()) throw new BusinessRuleException(`Work day with id ${id_work_day} is already finished. You cannot add business operation to a finished work day.`)
 			
 		// Retrieving work day model
-		const currentOperations = await this.workDayRepository.retrieveWorkDayOperationsHistoricByWorkDayId([
-			id_work_day,
-		]);
+		const currentOperations = await this.workDayRepository.retrieveWorkDayOperationsHistoricByWorkDayId([ id_work_day ]);
 
-		const businessOperationDay = new BusinessOperationDayAggregate(
-			currentOperations
+		const businessOperationDay = new BusinessOperationDayAggregate(currentOperations);
+
+		// Retrieving existing work day operations
+		const workDaysToConsult: (string|undefined)[] = new_operations.map((operation) => operation.id_work_day_operation)
+		
+		const existingWorkDayOperation: WorkDayOperationHistoricEntity[] = await this.workDayRepository.retrieveWorkDayOperationsHistoricByWorkDayOperationId(
+			workDaysToConsult.filter((workdayToConsult) => typeof workdayToConsult === "string")
 		);
+		
+		const existingWorkDayOperationsSet: Set<string> = new Set<string>(existingWorkDayOperation.map((existingWorkDayOp) => existingWorkDayOp.id_work_day_operation))
+
+
 
 		// Registering new day operations
 		for (const operation of new_operations) {
+			const { id_work_day_operation } = operation;
+
+			if (typeof id_work_day_operation === "string") {
+				if (existingWorkDayOperationsSet.has(id_work_day_operation)) {
+					continue;
+				}
+			}
+
 			businessOperationDay.createBusinessOperation({
 				id_work_day_operation: operation.id_work_day_operation ?? this.integrityRepository.generateUUIDv4(),
 				id_work_day,
