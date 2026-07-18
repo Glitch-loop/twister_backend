@@ -24,6 +24,7 @@ import { InventoryOperationDescriptionObjectValue } from '@/src/inventories/core
 
 // Errors
 import { BusinessRuleException } from '@/src/shared/errors/BusinessRuleException';
+import { InventoryOperationEntity } from '../../core/entities/inventory-operation.entity';
 
 
 @Injectable()
@@ -43,6 +44,12 @@ export class RegisterRouteInventoryOperationCommand {
   ): Promise<void> {
     let inventoryConfigurationErrorMessage: string = 'An error has been occured while registering route inventory operation. Verify the inventory configuration is set properly'
     
+        
+    const existingInventoryOperation: InventoryOperationEntity[] = await this.inventoryRepository.retrieveInventoryOperations([id_inventory_operation])
+    if(existingInventoryOperation.length > 0) {
+      return;
+    }
+
     /*
       Design note (07-17-26)
 

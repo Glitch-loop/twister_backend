@@ -5,6 +5,9 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 // Constant
 import { GENERAL_PUBLIC_CLIENT } from '@/src/sellings/core/constants/general_public_client.constant'
  
+// Entities
+import { TransactionEntity } from '@/src/sellings/core/entities/transaction.entity';
+
 // Repositories
 import { RouteTransactionRepository } from '@/src/sellings/core/interfaces/route-transactions.repository';
 
@@ -59,6 +62,14 @@ export class RegisterTransactionCommand {
 		_id_location?: string,
 		_cfdi?: string,
 	): Promise<void> {
+
+		if (typeof _id_transaction === "string") {
+			const existingTransaction: TransactionEntity[] = await this.routeTransactionRepository.retrieveTransactionsByIdTransaction([_id_transaction]);
+			if(existingTransaction.length > 0) {
+				return;
+			}
+		}
+
 		const idTransactionToUse = _id_transaction ?? this.integrityRepository.generateUUIDv4();
 		const createdAtToUse = _created_at === undefined ? new Date() : new Date(_created_at);
 		const paymentMethods = await this.routeTransactionRepository.listPaymentMethods();
