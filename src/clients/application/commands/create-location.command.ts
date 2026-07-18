@@ -42,6 +42,13 @@ export class CreateLocationCommand {
     const newLocation:LocationEntity[] = [];
     
     const locationType: LocationTypeObjectValue[] = await this.locationRepository.retrieveLocationTypeById([_id_location_type]);
+    
+    if (typeof _id_location === "string") {
+      const existingLocation: LocationEntity[] = await this.locationRepository.retrieveLocationById([_id_location_type]);
+      if(existingLocation.length) {
+        return;
+      }
+    }
 
     if (locationType.length === 0) {
       throw new Error(`Location type with id ${_id_location_type} does not exist.`);
