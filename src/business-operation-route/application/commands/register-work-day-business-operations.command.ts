@@ -167,11 +167,13 @@ export class RegisterWorkDayBusinessOperationsCommand {
 				for (const newClientOp of prospectOfClientOperations) { 
 					const { id_location, id_work_day_operation  } = newClientOp;
 					let positionInRouteOfProspectOfClient: number = -1;
-					
-					const isFirstOperation = businessOperationDay.isOperationBeforeTheFirstRouteDayClientVisited();
+					let isFirstPosition: boolean = false;
+					const isFirstOperation = businessOperationDay.isOperationBeforeTheFirstRouteDayClientVisited(id_location);
 					
 					if (isFirstOperation) {
+						console.log("First operation")
 						positionInRouteOfProspectOfClient = 1;
+						isFirstPosition = true;
 					} else {
 						const lastOperation:WorkDayOperationHistoricEntity | undefined = businessOperationDay
 							.getLastOperationByTypeBeforeCurrentOperation(id_work_day_operation);
@@ -179,7 +181,7 @@ export class RegisterWorkDayBusinessOperationsCommand {
 							if (lastOperation.id_location === null) {
 								throw new BusinessRuleException(`Last operation with id ${lastOperation.id_work_day_operation} does not have an id_location to locate insertion point.`);
 							}
-							
+							console.log("In the middle")
 							// Find the position of the last visited location
 							const lastVisitedLocation:RouteDayLocationObjectValue | undefined = routeDayLocationSet.get(lastOperation.id_location);
 							if (lastVisitedLocation === undefined) throw new BusinessRuleException(`Error while locating the new prospect of client within the route. Location with id ${lastOperation.id_location} doesn't not belongs to this day.`);
@@ -192,15 +194,37 @@ export class RegisterWorkDayBusinessOperationsCommand {
 					}
 
 					// Updating position of locations
+					console.log("Updating positions. ")
+					console.log("Position of the new operation to add: ", positionInRouteOfProspectOfClient)
 					for (const [idRouteLocation, routeDaylocation] of routeDayLocationSet) {
 						const { id_location, id_owner, id_route_day_location, position_in_route} = routeDaylocation;
-						if(routeDaylocation.position_in_route > positionInRouteOfProspectOfClient) {
-							routeDayLocationSet[idRouteLocation] = new RouteDayLocationObjectValue(
-								position_in_route + 1,
-								id_location,
-								id_owner, // Route day
-								id_route_day_location,
-							);	
+						console.log("routeDaylocation.position_in_route: ", routeDaylocation.position_in_route)
+						if (isFirstPosition) {
+						console.log("Is true (first position): ", routeDaylocation.position_in_route >= positionInRouteOfProspectOfClient)
+							if (routeDaylocation.position_in_route >= positionInRouteOfProspectOfClient) {
+								routeDayLocationSet.set(
+									id_location,
+									new RouteDayLocationObjectValue(
+										position_in_route + 1,
+										id_location,
+										id_owner, // Route day
+										id_route_day_location,
+									)
+								);
+							}
+						} else {
+							console.log("Is true (first position): ", routeDaylocation.position_in_route >= positionInRouteOfProspectOfClient)
+							if (routeDaylocation.position_in_route > positionInRouteOfProspectOfClient) {
+								routeDayLocationSet.set(
+									id_location,
+									new RouteDayLocationObjectValue(
+										position_in_route + 1,
+										id_location,
+										id_owner, // Route day
+										id_route_day_location,
+									)
+								);
+							}
 						}
 					}
 
@@ -217,12 +241,15 @@ export class RegisterWorkDayBusinessOperationsCommand {
 				}
 
 				// Persist changes
+				console.log("Changes to persist")
+				console.log(Array.from(routeDayLocationSet.values()).sort((a, b) => a.position_in_route - b.position_in_route))
 				await this.organizeRouteDayCommand.execute(
 					id_route_day, 
 					Array.from(routeDayLocationSet.values()).sort((a, b) => a.position_in_route - b.position_in_route)
 				);
 
 			} else { // Default route organization: Place new clients at the end of the day.
+				console.log("At the end")
 				let currentPosition = locations.length + 1; // From 0-base index to 1-base index.
 				for (const newClientOp of prospectOfClientOperations) { 
 					const { id_location  } = newClientOp;
@@ -233,10 +260,9 @@ export class RegisterWorkDayBusinessOperationsCommand {
 							id_route_day,
 							this.integrityRepository.generateUUIDv4()
 						)
-					)
+					);
 					currentPosition += 1;
 				}	
-
 				await this.organizeRouteDayCommand.execute(id_route_day, locations);
 			}
 		}

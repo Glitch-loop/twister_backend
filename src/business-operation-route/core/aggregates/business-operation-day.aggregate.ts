@@ -110,8 +110,8 @@ export class BusinessOperationDayAggregate {
 		return this.dayOperations[indexCurrentOperation];
 	}
 
-	isOperationBeforeTheFirstRouteDayClientVisited(): boolean {
-		if (this.dayOperations === null) {
+	isOperationBeforeTheFirstRouteDayClientVisited(idCurrentLocation: string|null): boolean {
+		if (this.dayOperations === null || idCurrentLocation === null) {
 			return false;
 		} else {
 			const clientsToAttendInTheRoute: WorkDayOperationHistoricEntity[] = [...this.dayOperations].filter((dayOperation) => {
@@ -121,9 +121,18 @@ export class BusinessOperationDayAggregate {
 			});
 
 			const clientsToAttendInTheRouteSet: Set<string> = new Set<string>(clientsToAttendInTheRoute.map((client) => client.id_location!));
-
+			console.log("In function determining if it has not beed visited a route attention client: ", [...this.dayOperations]
+				.some((dayOperation) => 
+						 dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.client_visited 
+					&& clientsToAttendInTheRouteSet.has(dayOperation.id_location!)
+					&& dayOperation.id_location !== idCurrentLocation
+				))
 			return !([...this.dayOperations]
-				.some((dayOperation) => dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.client_visited && clientsToAttendInTheRouteSet.has(dayOperation.id_location!)));
+				.some((dayOperation) => 
+					 dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.client_visited 
+				&& clientsToAttendInTheRouteSet.has(dayOperation.id_location!)
+				&& dayOperation.id_location !== idCurrentLocation
+			));
 
  		}
 	}

@@ -136,9 +136,7 @@ export default class RouteDayAggregate {
 
       this._routeDayLocations = orderedLocations.map((location, index) => {
         if (location.id_owner !== id_route_day) {
-          throw new Error(
-            `Invalid location owner id ${location.id_owner}. Expected route day id ${id_route_day}.`,
-          );
+          throw new Error(`Invalid location owner id ${location.id_owner}. Expected route day id ${id_route_day}.`);
         }
 
         if (!location.id_route_day_location) {
