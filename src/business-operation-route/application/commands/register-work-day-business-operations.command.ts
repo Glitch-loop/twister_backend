@@ -81,8 +81,6 @@ export class RegisterWorkDayBusinessOperationsCommand {
 		
 		const existingWorkDayOperationsSet: Set<string> = new Set<string>(existingWorkDayOperation.map((existingWorkDayOp) => existingWorkDayOp.id_work_day_operation))
 
-
-
 		// Registering new day operations
 		for (const operation of new_operations) {
 			const { id_work_day_operation } = operation;
@@ -125,8 +123,6 @@ export class RegisterWorkDayBusinessOperationsCommand {
 			const routeDay: RouteDayEntity[] = await this.routeRepository.retrieveRouteDay([ id_route_day ]);
 			if (routeDay.length === 0) throw new BusinessRuleException(`Route day with id ${id_route_day} which you are trying to place the new location (through a business operation) doesn't exist.`);
 			const { locations } = routeDay[0];
-				console.log("register work day business operation command. locations from database*********************************")
-				console.log(locations)
 
 			const routeOrganizationStrategies: OrganizationStrategyEntity[] = await this.routeRepository.listOrganizationStrategies();
 			const routeOrganizationStrategyAggregate: RouteOrganizationStrategyAggregate = new RouteOrganizationStrategyAggregate(routeOrganizationStrategies)
@@ -149,79 +145,78 @@ export class RegisterWorkDayBusinessOperationsCommand {
 				const routeDayLocationSet: Map<string, RouteDayLocationObjectValue> = new Map<string, RouteDayLocationObjectValue>();
 
 				// Creating map of the locations
-				for (const location of locations) {
-					const { id_route_day_location } = location;
-					routeDayLocationSet.set(id_route_day_location, location)
-				}
-				console.log("register work day business operation command. Current route day*********************************")
-				console.log(routeDayLocationSet)
+				/* 
+					Potential bug (07-18-26):
+					If a location appears twice in a route day, this scenario might 
+					cause unexcpected behavior placing a new location in a wrong position.
 
+					This is caused because route day set depends on id_location and not
+					in id_route_day_location (id for that particular location).
+
+					To solve this it is needed to change the id and find the last 
+					visited store based on the placing and not in the store.
+
+
+					Due to deadline this design is let as it is.
+				*/
+				for (const location of locations) {
+					const { id_location } = location;
+					routeDayLocationSet.set(id_location, location)
+				}
 
 				for (const newClientOp of prospectOfClientOperations) { 
 					const { id_location, id_work_day_operation  } = newClientOp;
-					const lastOperation:WorkDayOperationHistoricEntity | undefined = businessOperationDay
-						.getLastOperationByTypeBeforeCurrentOperation(id_work_day_operation);
-
-					if (lastOperation) { // The prospect of client is in the middle of the route day.
-						if (!lastOperation.id_location) {
-							throw new BusinessRuleException(
-								`Last operation with id ${lastOperation.id_work_day_operation} does not have an id_location to locate insertion point.`,
-							);
-						}
-						
-						// Find the position of the last visited location
-						console.log("Last location: ", lastOperation)
-						const lastVisitedLocation:RouteDayLocationObjectValue | undefined = routeDayLocationSet.get(lastOperation.id_location);
-						console.log("Last visited location: ", lastVisitedLocation)
-						if (lastVisitedLocation === undefined) throw new BusinessRuleException(`Error while locating the new prospect of client within the route. Location with id ${lastOperation.id_location} doesn't not belongs to this day.`);
-
-						const positionInRouteDayOfLastVisit: number = lastVisitedLocation.position_in_route;
-
-						// Updating position of locations
-						console.log("At the middle of the route day")
-						for (const [idRouteLocation, routeDaylocation] of routeDayLocationSet) {
-							const { id_location, id_owner, id_route_day_location, position_in_route} = routeDaylocation;
-							if(routeDaylocation.position_in_route > positionInRouteDayOfLastVisit) {
-								routeDayLocationSet[idRouteLocation] = new RouteDayLocationObjectValue(
-									position_in_route + 1,
-									id_location,
-									id_owner, // Route day
-									id_route_day_location,
-								);	
-							}
-						}
-
-						// Inserting new location
-						const idNewRouteDayLocation = this.integrityRepository.generateUUIDv4();
-						routeDayLocationSet.set(
-							idNewRouteDayLocation,
-							new RouteDayLocationObjectValue(
-									positionInRouteDayOfLastVisit + 1,
-									id_location!,
-									id_route_day, // Route day
-									idNewRouteDayLocation,
-							)
-						);
+					let positionInRouteOfProspectOfClient: number = -1;
+					
+					const isFirstOperation = businessOperationDay.isOperationBeforeTheFirstRouteDayClientVisited();
+					
+					if (isFirstOperation) {
+						positionInRouteOfProspectOfClient = 1;
 					} else {
-						console.log("At the end of the route day")
-						const positionOfnewProspectOfClient = routeDayLocationSet.size + 1; // + 1 For transforming from 0-base to 1-base.
-						console.log("Postion of the last location: ", positionOfnewProspectOfClient)
-						const idNewRouteDayLocation = this.integrityRepository.generateUUIDv4();
-						routeDayLocationSet.set(
-							idNewRouteDayLocation,
-							new RouteDayLocationObjectValue(
-									positionOfnewProspectOfClient,
-									id_location!,
-									id_route_day, // Route day
-									idNewRouteDayLocation,
-							)
-						);
+						const lastOperation:WorkDayOperationHistoricEntity | undefined = businessOperationDay
+							.getLastOperationByTypeBeforeCurrentOperation(id_work_day_operation);
+						if (lastOperation) { // The prospect of client is in the middle of the route day.
+							if (lastOperation.id_location === null) {
+								throw new BusinessRuleException(`Last operation with id ${lastOperation.id_work_day_operation} does not have an id_location to locate insertion point.`);
+							}
+							
+							// Find the position of the last visited location
+							const lastVisitedLocation:RouteDayLocationObjectValue | undefined = routeDayLocationSet.get(lastOperation.id_location);
+							if (lastVisitedLocation === undefined) throw new BusinessRuleException(`Error while locating the new prospect of client within the route. Location with id ${lastOperation.id_location} doesn't not belongs to this day.`);
+							
+							positionInRouteOfProspectOfClient = lastVisitedLocation.position_in_route;
+						} else {
+							positionInRouteOfProspectOfClient = routeDayLocationSet.size + 1; // + 1 For transforming from 0-base to 1-base.
+						}
+
 					}
+
+					// Updating position of locations
+					for (const [idRouteLocation, routeDaylocation] of routeDayLocationSet) {
+						const { id_location, id_owner, id_route_day_location, position_in_route} = routeDaylocation;
+						if(routeDaylocation.position_in_route > positionInRouteOfProspectOfClient) {
+							routeDayLocationSet[idRouteLocation] = new RouteDayLocationObjectValue(
+								position_in_route + 1,
+								id_location,
+								id_owner, // Route day
+								id_route_day_location,
+							);	
+						}
+					}
+
+					const idNewRouteDayLocation = this.integrityRepository.generateUUIDv4();
+					routeDayLocationSet.set(
+						idNewRouteDayLocation,
+						new RouteDayLocationObjectValue(
+								positionInRouteOfProspectOfClient,
+								id_location!,
+								id_route_day, // Route day
+								idNewRouteDayLocation,
+						)
+					);
 				}
 
 				// Persist changes
-				console.log("Changes to persist****************")
-				console.log(routeDayLocationSet)
 				await this.organizeRouteDayCommand.execute(
 					id_route_day, 
 					Array.from(routeDayLocationSet.values()).sort((a, b) => a.position_in_route - b.position_in_route)

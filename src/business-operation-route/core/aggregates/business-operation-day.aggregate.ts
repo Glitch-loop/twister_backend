@@ -110,6 +110,24 @@ export class BusinessOperationDayAggregate {
 		return this.dayOperations[indexCurrentOperation];
 	}
 
+	isOperationBeforeTheFirstRouteDayClientVisited(): boolean {
+		if (this.dayOperations === null) {
+			return false;
+		} else {
+			const clientsToAttendInTheRoute: WorkDayOperationHistoricEntity[] = [...this.dayOperations].filter((dayOperation) => {
+				return (dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.route_client_attention 
+				|| dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.prospect_registration)
+				&& dayOperation.id_location !== null
+			});
+
+			const clientsToAttendInTheRouteSet: Set<string> = new Set<string>(clientsToAttendInTheRoute.map((client) => client.id_location!));
+
+			return !([...this.dayOperations]
+				.some((dayOperation) => dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.client_visited && clientsToAttendInTheRouteSet.has(dayOperation.id_location!)));
+
+ 		}
+	}
+
 	getLastOperationByTypeBeforeCurrentOperation(idCurrentOperation: string): WorkDayOperationHistoricEntity | undefined {
 		console.log("START finding last operation type.%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 		const clientToAttendInTheRouteSet:Set<string> = new Set<string>();
@@ -118,9 +136,12 @@ export class BusinessOperationDayAggregate {
 			return undefined;
 		}
 
-		// Retrieve prospect of client to determine its location.
+		console.log("List all the day operations")
+		console.log([...this.dayOperations])
+
+		// Retrieve the day operations that represent the prospect of client.
 		const dayOperationToDetermineLocation = [...this.dayOperations].find(
-			(operation) => operation.id_work_day_operation === idCurrentOperation,
+			(operation) => operation.id_work_day_operation === idCurrentOperation
 		);
 
 		if (dayOperationToDetermineLocation === undefined) {
@@ -129,58 +150,56 @@ export class BusinessOperationDayAggregate {
 			);
 		}
 
-		// Retrieve visits of clients to attend in the route to determine the position which the prospect of client will be located.
-		console.log("Full ops")
-		console.log(this.dayOperations)
-		console.log("################################")
+		// Retriving route day clients and previous prospect of clients (registered in the current work day).
 		const clientsToAttendInTheRoute: WorkDayOperationHistoricEntity[] = [...this.dayOperations].filter((dayOperation) => {
-			return dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.route_client_attention || dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.prospect_registration
+			return (dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.route_client_attention 
+			|| dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.prospect_registration)
 			&& dayOperation.id_location !== null
+			&& dayOperation.id_work_day_operation !==  dayOperationToDetermineLocation.id_work_day_operation
 		});
-
-		console.log("Clientes in the route")
-		console.log(clientsToAttendInTheRoute)
 
 		clientsToAttendInTheRoute.forEach((clientToAttend) => {
 			const { id_location } = clientToAttend;
 			if (id_location !== null) clientToAttendInTheRouteSet.add(id_location);
-		})
-		console.log("SET:  SET:  SET: ")
-		console.log(clientToAttendInTheRouteSet)
+		});
+
+		console.log("Clients in the route and previous prospect of clients")
+		console.log(clientsToAttendInTheRoute)
+		
+		// Retrieving those clients (clients in route or prospect of clients) that has already visited during the day.
 		const visitClientsToAttendInTheRoute: WorkDayOperationHistoricEntity[] = [...this.dayOperations].filter((clientToAttend) => {
 			const { id_operation_type, id_location } = clientToAttend
+			console.log("Selection for id_location: ", id_location)
 			console.log("id_operation_type === DAY_OPERATIONS_ENUM.client_visited: ", id_operation_type === DAY_OPERATIONS_ENUM.client_visited)
 			console.log("id_operation_type: ", id_operation_type, " - ", DAY_OPERATIONS_ENUM.client_visited)
-			console.log("id_location !== null: ", id_location !== null)
 			console.log("clientToAttendInTheRouteSet.has(id_location): ", clientToAttendInTheRouteSet.has(id_location!))
 			return id_operation_type === DAY_OPERATIONS_ENUM.client_visited && id_location !== null && clientToAttendInTheRouteSet.has(id_location)
 		});
-
-		console.log("&&&&&&&&&&&&&&&&&&&")
-		console.log("visitClientsToAttendInTheRoute")
-		console.log(visitClientsToAttendInTheRoute)
 
 		const visitOfClientsToAttendInRouteOrdered = visitClientsToAttendInTheRoute.sort(
 			(a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
 		);
 
-		console.log("Ordered list of visit operaions")
-		console.log(visitOfClientsToAttendInRouteOrdered)
+		console.log("&&&&&&&&&&&&&&&&&&&")
+		console.log("Candidate clients for organizing ordered by date")
+		console.log(visitClientsToAttendInTheRoute)
 		
 		console.log("Determining")
 		while (visitOfClientsToAttendInRouteOrdered.length > 0) {
-			console.log("Lenght: ", visitOfClientsToAttendInRouteOrdered.length)
 			const currentVisitOfClientToAttendInRoute = visitOfClientsToAttendInRouteOrdered.pop();
-			console.log("candidate: ", currentVisitOfClientToAttendInRoute)
 			if (currentVisitOfClientToAttendInRoute === undefined) return undefined;
 
 			const { created_at } = currentVisitOfClientToAttendInRoute;
-			if (dayOperationToDetermineLocation.created_at > created_at && dayOperationToDetermineLocation.id_work_day_operation !== idCurrentOperation) {
-				console.log("finishing: ", dayOperationToDetermineLocation)
-				return dayOperationToDetermineLocation;
+						
+			// 2. Applied direct date comparison and fixed the .id_work_day_operation property typo
+			if (created_at < dayOperationToDetermineLocation.created_at
+			&& dayOperationToDetermineLocation.id_work_day_operation !== currentVisitOfClientToAttendInRoute.id_work_day_operation
+			) {
+				return currentVisitOfClientToAttendInRoute;
 			}
 		}
-		console.log("FINISH finding last operation type.%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+		console.log("There is not a last day operation.")
+		console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 		return undefined;
 	}
 
