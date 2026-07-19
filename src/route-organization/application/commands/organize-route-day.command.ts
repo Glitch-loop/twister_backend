@@ -36,8 +36,7 @@ export class OrganizeRouteDayCommand {
         if (!routeAggregate.validateRouteIsActive()) throw new BusinessRuleException(`You cannot perform the organization because the route is deactivated.`);
 
         const updatedRouteDay = routeDayAggregate.organizeRouteDayStores(routeDayLocations);
-        console.log("In Organize route day command-----------------------------")
-        console.log(updatedRouteDay)
+
         // TODO: Transfer this logic into a database transaction.
         await this.routeRepository.deleteRouteDayLocations(updatedRouteDay.id_route_day);
         await this.routeRepository.insertRouteDayLocations(updatedRouteDay.locations);
