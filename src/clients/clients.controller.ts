@@ -114,7 +114,7 @@ export class ClientsController {
     summary: 'List clients',
     description: 'Returns a paginated collection of clients with optional filters.',
   })
-  @ApiQuery({ name: 'limit', required: false, type: String, description: 'Page size (max 1000).' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Page size (max 1000).' })
   @ApiQuery({ name: 'next_item', required: false, type: String, description: 'Opaque cursor for next page.' })
   @ApiQuery({ name: 'cellphone', required: false, type: String, description: 'Retrieve the client(s) with the exact match.' })
   @ApiQuery({ name: 'email', required: false, type: String, description: 'Retrieve the client(s) with similar match.' })
@@ -124,7 +124,7 @@ export class ClientsController {
   @ApiOkResponse({ description: 'Standardized paginated response with clients collection.', type: ClientDto })
   @Get('')
   async listClients(
-    @Query('limit') limit?: string,
+    @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
     @Query('cellphone') cellphone?: string,
     @Query('email') email?: string,
     @Query('legal_name') legal_name?: string,
@@ -134,7 +134,6 @@ export class ClientsController {
   ): Promise<httpControllerResponse> {
     let next_id: string|undefined = undefined;
     let next_date: string|undefined = undefined
-    let parsedLimit: number|undefined = undefined;
 
     const httpRequestFormatter = new httpFormatter();
     const httpResponseFormatter = new httpFormatter();
@@ -144,10 +143,8 @@ export class ClientsController {
       if(paginationInformation.created_at) next_date = paginationInformation.created_at;
     }
     
-    if (limit) parsedLimit = parseInt(limit, 10);
-    
     const data: ClientDto[] = await this.listClientsQuery.execute(
-      parsedLimit, 
+      limit, 
       cellphone, 
       email, 
       legal_name, 
@@ -156,7 +153,7 @@ export class ClientsController {
       next_id, 
       next_date);
     
-    return httpResponseFormatter.createResponse('Client listed successfully.', data, parsedLimit, 'id_client', 'created_at');
+    return httpResponseFormatter.createResponse('Client listed successfully.', data, limit, 'id_client', 'created_at');
   }
 
   /**
@@ -276,7 +273,7 @@ export class ClientsController {
     summary: 'List locations',
     description: 'Returns a paginated collection of locations with optional filters.',
   })
-  @ApiQuery({ name: 'limit', required: false, type: String, description: 'Page size (max 1000).' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Page size (max 1000).' })
   @ApiQuery({ name: 'next_item', required: false, type: String, description: 'Opaque cursor for next page.' })
   @ApiQuery({ name: 'ext_number', required: false, type: String })
   @ApiQuery({ name: 'colony', required: false, type: String })
@@ -313,7 +310,7 @@ export class ClientsController {
   @ApiOkResponse({ description: 'Standardized paginated response with locations collection.', type: [ClientDto] })
   @Get('/locations')
   async listLocations(
-    @Query('limit') limit?: string,
+    @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
     @Query('next_item') next_item?: string,
     @Query('ext_number') ext_number?: string,
     @Query('colony') colony?: string,
@@ -326,7 +323,6 @@ export class ClientsController {
   ): Promise<httpControllerResponse> {
     let next_id: string | undefined = undefined;
     let next_date: string | undefined = undefined;
-    let parsedLimit: number | undefined = undefined;
 
     const httpRequestFormatter = new httpFormatter();
     const httpResponseFormatter = new httpFormatter();
@@ -337,10 +333,8 @@ export class ClientsController {
       if (paginationInformation.created_at) next_date = paginationInformation.created_at;
     }
 
-    if (limit) parsedLimit = Number.parseInt(limit, 10);
-
     const data: LocationDto[] = await this.listLocationsQuery.execute(
-      parsedLimit,
+      limit,
       next_date,
       next_id,
       ext_number,
@@ -356,7 +350,7 @@ export class ClientsController {
     return httpResponseFormatter.createResponse(
       'Locations listed successfully.',
       data,
-      parsedLimit,
+      limit,
       'id_location',
       'created_at',
     );
@@ -486,18 +480,17 @@ Deactivation reason/type:
     summary: 'List location types',
     description: 'Returns a paginated collection of location types.',
   })
-  @ApiQuery({ name: 'limit', required: false, type: String, description: 'Page size (max 1000).' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Page size (max 1000).' })
   @ApiQuery({ name: 'next_item', required: false, type: String, description: 'Opaque cursor for next page.' })
   @ApiOkResponse({ description: 'Standardized paginated response with location types collection.', type: [LocationTypeDto] })
   @Get('/locations/types')
   async listLocationTypes(
-    @Query('limit') limit?: string,
+    @Query('limit') limit?: number,
     @Query('next_item') next_item?: string,
   ): Promise<httpControllerResponse> {
     let next_id: string | undefined = undefined;
     let next_date: string | undefined = undefined;
-    let parsedLimit: number | undefined = undefined;
-
+    
     const httpRequestFormatter = new httpFormatter();
 
     if (next_item) {
@@ -506,10 +499,8 @@ Deactivation reason/type:
       if (paginationInformation.created_at) next_date = paginationInformation.created_at;
     }
 
-    if (limit) parsedLimit = Number.parseInt(limit, 10);
-
     const locationTypes = await this.listLocationTypesQuery.execute(
-      parsedLimit,
+      limit,
       next_date,
       next_id,
     );
@@ -518,7 +509,7 @@ Deactivation reason/type:
     return httpResponseFormatter.createResponse(
       'Location types retrieved successfully',
       locationTypes,
-      parsedLimit,
+      limit,
       'id_location_type',
       'created_at',
     );

@@ -158,7 +158,7 @@ export class WorkDaySupabaseRepository implements WorkDayRepository {
 		limit: number,
 		start_date?: Date,
 		end_date?: Date,
-		id_location?: number,
+		id_location?: string[],
 		id_route_transaction?: string[],
 		id_route_day?: string[],
 		operation_type?: DAY_OPERATIONS_ENUM[],
@@ -303,7 +303,7 @@ export class WorkDaySupabaseRepository implements WorkDayRepository {
 		limit: number,
 		start_date_created_at?: Date,
 		end_date_created_at?: Date,
-		id_location?: number,
+		id_location?: string[],
 		id_route_transaction?: string[],
 		id_route_day?: string[],
 		operation_type?: DAY_OPERATIONS_ENUM[],
@@ -319,10 +319,9 @@ export class WorkDaySupabaseRepository implements WorkDayRepository {
 				.order('id_work_day_operation', { ascending: false })
 				.limit(limit);
 
-			console.log("filter param id_work_day: ", id_work_day)
 			if (start_date_created_at) query = query.gte('created_at', start_date_created_at.toISOString());
 			if (end_date_created_at) query = query.lte('created_at', end_date_created_at.toISOString());
-			if (id_location !== undefined) query = query.eq('id_client', id_location);
+			if (id_location !== undefined) query = query.eq('id_location', id_location);
 			if (id_route_transaction && id_route_transaction.length > 0) query = query.in('id_route_transaction', id_route_transaction);
 			if (id_route_day && id_route_day.length > 0) query = query.in('id_route_day', id_route_day);
 			if (operation_type && operation_type.length > 0) query = query.in('id_operation_type', operation_type);

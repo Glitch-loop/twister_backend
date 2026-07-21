@@ -1,5 +1,5 @@
 // Libraries
-import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import {
   ApiBody,
   ApiOkResponse,
@@ -321,7 +321,7 @@ ENABLE stock validation.`,
     summary: 'List inventories',
     description: 'Returns a paginated collection of inventories with optional filters.',
   })
-  @ApiQuery({ name: 'limit', required: false, type: String, description: 'Page size (max 1000).' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Page size (max 1000).' })
   @ApiQuery({ name: 'next_item', required: false, type: String, description: 'Opaque cursor for next page.' })
   @ApiQuery({ name: 'inventory_context', required: false, type: String, isArray: true })
   @ApiQuery({ name: 'inventory_name', required: false, type: String, isArray: true })
@@ -332,7 +332,7 @@ ENABLE stock validation.`,
   @ApiOkResponse({ description: 'Standardized paginated response with inventories collection.', type: [InventoryDto] })
   @Get('')
   async listInventories(
-    @Query('limit') limit?: string,
+    @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
     @Query('next_item') next_item?: string,
     @Query('inventory_context') inventory_context?: string | string[],
     @Query('inventory_name') inventory_name?: string | string[],
@@ -353,7 +353,6 @@ ENABLE stock validation.`,
 
     let nextId: string | undefined = undefined;
     let nextDate: string | undefined = undefined;
-    let parsedLimit: number | undefined = undefined;
 
     const inventoryContextValues = toArray(inventory_context);
     const inventoryContextParsed = inventoryContextValues?.map((value) => Number.parseInt(value, 10))
@@ -372,10 +371,8 @@ ENABLE stock validation.`,
       if (paginationInformation.created_at) nextDate = paginationInformation.created_at;
     }
 
-    if (limit) parsedLimit = Number.parseInt(limit, 10);
-
     const data = await this.listInventoriesQuery.execute(
-      parsedLimit,
+      limit,
       inventoryContextParsed,
       toArray(inventory_name),
       isActiveParsed,
@@ -389,7 +386,7 @@ ENABLE stock validation.`,
     return httpResponseFormatter.createResponse(
       'Inventories listed successfully.',
       data,
-      parsedLimit,
+      limit,
       'id_inventory',
       'created_at',
     );

@@ -426,19 +426,18 @@ that route day was assigned to the vendor (his default route).`,
 		summary: 'List route day proposals',
 		description: 'Returns a paginated list of route day proposals with optional filtering.',
 	})
-	@ApiQuery({ name: 'limit', required: false, type: String, description: 'Page size (max 100).' })
+	@ApiQuery({ name: 'limit', required: false, type: Number, description: 'Page size (max 100).' })
 	@ApiQuery({ name: 'next_item', required: false, type: String, description: 'Opaque cursor for next page.' })
 	@ApiQuery({ name: 'proposal_name', required: false, type: String, description: 'Filter by proposal name.' })
 	@ApiQuery({ name: 'id_route_day', required: false, type: String, description: 'Filter by route day id.' })
 	@ApiOkResponse({ description: 'Standardized paginated response with proposals collection.', type: [RouteDayProposalDto] })
 	@Get('/routes/days/proposals')
 	async listRouteDayProposals(
-		@Query('limit') limit?: string,
+		@Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
 		@Query('proposal_name') proposal_name?: string,
 		@Query('id_route_day', ParseUUIDPipe) id_route_day?: string,
 		@Query('next_item') next_item?: string,
 	): Promise<httpControllerResponse> {
-		let parsedLimit: number = 100;
 		let next_id: string | undefined = undefined;
 		let next_date: string | undefined = undefined;
 
@@ -451,10 +450,8 @@ that route day was assigned to the vendor (his default route).`,
 			if (paginationInformation.created_at) next_date = paginationInformation.created_at;
 		}
 
-		if (limit) parsedLimit = Number.parseInt(limit, 10);
-
 		const proposals: RouteDayProposalDto[] = await this.listRouteDaysProposalsQuery.execute(
-			parsedLimit,
+			limit,
 			proposal_name,
 			id_route_day,
 			next_date,
@@ -464,7 +461,7 @@ that route day was assigned to the vendor (his default route).`,
 		return httpResponseFormatter.createResponse(
 			'Route day proposals listed successfully.',
 			proposals,
-			parsedLimit,
+			limit,
 			'id_route_day_proposal',
 			'created_at',
 		);

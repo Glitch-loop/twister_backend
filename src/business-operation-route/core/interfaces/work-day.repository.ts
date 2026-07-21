@@ -23,7 +23,7 @@ export abstract class WorkDayRepository {
     limit: number,
     start_date_created_at?: Date,
     end_date_created_at?: Date,
-    id_location?: number,
+    id_location?: string[],
     id_route_transaction?: string[],
     id_route_day?: string[],
     operation_type?: DAY_OPERATIONS_ENUM[],

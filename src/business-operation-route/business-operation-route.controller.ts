@@ -4,6 +4,10 @@ import {
 	Controller, 
 	Get, 
 	Param, 
+	ParseArrayPipe, 
+	ParseDatePipe, 
+	ParseIntPipe, 
+	ParseUUIDPipe, 
 	Patch, 
 	Post, 
 	Query,
@@ -91,7 +95,7 @@ date at moment of the creation.`,
 	@ApiOkResponse({ description: 'Standardized response with operation message.' })
 	@Patch('/work-days/:id_work_day')
 	async finishWorkDay(
-		@Param('id_work_day') id_work_day: string,
+		@Param('id_work_day', ParseUUIDPipe) id_work_day: string,
 		@Body() body: FinishWorkDayRequestDto,
 	): Promise<httpControllerResponse> {
 		await this.updateWorkDayCommand.execute(
@@ -112,7 +116,7 @@ date at moment of the creation.`,
 	@ApiOkResponse({ description: 'Standardized response with operation message.' })
 	@Post('/work-days/:id_work_day/notes')
 	async createWorkDayNote(
-		@Param('id_work_day') id_work_day: string,
+		@Param('id_work_day', ParseUUIDPipe) id_work_day: string,
 		@Body() body: CreateWorkDayNoteRequestDto,
 	): Promise<httpControllerResponse> {
 		await this.createWorkDayNoteCommand.execute(
@@ -242,52 +246,31 @@ new_client_confirmation
 		summary: 'List work days',
 		description: 'Returns a paginated collection of work days with optional filters.',
 	})
-	@ApiQuery({ name: 'limit', required: false, type: String, description: 'Page size (max 1000).' })
+	@ApiQuery({ name: 'limit', required: false, type: Number, description: 'Page size (max 1000).' })
 	@ApiQuery({ name: 'next_item', required: false, type: String, description: 'Opaque cursor for next page.' })
-	@ApiQuery({ name: 'start_date_start_work_day', required: false, type: String })
-	@ApiQuery({ name: 'end_date_end_work_day', required: false, type: String })
-	@ApiQuery({ name: 'final_pretty_cash', required: false, type: String })
+	@ApiQuery({ name: 'start_date_start_work_day', required: false, type: Date })
+	@ApiQuery({ name: 'end_date_end_work_day', required: false, type: Date })
+	@ApiQuery({ name: 'final_pretty_cash', required: false, type: Number })
 	@ApiQuery({ name: 'id_route_day', required: false, type: String, isArray: true })
 	@ApiQuery({ name: 'id_vendor', required: false, type: String, isArray: true })
 	@ApiQuery({ name: 'id_pay_stub', required: false, type: String, isArray: true })
 	@ApiOkResponse({ description: 'Standardized paginated response with work day collection.', type: [WorkDayDto] })
 	@Get('/work-days')
 	async listWorkDays(
-		@Query('limit') limit?: string,
+		@Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
 		@Query('next_item') next_item?: string,
-		@Query('start_date_start_work_day') start_date_start_work_day?: string,
-		@Query('end_date_end_work_day') end_date_end_work_day?: string,
-		@Query('final_pretty_cash') final_pretty_cash?: string,
-		@Query('id_route_day') id_route_day?: string[],
-		@Query('id_vendor') id_vendor?: string[],
-		@Query('id_pay_stub') id_pay_stub?: string[],
+		@Query('start_date_start_work_day', new ParseDatePipe({ optional: true })) start_date_start_work_day?: Date,
+		@Query('end_date_end_work_day', new ParseDatePipe({ optional: true })) end_date_end_work_day?: Date,
+		@Query('final_pretty_cash', new ParseIntPipe({ optional: true })) final_pretty_cash?: number,
+		@Query('id_route_day', new ParseArrayPipe({ items: String, separator: ',', optional: true })) id_route_day?: string[],
+		@Query('id_vendor', new ParseArrayPipe({ items: String, separator: ',', optional: true })) id_vendor?: string[],
+		@Query('id_pay_stub', new ParseArrayPipe({ items: String, separator: ',', optional: true })) id_pay_stub?: string[],
 	): Promise<httpControllerResponse> {
-		const toDate = (value?: string): Date | undefined => {
-			if (!value) return undefined;
-			const parsed = new Date(value);
-			return Number.isNaN(parsed.getTime()) ? undefined : parsed;
-		};
-
-		const toArray = (value?: string | string[]): string[] | undefined => {
-			if (!value) return undefined;
-			if (Array.isArray(value)) return value.filter((item) => item.length > 0);
-
-			return value
-				.split(',')
-				.map((item) => item.trim())
-				.filter((item) => item.length > 0);
-		};
 
 		let next_id: string | undefined;
 		let next_date: string | undefined;
 		let parsedLimit: number | undefined;
 
-		const parsedFinalPettyCash = final_pretty_cash ? Number.parseFloat(final_pretty_cash) : undefined;
-		const startDate = toDate(start_date_start_work_day);
-		const endDate = toDate(end_date_end_work_day);
-		const idRouteDay = toArray(id_route_day);
-		const idVendor = toArray(id_vendor);
-		const idPayStub = toArray(id_pay_stub);
 		const httpRequestFormatter = new httpFormatter();
 
 		if (next_item) {
@@ -296,15 +279,14 @@ new_client_confirmation
 			if (paginationInformation.created_at) next_date = paginationInformation.created_at;
 		}
 
-		if (limit) parsedLimit = Number.parseInt(limit, 10);
 		const data: WorkDayDto[] = await this.listWorkDayQuery.execute(
-			parsedLimit,
-			startDate,
-			endDate,
-			parsedFinalPettyCash,
-			idRouteDay,
-			idVendor,
-			idPayStub,
+			limit,
+			start_date_start_work_day,
+			end_date_end_work_day,
+			final_pretty_cash,
+			id_route_day,
+			id_vendor,
+			id_pay_stub,
 			next_date,
 			next_id,
 		);
@@ -323,11 +305,11 @@ new_client_confirmation
 		summary: 'List work day operations historic',
 		description: 'Returns a paginated collection of work day operation historic with optional filters.',
 	})
-	@ApiQuery({ name: 'limit', required: false, type: String, description: 'Page size (max 1000).' })
+	@ApiQuery({ name: 'limit', required: false, type: Number, description: 'Page size (max 1000).' })
 	@ApiQuery({ name: 'next_item', required: false, type: String, description: 'Opaque cursor for next page.' })
-	@ApiQuery({ name: 'start_date_created_at', required: false, type: String })
-	@ApiQuery({ name: 'end_date_created_at', required: false, type: String })
-	@ApiQuery({ name: 'id_location', required: false, type: String })
+	@ApiQuery({ name: 'start_date_created_at', required: false, type: Date })
+	@ApiQuery({ name: 'end_date_created_at', required: false, type: Date })
+	@ApiQuery({ name: 'id_location', required: false, type: String, isArray: true })
 	@ApiQuery({ name: 'id_route_transaction', required: false, type: String, isArray: true })
 	@ApiQuery({ name: 'id_route_day', required: false, type: String, isArray: true })
 	@ApiQuery({ name: 'operation_type', required: false, enum: DAY_OPERATIONS_ENUM, isArray: true })
@@ -335,47 +317,20 @@ new_client_confirmation
 	@ApiOkResponse({ description: 'Standardized paginated response with work day operation historic collection.', type: [WorkDayOperationHistoricDto] })
 	@Get('/work-days/operations')
 	async listWorkDayOperationsHistoric(
-		@Query('limit') limit?: string,
+		@Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
 		@Query('next_item') next_item?: string,
-		@Query('start_date_created_at') start_date_created_at?: string,
-		@Query('end_date_created_at') end_date_created_at?: string,
-		@Query('id_location') id_location?: string,
-		@Query('id_route_transaction') id_route_transaction?: string | string[],
-		@Query('id_route_day') id_route_day?: string | string[],
-		@Query('operation_type') operation_type?: string | string[],
-		@Query('id_work_day') id_work_day?: string | string[],
+		@Query('start_date_created_at', new ParseDatePipe({ optional: true })) start_date_created_at?: Date,
+		@Query('end_date_created_at', new ParseDatePipe({ optional: true })) end_date_created_at?: Date,
+		@Query('id_location', new ParseArrayPipe({ items: String, separator: ',', optional: true })) id_location?: string[],
+		@Query('id_route_transaction', new ParseArrayPipe({ items: String, separator: ',', optional: true })) id_route_transaction?: string[],
+		@Query('id_route_day', new ParseArrayPipe({ items: String, separator: ',', optional: true })) id_route_day?: string[],
+		@Query('operation_type', new ParseArrayPipe({ items: String, separator: ',', optional: true })) operation_type?: string[],
+		@Query('id_work_day', new ParseArrayPipe({ items: String, separator: ',', optional: true })) id_work_day?: string[],
 	): Promise<httpControllerResponse> {
-		const toArray = (value?: string | string[]): string[] | undefined => {
-			if (!value) return undefined;
-			if (Array.isArray(value)) return value.filter((item) => item.length > 0);
-
-			return value
-				.split(',')
-				.map((item) => item.trim())
-				.filter((item) => item.length > 0);
-		};
-
-		const toDate = (value?: string): Date | undefined => {
-			if (!value) return undefined;
-			const parsed = new Date(value);
-			return Number.isNaN(parsed.getTime()) ? undefined : parsed;
-		};
 
 		let next_id: string | undefined;
 		let next_date: string | undefined;
 		let parsedLimit: number | undefined;
-
-		const parsedIdLocation = id_location ? Number.parseInt(id_location, 10) : undefined;
-		const startDate = toDate(start_date_created_at);
-		const endDate = toDate(end_date_created_at);
-		const idRouteTransaction = toArray(id_route_transaction);
-		const idRouteDay = toArray(id_route_day);
-		const operationTypeRaw = toArray(operation_type);
-		const idWorkDay = toArray(id_work_day);
-		const operationType = operationTypeRaw?.filter((value): value is DAY_OPERATIONS_ENUM =>
-			Object.values(DAY_OPERATIONS_ENUM).includes(value as DAY_OPERATIONS_ENUM),
-		);
-
 		const httpRequestFormatter = new httpFormatter();
 
 		if (next_item) {
@@ -384,17 +339,15 @@ new_client_confirmation
 			if (paginationInformation.created_at) next_date = paginationInformation.created_at;
 		}
 
-		if (limit) parsedLimit = Number.parseInt(limit, 10);
-
 		const data: WorkDayOperationHistoricDto[] = await this.listWorkDayOperationsHistoricQuery.execute(
-			parsedLimit,
-			startDate,
-			endDate,
-			parsedIdLocation,
-			idRouteTransaction,
-			idRouteDay,
-			operationType,
-			idWorkDay,
+			limit,
+			start_date_created_at,
+			end_date_created_at,
+			id_location,
+			id_route_transaction,
+			id_route_day,
+			operation_type as DAY_OPERATIONS_ENUM[],
+			id_work_day,
 			next_date,
 			next_id,
 		);
