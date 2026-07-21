@@ -1,5 +1,5 @@
 // Libraries
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
 import {
   ApiBody,
   ApiOkResponse,
@@ -72,17 +72,16 @@ export class ProductsController {
     summary: 'List products',
     description: 'Returns a paginated list of products with optional text filter.',
   })
-  @ApiQuery({ name: 'limit', required: false, type: String, description: 'Page size (max 100).' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Page size (max 100).' })
   @ApiQuery({ name: 'next_item', required: false, type: String, description: 'Opaque cursor for next page.' })
   @ApiQuery({ name: 'filter', required: false, type: String, description: 'Filter by product name or barcode.' })
   @ApiOkResponse({ description: 'Standardized paginated response with products collection.', type: [ProductDto] })
   @Get()
   async listProducts(
-    @Query('limit') limit?: string,
+    @Query('limit', new ParseIntPipe({ optional: true})) limit?: number,
     @Query('filter') filter?: string,
     @Query('next_item') next_item?: string,
   ): Promise<httpControllerResponse> {
-    let parsedLimit = 100;
     let next_id: string | undefined;
     let next_date: string | undefined;
 
@@ -97,12 +96,8 @@ export class ProductsController {
       }
     }
 
-    if (limit) {
-      parsedLimit = Number.parseInt(limit, 10);
-    }
-
     const products = await this.listProductsQuery.execute(
-      parsedLimit,
+      limit,
       filter,
       next_date,
       next_id,
@@ -111,9 +106,9 @@ export class ProductsController {
     return httpResponseFormatter.createResponse(
       'Products listed successfully.',
       products,
-      parsedLimit,
+      limit,
       'id_product',
-      'id_product',
+      'created_at',
     );
   }
 
@@ -142,7 +137,7 @@ export class ProductsController {
   @ApiOkResponse({ description: 'Standardized response with operation message.' })
   @Patch('/:id_product')
   async updateProduct(
-    @Param('id_product') id_product: string,
+    @Param('id_product', ParseUUIDPipe) id_product: string,
     @Body() body: UpdateProductRequestDto,
   ): Promise<httpControllerResponse> {
     await this.updateProductCommand.execute(
@@ -167,7 +162,7 @@ export class ProductsController {
   @ApiOkResponse({ description: 'Standardized response with operation message.' })
   @Patch('/:id_product/deactivate')
   async deactivateProduct(
-    @Param('id_product') id_product: string,
+    @Param('id_product', ParseUUIDPipe) id_product: string,
   ): Promise<httpControllerResponse> {
     await this.deactivateProductCommand.execute(id_product);
 
@@ -183,7 +178,7 @@ export class ProductsController {
   @ApiOkResponse({ description: 'Standardized response with operation message.' })
   @Patch('/:id_product/reactivate')
   async reactivateProduct(
-    @Param('id_product') id_product: string,
+    @Param('id_product', ParseUUIDPipe) id_product: string,
   ): Promise<httpControllerResponse> {
     await this.reactivateProductCommand.execute(id_product);
 
@@ -200,7 +195,7 @@ export class ProductsController {
   @ApiOkResponse({ description: 'Standardized response with operation message.' })
   @Post('/:id_product/prices')
   async createPrice(
-    @Param('id_product') id_product: string,
+    @Param('id_product', ParseUUIDPipe) id_product: string,
     @Body() body: CreateProductPriceRequestDto,
   ): Promise<httpControllerResponse> {
     await this.createPriceCommand.execute(
@@ -224,8 +219,8 @@ export class ProductsController {
   @ApiOkResponse({ description: 'Standardized response with operation message.' })
   @Delete('/:id_product/prices/:id_product_price')
   async removePrice(
-    @Param('id_product') id_product: string,
-    @Param('id_product_price') id_product_price: string,
+    @Param('id_product', ParseUUIDPipe) id_product: string,
+    @Param('id_product_price', ParseUUIDPipe) id_product_price: string,
   ): Promise<httpControllerResponse> {
     await this.removePriceCommand.execute(id_product, id_product_price);
 
