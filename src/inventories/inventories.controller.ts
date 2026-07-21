@@ -1,5 +1,5 @@
 // Libraries
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseArrayPipe, ParseIntPipe, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
 import {
   ApiBody,
   ApiOkResponse,
@@ -120,7 +120,7 @@ ENABLE stock validation.`,
   @ApiOkResponse({ description: 'Standardized response with operation message.' })
   @Patch('/:id_inventory')
   async updateInventory(
-    @Param('id_inventory') id_inventory: string,
+    @Param('id_inventory', ParseUUIDPipe) id_inventory: string,
     @Body() body: UpdateInventoryRequestDto,
   ): Promise<httpControllerResponse> {
     await this.updateInventoryCommand.execute(id_inventory, 
@@ -140,7 +140,7 @@ ENABLE stock validation.`,
   @ApiParam({ name: 'id_inventory', description: 'Inventory identifier', type: String })
   @ApiOkResponse({ description: 'Standardized response with operation message.' })
   @Patch('/:id_inventory/deactivate')
-  async deactiveInventory(@Param('id_inventory') id_inventory: string): Promise<httpControllerResponse> {
+  async deactiveInventory(@Param('id_inventory', ParseUUIDPipe) id_inventory: string): Promise<httpControllerResponse> {
     await this.deactiveInventoryCommand.execute(id_inventory);
 
     const httpResponseFormatter = new httpFormatter();
@@ -323,9 +323,9 @@ ENABLE stock validation.`,
   })
   @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Page size (max 1000).' })
   @ApiQuery({ name: 'next_item', required: false, type: String, description: 'Opaque cursor for next page.' })
-  @ApiQuery({ name: 'inventory_context', required: false, type: String, isArray: true })
+  @ApiQuery({ name: 'inventory_context', required: false, type: Number, isArray: true })
   @ApiQuery({ name: 'inventory_name', required: false, type: String, isArray: true })
-  @ApiQuery({ name: 'is_active', required: false, type: String, isArray: true })
+  @ApiQuery({ name: 'is_active', required: false, type: Number, isArray: true })
   @ApiQuery({ name: 'created_by', required: false, type: String, isArray: true })
   @ApiQuery({ name: 'assigned_to', required: false, type: String, isArray: true })
   @ApiQuery({ name: 'assigned_facility', required: false, type: String, isArray: true })
@@ -334,33 +334,15 @@ ENABLE stock validation.`,
   async listInventories(
     @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
     @Query('next_item') next_item?: string,
-    @Query('inventory_context') inventory_context?: string | string[],
-    @Query('inventory_name') inventory_name?: string | string[],
-    @Query('is_active') is_active?: string | string[],
-    @Query('created_by') created_by?: string | string[],
-    @Query('assigned_to') assigned_to?: string | string[],
-    @Query('assigned_facility') assigned_facility?: string | string[],
+    @Query('inventory_context', new ParseArrayPipe({ items: Number, separator: ',', optional: true })) inventory_context?:number[],
+    @Query('inventory_name', new ParseArrayPipe({ items: String, separator: ',', optional: true })) inventory_name?: string[],
+    @Query('is_active', new ParseArrayPipe({ items: Number, separator: ',', optional: true })) is_active?: number[],
+    @Query('created_by', new ParseArrayPipe({ items: String, separator: ',', optional: true })) created_by?: string[],
+    @Query('assigned_to', new ParseArrayPipe({ items: String, separator: ',', optional: true })) assigned_to?: string[],
+    @Query('assigned_facility', new ParseArrayPipe({ items: String, separator: ',', optional: true })) assigned_facility?: string[],
   ): Promise<httpControllerResponse> {
-    const toArray = (value?: string | string[]): string[] | undefined => {
-      if (!value) return undefined;
-      if (Array.isArray(value)) return value.filter((item) => item.length > 0);
-
-      return value
-        .split(',')
-        .map((item) => item.trim())
-        .filter((item) => item.length > 0);
-    };
-
     let nextId: string | undefined = undefined;
     let nextDate: string | undefined = undefined;
-
-    const inventoryContextValues = toArray(inventory_context);
-    const inventoryContextParsed = inventoryContextValues?.map((value) => Number.parseInt(value, 10))
-      .filter((value) => Number.isInteger(value));
-
-    const isActiveValues = toArray(is_active);
-    const isActiveParsed = isActiveValues?.map((value) => Number.parseInt(value, 10))
-      .filter((value) => Number.isInteger(value));
 
     const httpRequestFormatter = new httpFormatter();
     const httpResponseFormatter = new httpFormatter();
@@ -373,12 +355,12 @@ ENABLE stock validation.`,
 
     const data = await this.listInventoriesQuery.execute(
       limit,
-      inventoryContextParsed,
-      toArray(inventory_name),
-      isActiveParsed,
-      toArray(created_by),
-      toArray(assigned_to),
-      toArray(assigned_facility),
+      inventory_context,
+      inventory_name,
+      is_active,
+      created_by,
+      assigned_to,
+      assigned_facility,
       nextId,
       nextDate,
     );
@@ -412,10 +394,10 @@ ENABLE stock validation.`,
     summary: 'List inventory operations',
     description: 'Returns a paginated collection of inventory operations with optional filters.',
   })
-  @ApiQuery({ name: 'limit', required: false, type: String, description: 'Page size (max 1000).' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Page size (max 1000).' })
   @ApiQuery({ name: 'next_item', required: false, type: String, description: 'Opaque cursor for next page.' })
   @ApiQuery({ name: 'inventory_operation_reference', required: false, type: String, isArray: true })
-  @ApiQuery({ name: 'movement_type', required: false, type: String, isArray: true })
+  @ApiQuery({ name: 'movement_type', required: false, type: Number, isArray: true })
   @ApiQuery({ name: 'document_reference', required: false, type: String, isArray: true })
   @ApiQuery({ name: 'created_by', required: false, type: String, isArray: true })
   @ApiQuery({ name: 'id_inventory_origin', required: false, type: String, isArray: true })
@@ -423,32 +405,17 @@ ENABLE stock validation.`,
   @ApiOkResponse({ description: 'Standardized paginated response with inventory operations collection.', type: [InventoryOperationDto] })
   @Get('/operations')
   async listInventoryOperations(
-    @Query('limit') limit?: string,
+    @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
     @Query('next_item') next_item?: string,
-    @Query('inventory_operation_reference') inventory_operation_reference?: string | string[],
-    @Query('movement_type') movement_type?: string | string[],
-    @Query('document_reference') document_reference?: string | string[],
-    @Query('created_by') created_by?: string | string[],
-    @Query('id_inventory_origin') id_inventory_origin?: string | string[],
-    @Query('id_inventory_target') id_inventory_target?: string | string[],
+    @Query('inventory_operation_reference', new ParseArrayPipe({ items: String, separator: ',', optional: true })) inventory_operation_reference?: string[],
+    @Query('movement_type', new ParseArrayPipe({ items: Number, separator: ',', optional: true })) movement_type?: number[],
+    @Query('document_reference', new ParseArrayPipe({ items: String, separator: ',', optional: true })) document_reference?:  string[],
+    @Query('created_by', new ParseArrayPipe({ items: String, separator: ',', optional: true })) created_by?: string[],
+    @Query('id_inventory_origin', new ParseArrayPipe({ items: String, separator: ',', optional: true })) id_inventory_origin?: string[],
+    @Query('id_inventory_target', new ParseArrayPipe({ items: String, separator: ',', optional: true })) id_inventory_target?: string[],
   ): Promise<httpControllerResponse> {
-    const toArray = (value?: string | string[]): string[] | undefined => {
-      if (!value) return undefined;
-      if (Array.isArray(value)) return value.filter((item) => item.length > 0);
-
-      return value
-        .split(',')
-        .map((item) => item.trim())
-        .filter((item) => item.length > 0);
-    };
-
     let nextId: string | undefined = undefined;
     let nextDate: string | undefined = undefined;
-    let parsedLimit: number | undefined = undefined;
-
-    const movementTypeValues = toArray(movement_type);
-    const movementTypeParsed = movementTypeValues?.map((value) => Number.parseInt(value, 10))
-      .filter((value) => Number.isInteger(value));
 
     const httpRequestFormatter = new httpFormatter();
     const httpResponseFormatter = new httpFormatter();
@@ -459,16 +426,14 @@ ENABLE stock validation.`,
       if (paginationInformation.created_at) nextDate = paginationInformation.created_at;
     }
 
-    if (limit) parsedLimit = Number.parseInt(limit, 10);
-
     const data = await this.listInventoryOperationsQuery.execute(
-      parsedLimit,
-      toArray(inventory_operation_reference),
-      movementTypeParsed,
-      toArray(document_reference),
-      toArray(created_by),
-      toArray(id_inventory_origin),
-      toArray(id_inventory_target),
+      limit,
+      inventory_operation_reference,
+      movement_type,
+      document_reference,
+      created_by,
+      id_inventory_origin,
+      id_inventory_target,
       nextId,
       nextDate,
     );
@@ -476,7 +441,7 @@ ENABLE stock validation.`,
     return httpResponseFormatter.createResponse(
       'Inventory operations listed successfully.',
       data,
-      parsedLimit,
+      limit,
       'id_inventory_operation',
       'created_at',
     );
