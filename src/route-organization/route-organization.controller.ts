@@ -1,5 +1,5 @@
 // Libraries
-import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
 import {
 	ApiBody,
 	ApiOkResponse,
@@ -95,7 +95,7 @@ export class RouteOrganizationController {
 	@ApiOkResponse({ description: 'Standardized response with operation message.' })
 	@Patch('/routes/days/organization-strategies/:id_organization_strategy/select')
 	async selectOrganizationStrategy(
-		@Param('id_organization_strategy') id_organization_strategy: string,
+		@Param('id_organization_strategy', ParseUUIDPipe) id_organization_strategy: string,
 	): Promise<httpControllerResponse> {
 		await this.selectRouteDayOrganizationStrategyCommand.execute(id_organization_strategy);
 
@@ -135,7 +135,7 @@ this behavior is needed.`,
 	@ApiOkResponse({ description: 'Standardized response with operation message.' })
 	@Patch('/routes/:id_route')
 	async updateRoute(
-		@Param('id_route') id_route: string,
+		@Param('id_route', ParseUUIDPipe) id_route: string,
 		@Body() body: RouteRequestDto,
 	): Promise<httpControllerResponse> {
 		await this.updateRouteCommand.execute(
@@ -158,11 +158,9 @@ this behavior is needed.`,
 	@Get('/routes')
 	async listRoutes(
 		@Query('route_name') route_name?: string,
-		@Query('route_status') route_status?: string,
+		@Query('route_status', ParseIntPipe) route_status?: number,
 	): Promise<httpControllerResponse> {
-		const parsedRouteStatus = route_status !== undefined ? Number.parseInt(route_status, 10) : undefined;
-		const routes: RouteDto[] = await this.listRoutesQuery.execute(route_name, parsedRouteStatus);
-
+		const routes: RouteDto[] = await this.listRoutesQuery.execute(route_name, route_status);
 		const httpResponseFormatter = new httpFormatter();
 		return httpResponseFormatter.createResponse('Routes listed successfully.', routes);
 	}
@@ -261,7 +259,7 @@ Note:
 	@ApiParam({ name: 'id_route', description: 'Route identifier', type: String })
 	@ApiOkResponse({ description: 'Standardized response with operation message.' })
 	@Patch('/routes/:id_route/deactivate')
-	async deactivateRoute(@Param('id_route') id_route: string): Promise<httpControllerResponse> {
+	async deactivateRoute(@Param('id_route', ParseUUIDPipe) id_route: string): Promise<httpControllerResponse> {
 		await this.deactivateRouteCommand.execute(id_route);
 
 		const httpResponseFormatter = new httpFormatter();
@@ -275,7 +273,7 @@ Note:
 	@ApiParam({ name: 'id_route', description: 'Route identifier', type: String })
 	@ApiOkResponse({ description: 'Standardized response with operation message.' })
 	@Patch('/routes/:id_route/reactivate')
-	async reactivateRoute(@Param('id_route') id_route: string): Promise<httpControllerResponse> {
+	async reactivateRoute(@Param('id_route', ParseUUIDPipe) id_route: string): Promise<httpControllerResponse> {
 		await this.reactivateRouteCommand.execute(id_route);
 
 		const httpResponseFormatter = new httpFormatter();
@@ -301,8 +299,8 @@ that route day was assigned to the vendor (his default route).`,
 	@ApiOkResponse({ description: 'Standardized response with operation message.' })
 	@Patch('/routes/days/:id_route_day/assign/:id_user')
 	async assignRouteDayToVendor(
-		@Param('id_route_day') id_route_day: string,
-		@Param('id_user') id_user: string,
+		@Param('id_route_day', ParseUUIDPipe) id_route_day: string,
+		@Param('id_user', ParseUUIDPipe) id_user: string,
 		@Body() body: { expired_at?: Date },
 	): Promise<httpControllerResponse> {
 
@@ -340,7 +338,7 @@ that route day was assigned to the vendor (his default route).`,
 	@ApiOkResponse({ description: 'Standardized response with operation message.' })
 	@Patch('/routes/days/unassign/:id_user')
 	async unassignRouteDayFromVendor(
-		@Param('id_user') id_user: string,
+		@Param('id_user', ParseUUIDPipe) id_user: string,
 		@Body() body: { id_route_days: string[] },
 	): Promise<httpControllerResponse> {
 		await this.unassignRouteToVendorCommand.execute(
@@ -384,7 +382,7 @@ that route day was assigned to the vendor (his default route).`,
 	@ApiOkResponse({ description: 'Standardized response with operation message.' })
 	@Patch('/routes/days/:id_route_day/organize')
 	async organizeRouteDay(
-		@Param('id_route_day') id_route_day: string,
+		@Param('id_route_day', ParseUUIDPipe) id_route_day: string,
 		@Body() body: { locations: Array<{ position_in_route: number; id_location: string; id_route_day_location: string }> },
 	): Promise<httpControllerResponse> {
 		const routeDayLocations = body.locations.map(
@@ -437,7 +435,7 @@ that route day was assigned to the vendor (his default route).`,
 	async listRouteDayProposals(
 		@Query('limit') limit?: string,
 		@Query('proposal_name') proposal_name?: string,
-		@Query('id_route_day') id_route_day?: string,
+		@Query('id_route_day', ParseUUIDPipe) id_route_day?: string,
 		@Query('next_item') next_item?: string,
 	): Promise<httpControllerResponse> {
 		let parsedLimit: number = 100;
@@ -510,7 +508,7 @@ that route day was assigned to the vendor (his default route).`,
 	@ApiOkResponse({ description: 'Standardized response with operation message.' })
 	@Patch('/routes/days/proposals/:id_route_day_proposal')
 	async updateRouteDayProposal(
-		@Param('id_route_day_proposal') id_route_day_proposal: string,
+		@Param('id_route_day_proposal', ParseUUIDPipe) id_route_day_proposal: string,
 		@Body() body: UpdateRouteDayProposalRequestDto,
 	): Promise<httpControllerResponse> {
 		await this.updateRouteDayProposalCommand.execute(
@@ -531,7 +529,7 @@ that route day was assigned to the vendor (his default route).`,
 	@ApiOkResponse({ description: 'Standardized response with operation message.' })
 	@Patch('/routes/days/proposals/:id_route_day_proposal/delete')
 	async deleteRouteDayProposal(
-		@Param('id_route_day_proposal') id_route_day_proposal: string,
+		@Param('id_route_day_proposal', ParseUUIDPipe) id_route_day_proposal: string,
 	): Promise<httpControllerResponse> {
 		await this.deleteRouteDayProposalCommand.execute(id_route_day_proposal);
 
