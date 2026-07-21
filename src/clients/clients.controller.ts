@@ -1,6 +1,18 @@
 // Libraries
-import { Body, Controller, Post, Get, Patch, Param, Query } from '@nestjs/common';
+import { 
+  Body,
+  Controller,
+  Post,
+  Get,
+  Patch,
+  Param,
+  Query,
+  ParseArrayPipe, 
+  ParseUUIDPipe,
+  ParseIntPipe
+} from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiOkResponse,
   ApiOperation,
@@ -44,6 +56,7 @@ import { httpControllerResponse } from '@/src/shared/presentation/http/interface
 import { httpFormatter } from '@/src/shared/presentation/http/handlers/http-formatter.handler';
 
 @ApiTags('Clients')
+@ApiBearerAuth()
 @Controller('clients')
 export class ClientsController {
   constructor(
@@ -103,10 +116,11 @@ export class ClientsController {
   })
   @ApiQuery({ name: 'limit', required: false, type: String, description: 'Page size (max 1000).' })
   @ApiQuery({ name: 'next_item', required: false, type: String, description: 'Opaque cursor for next page.' })
-  @ApiQuery({ name: 'cellphone', required: false, type: String })
-  @ApiQuery({ name: 'email', required: false, type: String })
-  @ApiQuery({ name: 'legal_name', required: false, type: String })
-  @ApiQuery({ name: 'name', required: false, type: String })
+  @ApiQuery({ name: 'cellphone', required: false, type: String, description: 'Retrieve the client(s) with the exact match.' })
+  @ApiQuery({ name: 'email', required: false, type: String, description: 'Retrieve the client(s) with similar match.' })
+  @ApiQuery({ name: 'legal_name', required: false, type: String, description: 'Retrieve the client(s) with similar match.' })
+  @ApiQuery({ name: 'name', required: false, type: String, description: 'Retrieve the client(s) with similar match.' })
+  @ApiQuery({ name: 'postal_code', required: false, type: String, description: 'Retrieve the client(s) with sim' })
   @ApiOkResponse({ description: 'Standardized paginated response with clients collection.', type: ClientDto })
   @Get('')
   async listClients(
@@ -115,6 +129,7 @@ export class ClientsController {
     @Query('email') email?: string,
     @Query('legal_name') legal_name?: string,
     @Query('name') name?: string,
+    @Query('postal_code') postal_code?: string,
     @Query('next_item') next_item?: string,
   ): Promise<httpControllerResponse> {
     let next_id: string|undefined = undefined;
@@ -137,6 +152,7 @@ export class ClientsController {
       email, 
       legal_name, 
       name, 
+      postal_code, 
       next_id, 
       next_date);
     
@@ -184,7 +200,7 @@ export class ClientsController {
   @ApiOkResponse({ description: 'Standardized response with operation message.' })
   @Patch('/:id_client')
   async modifyClient(
-    @Param('id_client') id_client: string,
+    @Param('id_client', ParseUUIDPipe) id_client: string,
     @Body() body: ClientDto,
   ): Promise<httpControllerResponse> {
     await this.modifyClientCommand.execute(
@@ -210,7 +226,7 @@ export class ClientsController {
   @ApiParam({ name: 'id_client', description: 'Client identifier', type: String })
   @ApiOkResponse({ description: 'Standardized response with operation message.' })
   @Patch('/:id_client/deactivate')
-  async deactivateClient(@Param('id_client') id_client: string): Promise<httpControllerResponse> {
+  async deactivateClient(@Param('id_client', ParseUUIDPipe) id_client: string): Promise<httpControllerResponse> {
     await this.deactivateClientCommand.execute(id_client);
 
     const httpResponseFormatter = new httpFormatter();
@@ -303,29 +319,14 @@ export class ClientsController {
     @Query('colony') colony?: string,
     @Query('postal_code') postal_code?: string,
     @Query('location_name') location_name?: string,
-    @Query('status_location') status_location?: string,
-    @Query('id_creator') id_creator?: string,
-    @Query('id_client') id_client?: string,
-    @Query('id_location_type') id_location_type?: string,
+    @Query('status_location', new ParseArrayPipe({ items: Number, separator: ',', optional: true })) status_location?: number[],
+    @Query('id_creator', new ParseArrayPipe({ items: String, separator: ',', optional: true })) id_creator?: string[],
+    @Query('id_client', new ParseArrayPipe({ items: String, separator: ',', optional: true })) id_client?: string[],
+    @Query('id_location_type', new ParseArrayPipe({ items: String, separator: ',', optional: true })) id_location_type?: string[],
   ): Promise<httpControllerResponse> {
     let next_id: string | undefined = undefined;
     let next_date: string | undefined = undefined;
     let parsedLimit: number | undefined = undefined;
-
-    /*
-      Patch (07-17-26)
-
-      Make safet the parsing of parameters.
-    */
-    const toArray = (value?: string): any[] | undefined => {
-      if (typeof value === 'string') return JSON.parse(value)
-      else return undefined;
-    };
-
-    const statusLocationParsed = toArray(status_location);
-    const idCreatorValues = toArray(id_creator);
-    const idClientValues = toArray(id_client);
-    const idLocationTypeValues = toArray(id_location_type);
 
     const httpRequestFormatter = new httpFormatter();
     const httpResponseFormatter = new httpFormatter();
@@ -346,10 +347,10 @@ export class ClientsController {
       colony,
       postal_code,
       location_name,
-      statusLocationParsed,
-      idCreatorValues,
-      idClientValues,
-      idLocationTypeValues,
+      status_location,
+      id_creator,
+      id_client,
+      id_location_type,
     );
 
     return httpResponseFormatter.createResponse(
@@ -403,7 +404,7 @@ export class ClientsController {
   @ApiOkResponse({ description: 'Standardized response with operation message.' })
   @Patch('/locations/:id_location')
   async modifyLocation(
-    @Param('id_location') id_location: string,
+    @Param('id_location', ParseUUIDPipe) id_location: string,
     @Body() body: UpdateLocationRequest,
   ): Promise<httpControllerResponse> {
     await this.modifyLocationCommand.execute(
@@ -434,20 +435,20 @@ export class ClientsController {
   @ApiOperation({ summary: 'Deactivate location', description: `Deactivates a location by ID and deactivation type.    
 Deactivation reason/type:
 
-- ***Closed*** - When a client ends their economical activity.
+- ***Closed (1)*** - When a client ends their economical activity.
 
-- ***Shutdown*** - When a client suddenly closes the business with the expectation of open in the future.
+- ***Shutdown (2)*** - When a client suddenly closes the business with the expectation of open in the future.
 
-- ***Churned*** - When a client change to another supplied (preference).` })
+- ***Churned (3)*** - When a client change to another supplied (preference).` })
   @ApiParam({ name: 'id_location', description: 'Location identifier', type: String })
   @ApiParam({ name: 'deactivation_type', description: 'Deactivation type identifier', type: String })
   @ApiOkResponse({ description: `Standardized response with operation message.` })
   @Patch('/locations/:id_location/deactivate/:deactivation_type')
   async deactivateLocation(
-    @Param('id_location') id_location: string,
-    @Param('deactivation_type') deactivation_type: string,
+    @Param('id_location', ParseUUIDPipe) id_location: string,
+    @Param('deactivation_type', ParseIntPipe) deactivation_type: number,
   ): Promise<httpControllerResponse> {
-    await this.deactivateLocationCommand.execute(id_location, parseInt(deactivation_type, 10));
+    await this.deactivateLocationCommand.execute(id_location, deactivation_type);
 
     const httpResponseFormatter = new httpFormatter();
     return httpResponseFormatter.createResponse('Location deactivated successfully');
@@ -463,7 +464,7 @@ Deactivation reason/type:
   @ApiOkResponse({ description: 'Standardized response with operation message.' })
   @Post('/locations/:id_location/notes')
   async createLocationNote(
-    @Param('id_location') id_location: string,
+    @Param('id_location', ParseUUIDPipe) id_location: string,
     @Body() body: Partial<LocationNoteDto>,
   ): Promise<httpControllerResponse> {
     await this.creationNoteCommand.execute(
@@ -567,7 +568,7 @@ Deactivation reason/type:
   @ApiOkResponse({ description: 'Standardized response with operation message.' })
   @Patch('/locations/furnitures/:id_furniture')
   async modifyFurniture(
-    @Param('id_furniture') id_furniture: string,
+    @Param('id_furniture', ParseUUIDPipe) id_furniture: string,
     @Body() body: Partial<FurnitureDto>,
   ): Promise<httpControllerResponse> {
     await this.modifyFurnitureCommand.execute(

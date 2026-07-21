@@ -105,14 +105,16 @@ export class ClientSupabase implements ClientRepository {
     email?: string, 
     legal_name?: string, 
     name?: string,
+    postal_code?: string,
   ): Promise<TaxClientInformationEntity[]> {
     const query = this.supabase.from('clients').select();
     
-    if(cellphone) query.eq('cellphone', `%${cellphone}%`)
-    if(email) query.eq('email', `%${email}%`)
-    
+    if(cellphone) query.eq('cellphone', `${cellphone}`)
+      
+    if(email) query.like('email', `%${email}%`)
     if(legal_name) query.like('legal_name', `%${legal_name}%`)
     if(name) query.ilike('name', `%${name}%`)
+    if(postal_code) query.ilike('postal_code', `%${postal_code}%`)
 
     if (lastCreatedAt && lastIdClient) {
       const createdAtCursor = lastCreatedAt;
@@ -124,6 +126,9 @@ export class ClientSupabase implements ClientRepository {
 
     query.order('created_at', { ascending: false})
     query.order('id_client', { ascending: false})
+
+    console.log(cellphone)
+    console.log(query)
 
     const { data, error } = await query.limit(limit);
     if (error) {

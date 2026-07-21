@@ -26,6 +26,7 @@ export class ListClientsQuery {
     email?: string, 
     legal_name?: string, 
     name?: string,
+    postal_code?: string,
     lastIdClient?: string, // Part of the cursor
     lastCreatedAt?: string, // Part of the cursor
   ): Promise<ClientDto[]> {
@@ -47,6 +48,7 @@ export class ListClientsQuery {
       email,
       legal_name,
       name,
+      postal_code,
     );
 		return clients.map((client: TaxClientInformationEntity) => this.mapper.toDto(client));
 	}

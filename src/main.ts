@@ -8,6 +8,7 @@ async function bootstrap() {
 
   // Swagger documentation
   const config = new DocumentBuilder()
+  .addBearerAuth()
   .setTitle('Twister backend documentation')
   .setDescription('This services provides the necessary endpoints for twister\'s clients')
   .setVersion('1.0')
