@@ -20,7 +20,7 @@ export abstract class RouteTransactionRepository {
     nextCreatedAt?: string, // Id transaction
     nextId?: string, // Id transaction
     cfdi?: string,
-    received_amount?: string,
+    received_amount?: number,
     transaction_status?: number[],
     id_location?: string[],
     id_client?: string[],

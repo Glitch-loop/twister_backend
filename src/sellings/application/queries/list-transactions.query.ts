@@ -16,7 +16,7 @@ export class ListTransactionsQuery {
 	async execute(
 		limit?: number,
 		cfdi?: string,
-		received_amount?: string,
+		received_amount?: number,
 		transaction_status?: number[],
 		id_location?: string[],
 		id_client?: string[],

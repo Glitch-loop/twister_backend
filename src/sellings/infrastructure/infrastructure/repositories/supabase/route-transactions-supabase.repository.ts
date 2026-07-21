@@ -235,7 +235,7 @@ export class RouteTransactionsSupabaseRepository implements RouteTransactionRepo
     nextCreatedAt?: string,
     nextId?: string,
     cfdi?: string,
-    received_amount?: string,
+    received_amount?: number,
     transaction_status?: number[],
     id_location?: string[],
     id_client?: string[],

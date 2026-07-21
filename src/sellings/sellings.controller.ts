@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseArrayPipe, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import {
 	ApiBody,
 	ApiOkResponse,
@@ -103,7 +103,7 @@ Considerations:
 	@ApiParam({ name: 'id_transaction', description: 'Transaction identifier', type: String })
 	@ApiOkResponse({ description: 'Standardized response with operation message.' })
 	@Patch('/transactions/:id_transaction/cancel')
-	async cancelTransaction(@Param('id_transaction') idTransaction: string): Promise<httpControllerResponse> {
+	async cancelTransaction(@Param('id_transaction', ParseIntPipe) idTransaction: string): Promise<httpControllerResponse> {
 		await this.cancelTransactionCommand.execute(idTransaction);
 
 		const httpResponseFormatter = new httpFormatter();
@@ -114,10 +114,10 @@ Considerations:
 		summary: 'List transactions',
 		description: 'Returns a paginated collection of transactions with optional filters.',
 	})
-	@ApiQuery({ name: 'limit', required: false, type: String, description: 'Page size (max 1000).' })
+	@ApiQuery({ name: 'limit', required: false, type: Number, description: 'Page size (max 1000).' })
 	@ApiQuery({ name: 'next_item', required: false, type: String, description: 'Opaque cursor for next page.' })
 	@ApiQuery({ name: 'cfdi', required: false, type: String })
-	@ApiQuery({ name: 'received_amount', required: false, type: String })
+	@ApiQuery({ name: 'received_amount', required: false, type: Number })
 	@ApiQuery({ name: 'transaction_status', required: false, type: Number, isArray: true })
 	@ApiQuery({ name: 'id_location', required: false, type: String, isArray: true })
 	@ApiQuery({ name: 'id_client', required: false, type: String, isArray: true })
@@ -127,34 +127,19 @@ Considerations:
 	@ApiOkResponse({ description: 'Standardized paginated response with transactions collection.', type: [TransactionDto] })
 	@Get('/transactions')
 	async listTransactions(
-		@Query('limit') limit?: string,
+		@Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
 		@Query('next_item') next_item?: string,
 		@Query('cfdi') cfdi?: string,
-		@Query('received_amount') received_amount?: string,
-		@Query('transaction_status') transaction_status?: string | string[],
-		@Query('id_location') id_location?: string | string[],
-		@Query('id_client') id_client?: string | string[],
-		@Query('id_work_day') id_work_day?: string | string[],
-		@Query('id_payment_method') id_payment_method?: string | string[],
-		@Query('id_payment_schema') id_payment_schema?: string | string[],
+		@Query('received_amount', new ParseIntPipe({ optional: true })) received_amount?: number,
+		@Query('transaction_status', new ParseArrayPipe({ items: Number, separator: ',', optional: true })) transaction_status?: number[],
+		@Query('id_location', new ParseArrayPipe({ items: String, separator: ',', optional: true })) id_location?: string[],
+		@Query('id_client', new ParseArrayPipe({ items: String, separator: ',', optional: true })) id_client?: string[],
+		@Query('id_work_day', new ParseArrayPipe({ items: String, separator: ',', optional: true })) id_work_day?: string[],
+		@Query('id_payment_method', new ParseArrayPipe({ items: String, separator: ',', optional: true })) id_payment_method?: string[],
+		@Query('id_payment_schema', new ParseArrayPipe({ items: String, separator: ',', optional: true })) id_payment_schema?: string[],
 	): Promise<httpControllerResponse> {
-		const toArray = (value?: string | string[]): string[] | undefined => {
-			if (!value) return undefined;
-			if (Array.isArray(value)) return value.filter((item) => item.length > 0);
-
-			return value
-				.split(',')
-				.map((item) => item.trim())
-				.filter((item) => item.length > 0);
-		};
-
 		let nextId: string | undefined = undefined;
 		let nextDate: string | undefined = undefined;
-		let parsedLimit: number | undefined = undefined;
-
-		const transactionStatusValues = toArray(transaction_status);
-		const parsedTransactionStatus = transactionStatusValues?.map((value) => Number.parseInt(value, 10))
-			.filter((value) => Number.isInteger(value));
 
 		const httpRequestFormatter = new httpFormatter();
 		const httpResponseFormatter = new httpFormatter();
@@ -165,18 +150,16 @@ Considerations:
 			if (paginationInformation.created_at) nextDate = paginationInformation.created_at;
 		}
 
-		if (limit) parsedLimit = Number.parseInt(limit, 10);
-
 		const data: TransactionDto[] = await this.listTransactionsQuery.execute(
-			parsedLimit,
+			limit,
 			cfdi,
 			received_amount,
-			parsedTransactionStatus,
-			toArray(id_location),
-			toArray(id_client),
-			toArray(id_work_day),
-			toArray(id_payment_method),
-			toArray(id_payment_schema),
+			transaction_status,
+			id_location,
+			id_client,
+			id_work_day,
+			id_payment_method,
+			id_payment_schema,
 			nextId,
 			nextDate,
 		);
@@ -184,7 +167,7 @@ Considerations:
 		return httpResponseFormatter.createResponse(
 			'Transactions listed successfully.',
 			data,
-			parsedLimit,
+			limit,
 			'id_transaction',
 			'created_at',
 		);
