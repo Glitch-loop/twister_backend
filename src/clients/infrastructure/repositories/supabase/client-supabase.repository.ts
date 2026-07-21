@@ -127,9 +127,6 @@ export class ClientSupabase implements ClientRepository {
     query.order('created_at', { ascending: false})
     query.order('id_client', { ascending: false})
 
-    console.log(cellphone)
-    console.log(query)
-
     const { data, error } = await query.limit(limit);
     if (error) {
       throw new Error(`Failed to list clients: ${error.message}`);

@@ -121,12 +121,7 @@ export class BusinessOperationDayAggregate {
 			});
 
 			const clientsToAttendInTheRouteSet: Set<string> = new Set<string>(clientsToAttendInTheRoute.map((client) => client.id_location!));
-			console.log("In function determining if it has not beed visited a route attention client: ", [...this.dayOperations]
-				.some((dayOperation) => 
-						 dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.client_visited 
-					&& clientsToAttendInTheRouteSet.has(dayOperation.id_location!)
-					&& dayOperation.id_location !== idCurrentLocation
-				))
+
 			return !([...this.dayOperations]
 				.some((dayOperation) => 
 					 dayOperation.id_operation_type === DAY_OPERATIONS_ENUM.client_visited 
@@ -138,15 +133,11 @@ export class BusinessOperationDayAggregate {
 	}
 
 	getLastOperationByTypeBeforeCurrentOperation(idCurrentOperation: string): WorkDayOperationHistoricEntity | undefined {
-		console.log("START finding last operation type.%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 		const clientToAttendInTheRouteSet:Set<string> = new Set<string>();
 		
 		if (this.dayOperations === null) {
 			return undefined;
 		}
-
-		console.log("List all the day operations")
-		console.log([...this.dayOperations])
 
 		// Retrieve the day operations that represent the prospect of client.
 		const dayOperationToDetermineLocation = [...this.dayOperations].find(
@@ -171,17 +162,10 @@ export class BusinessOperationDayAggregate {
 			const { id_location } = clientToAttend;
 			if (id_location !== null) clientToAttendInTheRouteSet.add(id_location);
 		});
-
-		console.log("Clients in the route and previous prospect of clients")
-		console.log(clientsToAttendInTheRoute)
 		
 		// Retrieving those clients (clients in route or prospect of clients) that has already visited during the day.
 		const visitClientsToAttendInTheRoute: WorkDayOperationHistoricEntity[] = [...this.dayOperations].filter((clientToAttend) => {
 			const { id_operation_type, id_location } = clientToAttend
-			console.log("Selection for id_location: ", id_location)
-			console.log("id_operation_type === DAY_OPERATIONS_ENUM.client_visited: ", id_operation_type === DAY_OPERATIONS_ENUM.client_visited)
-			console.log("id_operation_type: ", id_operation_type, " - ", DAY_OPERATIONS_ENUM.client_visited)
-			console.log("clientToAttendInTheRouteSet.has(id_location): ", clientToAttendInTheRouteSet.has(id_location!))
 			return id_operation_type === DAY_OPERATIONS_ENUM.client_visited && id_location !== null && clientToAttendInTheRouteSet.has(id_location)
 		});
 
@@ -189,11 +173,6 @@ export class BusinessOperationDayAggregate {
 			(a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
 		);
 
-		console.log("&&&&&&&&&&&&&&&&&&&")
-		console.log("Candidate clients for organizing ordered by date")
-		console.log(visitClientsToAttendInTheRoute)
-		
-		console.log("Determining")
 		while (visitOfClientsToAttendInRouteOrdered.length > 0) {
 			const currentVisitOfClientToAttendInRoute = visitOfClientsToAttendInRouteOrdered.pop();
 			if (currentVisitOfClientToAttendInRoute === undefined) return undefined;
@@ -207,8 +186,7 @@ export class BusinessOperationDayAggregate {
 				return currentVisitOfClientToAttendInRoute;
 			}
 		}
-		console.log("There is not a last day operation.")
-		console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+
 		return undefined;
 	}
 

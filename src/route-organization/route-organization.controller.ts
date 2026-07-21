@@ -158,7 +158,7 @@ this behavior is needed.`,
 	@Get('/routes')
 	async listRoutes(
 		@Query('route_name') route_name?: string,
-		@Query('route_status', ParseIntPipe) route_status?: number,
+		@Query('route_status', new ParseIntPipe({ optional: true })) route_status?: number,
 	): Promise<httpControllerResponse> {
 		const routes: RouteDto[] = await this.listRoutesQuery.execute(route_name, route_status);
 		const httpResponseFormatter = new httpFormatter();
@@ -435,7 +435,7 @@ that route day was assigned to the vendor (his default route).`,
 	async listRouteDayProposals(
 		@Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
 		@Query('proposal_name') proposal_name?: string,
-		@Query('id_route_day', ParseUUIDPipe) id_route_day?: string,
+		@Query('id_route_day', new ParseUUIDPipe({ optional: true })) id_route_day?: string,
 		@Query('next_item') next_item?: string,
 	): Promise<httpControllerResponse> {
 		let next_id: string | undefined = undefined;
