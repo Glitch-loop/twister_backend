@@ -7,6 +7,6 @@ export const isRouteEntity = (value: unknown): value is RouteEntity => {
     typeof value.id_route === 'string' &&
     typeof value.route_name === 'string' &&
     typeof value.route_status === 'number' &&
-    (value.description === undefined || value.description === null || typeof value.description === 'string')
+    (value.description === null || typeof value.description === 'string')
   );
 };

@@ -5,6 +5,6 @@ export class RouteEntity {
     public readonly id_route: string,
     public readonly route_name: string,
     public readonly route_status: ROUTE_STATUS_ENUM,
-    public readonly description?: string,
+    public readonly description: string|null,
   ) {}
 }

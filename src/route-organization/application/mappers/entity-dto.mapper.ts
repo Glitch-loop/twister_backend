@@ -172,7 +172,7 @@ export class Mapper {
 		return {
 			id_route: domainObject.id_route,
 			route_name: domainObject.route_name,
-			description: domainObject.description,
+			description: domainObject.description === null ? undefined : domainObject.description,
 		};
 	}
 
@@ -234,7 +234,7 @@ export class Mapper {
 			dto.id_route,
 			dto.route_name,
 			ROUTE_STATUS_ENUM.ACTIVE,
-			dto.description,
+			dto.description === undefined ? null : dto.description,
 		);
 	}
 

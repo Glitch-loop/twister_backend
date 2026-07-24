@@ -11,6 +11,6 @@ export const isRouteModel = (value: unknown): value is RouteModel => {
     typeof value.id_route === 'string' &&
     typeof value.route_name === 'string' &&
     typeof value.route_status === 'number' &&
-    (value.description === undefined || typeof value.description === 'string')
+    (value.description === null || typeof value.description === 'string')
   );
 };

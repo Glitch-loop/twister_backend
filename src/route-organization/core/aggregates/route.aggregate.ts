@@ -7,7 +7,7 @@ export class RouteAggregate {
     this.routeEntity = routeEntity;
   }
 
-  createRoute(id_route: string, route_name: string, description?: string) {
+  createRoute(id_route: string, route_name: string, description: string | null) {
     const newRouteEntity = new RouteEntity(
       id_route,
       route_name, 
@@ -79,7 +79,7 @@ export class RouteAggregate {
       throw new Error('Route entity does not exist.');
     }
 
-    if (this.routeEntity.route_status === ROUTE_STATUS_ENUM.INACTIVE) {
+    if (this.routeEntity.route_status === ROUTE_STATUS_ENUM.ACTIVE) {
       return true;
     } else {
       return false;

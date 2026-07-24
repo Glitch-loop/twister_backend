@@ -28,12 +28,13 @@ import { WorkDaysModel as NewWorkDaysModel } from "../models/models_new_schema/w
 import { ProductPriceModel as NewProductPricesModel } from "../models/models_new_schema/product-price.model";
 import { WorkDayOperationHistoricModel } from "../models/models_new_schema/work-day-operation-historic.model";
 // Enums
-import { ROUTE_INVENTORY_OPERATION_TYPE } from '@/src/inventories/core/enums/route-inventory-operation-type.enum';
-import { MOVEMENT_TYPE_ENUM } from "@/src/inventories/core/enums/movement-type.enum";
-import { INVENTORY_CONTEXT_ENUM } from "@/src/inventories/core/enums/inventory-context.enum";
 
+import { ROUTE_INVENTORY_OPERATION_TYPE } from '../../src/inventories/core/enums/route-inventory-operation-type.enum';
+import { MOVEMENT_TYPE_ENUM } from "../../src/inventories/core/enums/movement-type.enum";
+import { INVENTORY_CONTEXT_ENUM } from "../../src/inventories/core/enums/inventory-context.enum";
 
-import { IntegrityNodeRepository } from "@/src/shared/infrastructure/repositories/node/integrity.repository";
+import crypto from 'crypto';
+
 
 type oldDatabaseTableType =
   | "products"
@@ -153,7 +154,7 @@ const DEFAULT_LOCATION_CLIENT_ID = "041c6093-a97b-4f4c-ab8e-6d1e35689555";
 const DEFAULT_LOCATION_TYPE_ID = "c272bb96-cf1a-4d8f-8598-179e6869847a";
 const DEFAULT_MEASUREMENT_UNIT_ID = "4ec2e2fc-625b-4b45-a75f-4b028fb32ea0";
 const DEFAULT_PAYMENT_SCHEMA_ID = "a5c8cb96-860c-4f40-bff2-3fb80fde2ef4";
-const VISIT_DAY_OPERATION = " 45354223-2156-46d0-8aa7-6f178f85671a";
+const VISIT_DAY_OPERATION = "45354223-2156-46d0-8aa7-6f178f85671a";
 const DEFAULT_WAREHOUSE_ID = "09064209-234a-4ed7-a249-af97ec8f8bcf";
 const DEFAULT_WAREHOUSE_DEVOLUTION_ID = "f890c854-25fa-4b3c-882e-aa5c30fe095a";
 
@@ -271,70 +272,11 @@ async function fetchModelsFromTable<T>(
   return rows.map(mapper);
 }
 
-function getSnapshotTotalRecords(snapshot: Record<string, unknown[]>): number {
-  return Object.values(snapshot).reduce((sum, rows) => sum + rows.length, 0);
-}
-
-function getSnapshotTableCounts(snapshot: Record<string, unknown[]>): Record<string, number> {
-  const counts: Record<string, number> = {};
-
-  for (const [table, rows] of Object.entries(snapshot)) {
-    counts[table] = rows.length;
-  }
-
-  return counts;
-}
 
 function filterMissingById<T>(rows: T[], existingIds: Set<string>, getId: (row: T) => string): T[] {
   return rows.filter((row) => !existingIds.has(getId(row)));
 }
 
-function buildOriginRecordsToMigrate(
-  origin: OldSchemaSnapshot,
-  target: NewSchemaSnapshot,
-): OldSchemaSnapshot {
-  const targetProductIds = new Set(target.products.map((row) => row.id_product));
-  const targetLocationIds = new Set(target.locations.map((row) => row.id_location));
-  const targetRouteIds = new Set(target.routes.map((row) => row.id_route));
-  const targetWorkDayIds = new Set(target.work_days.map((row) => row.id_work_day));
-  const targetRouteDayIds = new Set(target.route_days.map((row) => row.id_route_day));
-  const targetRouteDayLocationIds = new Set(target.route_day_locations.map((row) => row.id_route_day_location));
-  const targetRouteDayProposalIds = new Set(target.route_day_proposals.map((row) => row.id_route_day_proposal));
-  const targetRouteDayLocationProposalIds = new Set(target.route_day_location_proposals.map((row) => row.id_route_day_location_proposal));
-  const targetTransactionIds = new Set(target.transactions.map((row) => row.id_transaction));
-  const targetTransactionDescriptionIds = new Set(target.transaction_descriptions.map((row) => row.id_transaction_description));
-  const targetInventoryOperationIds = new Set(target.inventory_operations.map((row) => row.id_inventory_operation));
-  const targetInventoryOperationDescriptionIds = new Set(
-    target.inventory_operation_descriptions.map((row) => row.id_inventory_operation_description),
-  );
-
-  return {
-    products: filterMissingById(origin.products, targetProductIds, (row) => row.id_product),
-    stores: filterMissingById(origin.stores, targetLocationIds, (row) => row.id_store),
-    routes: filterMissingById(origin.routes, targetRouteIds, (row) => row.id_route),
-    work_days: filterMissingById(origin.work_days, targetWorkDayIds, (row) => row.id_work_day),
-    route_days: filterMissingById(origin.route_days, targetRouteDayIds, (row) => row.id_route_day),
-    route_day_stores: filterMissingById(origin.route_day_stores, targetRouteDayLocationIds, (row) => row.id_route_day_store),
-    route_day_proposals: filterMissingById(origin.route_day_proposals, targetRouteDayProposalIds, (row) => row.id_route_day_proposal),
-    route_day_store_proposals: filterMissingById(
-      origin.route_day_store_proposals,
-      targetRouteDayLocationProposalIds,
-      (row) => row.id_route_day_store,
-    ),
-    route_transactions: filterMissingById(origin.route_transactions, targetTransactionIds, (row) => row.id_route_transaction),
-    route_transaction_descriptions: filterMissingById(
-      origin.route_transaction_descriptions,
-      targetTransactionDescriptionIds,
-      (row) => row.id_route_transaction_description,
-    ),
-    inventory_operations: filterMissingById(origin.inventory_operations, targetInventoryOperationIds, (row) => row.id_inventory_operation),
-    inventory_operation_descriptions: filterMissingById(
-      origin.inventory_operation_descriptions,
-      targetInventoryOperationDescriptionIds,
-      (row) => row.id_inventory_operation_description,
-    ),
-  };
-}
 
 async function fetchOldSchemaSnapshot<T extends oldDatabaseTableType>(
   client: SupabaseClientType,
@@ -629,46 +571,30 @@ async function fetchNewSchemaSnapshot<T extends newDatabaseTableType>(
   }
 }
 
-async function fetchCompleteOldSchemaSnapshot(client: SupabaseClientType): Promise<OldSchemaSnapshot> {
-  const entries = await Promise.all(
-    OLD_SCHEMA_TABLES.map(async (tableName) => [tableName, await fetchOldSchemaSnapshot(client, tableName)] as const),
-  );
-
-  return Object.fromEntries(entries) as OldSchemaSnapshot;
-}
-
-async function fetchCompleteNewSchemaSnapshot(client: SupabaseClientType): Promise<NewSchemaSnapshot> {
-  const entries = await Promise.all(
-    NEW_SCHEMA_TABLES.map(async (tableName) => [tableName, await fetchNewSchemaSnapshot(client, tableName)] as const),
-  );
-
-  return Object.fromEntries(entries) as NewSchemaSnapshot;
-}
-
 async function getRowsToMigrate<
-  TOldTable extends oldDatabaseTableType,
-  TNewTable extends newDatabaseTableType,
+  TOldRow extends object,
+  TNewRow extends object,
 >(
   oldDbClient: SupabaseClientType,
   newDbClient: SupabaseClientType,
-  originDbTable: TOldTable,
-  targetDbTable: TNewTable,
-  getOriginId: (row: OldSchemaSnapshot[TOldTable][number]) => string,
-  getTargetId: (row: NewSchemaSnapshot[TNewTable][number]) => string,
-): Promise<OldSchemaSnapshot[TOldTable]> {
+  originDbTable: oldDatabaseTableType,
+  targetDbTable: newDatabaseTableType,
+  getOriginId: (row: TOldRow) => string,
+  getTargetId: (row: TNewRow) => string,
+): Promise<TOldRow[]> {
   const [originRecords, targetRecords] = await Promise.all([
-    fetchOldSchemaSnapshot(oldDbClient, originDbTable),
-    fetchNewSchemaSnapshot(newDbClient, targetDbTable),
+    fetchOldSchemaSnapshot(oldDbClient, originDbTable) as Promise<TOldRow[]>,
+    fetchNewSchemaSnapshot(newDbClient, targetDbTable) as Promise<TNewRow[]>,
   ]);
 
   const targetIds = new Set(targetRecords.map(getTargetId));
-  return filterMissingById(originRecords, targetIds, getOriginId) as OldSchemaSnapshot[TOldTable];
+  return filterMissingById<TOldRow>(originRecords, targetIds, getOriginId);
 }
 
 async function productProcess(oldDbClient: SupabaseClientType, newDbClient: SupabaseClientType): Promise<void> {
   console.log(`[Process] Starting product migration`);
 
-  const rowsToMigrate = await getRowsToMigrate(
+  const rowsToMigrate = await getRowsToMigrate<OldProductsModel, NewProductsModel>(
     oldDbClient,
     newDbClient,
     "products",
@@ -711,8 +637,8 @@ async function productProcess(oldDbClient: SupabaseClientType, newDbClient: Supa
 
 async function locationProcess(originDbClient: SupabaseClientType, targetDbClient: SupabaseClientType): Promise<void> {
   console.log(`[Process] Starting location migration`);
-
-  const rowsToMigrate = await getRowsToMigrate(
+  const idCreatorSet = new Set<string>();
+  const rowsToMigrate = await getRowsToMigrate<OldStoresModel, NewLocationsModel>(
     originDbClient,
     targetDbClient,
     "stores",
@@ -723,33 +649,39 @@ async function locationProcess(originDbClient: SupabaseClientType, targetDbClien
 
   console.log(`[Process] Locations to migrate: ${rowsToMigrate.length}.`);
 
-  const locationRows = rowsToMigrate.map((row) => ({
-    id_location: row.id_store,
-    street: row.street,
-    ext_number: row.ext_number,
-    colony: row.colony,
-    postal_code: row.postal_code,
-    address_reference: row.address_reference,
-    location_name: row.store_name,
-    latitude: row.latitude,
-    longitude: row.longitude,
-    status_location: row.status_store,
-    id_creator: row.id_creator,
-    id_client: DEFAULT_LOCATION_CLIENT_ID,
-    id_location_type: DEFAULT_LOCATION_TYPE_ID,
-    created_at: row.creation_date,
-    updated_at: row.creation_date,
-  }));  
-
+  const locationRows = rowsToMigrate.map((row) => 
+    {
+      idCreatorSet.add(row.id_creator)
+      return {
+        id_location: row.id_store,
+        street: row.street,
+        ext_number: row.ext_number,
+        colony: row.colony,
+        postal_code: row.postal_code,
+        address_reference: row.address_reference,
+        location_name: row.store_name,
+        latitude: row.latitude,
+        longitude: row.longitude,
+        status_location: row.status_store,
+        id_creator: row.id_creator,
+        id_client: DEFAULT_LOCATION_CLIENT_ID,
+        id_location_type: DEFAULT_LOCATION_TYPE_ID,
+        created_at: row.creation_date,
+        updated_at: row.creation_date,
+      }
+    }
+  );  
+  console.info(`[Info] Set of id creators:`)
+  idCreatorSet.forEach((value) => console.log(value))
   const insertedLocations = await insertRows(targetDbClient, "locations", locationRows);
-  
   console.log(`[Process] Inserted locations: ${insertedLocations}`);
+
 }
 
 async function routeRecordsProcess(originDbClient: SupabaseClientType, targetDbClient: SupabaseClientType): Promise<void> {
   console.log(`[Process] Starting routes migration`);
 
-  const routesToMigrate = await getRowsToMigrate(
+  const routesToMigrate = await getRowsToMigrate<OldRoutesModel, NewRoutesModel>(
     originDbClient,
     targetDbClient,
     "routes",
@@ -773,7 +705,7 @@ async function routeRecordsProcess(originDbClient: SupabaseClientType, targetDbC
 
   console.log(`[Process] route_days to migrate: ${routesToMigrate.length}.`);
 
-  const routeDaysToMigrate = await getRowsToMigrate(
+  const routeDaysToMigrate = await getRowsToMigrate<OldRouteDaysModel, NewRouteDaysModel>(
     originDbClient,
     targetDbClient,
     "route_days",
@@ -794,7 +726,7 @@ async function routeRecordsProcess(originDbClient: SupabaseClientType, targetDbC
 
   console.log(`[Process] Starting route_days_locations migration`);
 
-  const routeDayLocationsToMigrate = await getRowsToMigrate(
+  const routeDayLocationsToMigrate = await getRowsToMigrate<OldRouteDayStoresModel, NewRouteDayLocationsModel>(
     originDbClient,
     targetDbClient,
     "route_day_stores",
@@ -819,7 +751,7 @@ async function routeRecordsProcess(originDbClient: SupabaseClientType, targetDbC
 async function workDayProcess(originDbClient: SupabaseClientType, targetDbClient: SupabaseClientType): Promise<void> {
   console.log(`[Process] Starting work_days migration.`);
 
-  const rowsToMigrate = await getRowsToMigrate(
+  const rowsToMigrate = await getRowsToMigrate<OldWorkDaysModel, NewWorkDaysModel>(
     originDbClient,
     targetDbClient,
     "work_days",
@@ -872,7 +804,7 @@ async function transactionProcess(originDbClient: SupabaseClientType, targetDbCl
 
   // Retrieve transactions and transaction descriptions.
   console.log(`[Process] Retrieving transaction and transaction descriptions.`)
-  const transactionToMigrate = await getRowsToMigrate(
+  const transactionToMigrate = await getRowsToMigrate<OldRouteTransactionsModel, NewTransactionsModel>(
     originDbClient,
     targetDbClient,
     "route_transactions",
@@ -882,7 +814,7 @@ async function transactionProcess(originDbClient: SupabaseClientType, targetDbCl
   );
   console.log(`[Process] All transactions (transaction with and without transaction descriptions): ${transactionToMigrate.length}.`);
   
-  const descriptionsToMigrate = await getRowsToMigrate(
+  const descriptionsToMigrate = await getRowsToMigrate<OldRouteTransactionDescriptionsModel, NewTransactionDescriptionsModel>(
     originDbClient,
     targetDbClient,
     "route_transaction_descriptions",
@@ -950,7 +882,6 @@ async function transactionProcess(originDbClient: SupabaseClientType, targetDbCl
     }
 
     // For each transaction, create a visit for that client.
-
     dayOperationRows.push(
       new WorkDayOperationHistoricModel(
         VISIT_DAY_OPERATION,
@@ -963,12 +894,10 @@ async function transactionProcess(originDbClient: SupabaseClientType, targetDbCl
         null,
         row.id_store,
         null,
-        undefined
+        crypto.randomUUID()
       )
     );
   });
-
-
 
   console.log(`[Process] Transactions to migrate (only transactions with at least one transaction description): ${transactionRows.length}.`);
   console.log(`[Process] Transaction descriptions to migrate: ${transactionDescriptionRows.length}.`);
@@ -977,13 +906,67 @@ async function transactionProcess(originDbClient: SupabaseClientType, targetDbCl
   const insertedTransactions = await insertRows(targetDbClient, "transactions", transactionRows);
   console.log(`[Process] Inserted transactions: ${insertedTransactions}`);
 
-
   const insertedTransactionDescriptions = await insertRows(targetDbClient, "transaction_descriptions", transactionDescriptionRows);
   console.log(`[Process] Inserted transaction descriptions: ${insertedTransactionDescriptions}`);
 
   const insertedDayOperations = await insertRows(targetDbClient, "work_day_operations_historic", dayOperationRows);
   console.log(`[Process] Inserted transaction descriptions: ${insertedDayOperations}`);
 
+}
+
+async function createVisitForTransactions(originDbClient: SupabaseClientType, targetDbClient: SupabaseClientType) {
+  const dayOperationRows: WorkDayOperationHistoricModel[] = [];
+  console.log(`[Process] Starting process for create a visit per transaction.`);
+  const transaction = await fetchOldSchemaSnapshot(originDbClient, "route_transactions");
+
+  // Retrieve necessary information
+  console.log(`[Process] Retrieving workdays.`)
+  const workDays = await fetchNewSchemaSnapshot(targetDbClient, "work_days");
+  
+  console.log(`[Process] Retrieving product prices.`)
+  const products = await fetchNewSchemaSnapshot(targetDbClient, "products");
+  
+  console.log(`[Process] Retrieving loctions.`)
+  const locations = await fetchNewSchemaSnapshot(targetDbClient, "locations");
+  
+  const workDaysMap: Map<string, NewWorkDaysModel> = new Map<string, NewWorkDaysModel>();
+  const productsMap: Map<string, NewProductsModel> = new Map<string, NewProductsModel>();
+  const locationsMap: Map<string, NewLocationsModel> = new Map<string, NewLocationsModel>();
+  
+  products.forEach((product) => { productsMap.set(product.id_product, product) });
+  workDays.forEach((workday) => { workDaysMap.set(workday.id_work_day, workday) });  
+  locations.forEach((location) => { locationsMap.set(location.id_location, location) });
+
+  transaction.forEach((row) => {
+    const location = locationsMap.get(row.id_store);
+    const workDay = workDaysMap.get(row.id_work_day);
+
+    if (workDay === undefined) {
+      throw new Error(`Error during transforming origin model to target model for transaction: work day with id ${row.id_work_day} doesn't exist`)
+    }
+
+    // For each transaction, create a visit for that client.
+    dayOperationRows.push(
+      new WorkDayOperationHistoricModel(
+        VISIT_DAY_OPERATION,
+        row.date,
+        row.id_work_day,
+        workDay.id_route_day,
+        location?.latitude ?? null,
+        location?.longitude ?? null,
+        row.id_route_transaction,
+        null,
+        row.id_store,
+        null,
+        crypto.randomUUID()
+      )
+    );
+  });
+
+  console.log(`[Process] Day operations to to migrate: ${dayOperationRows.length}.`);
+
+  const insertedDayOperations = await insertRows(targetDbClient, "work_day_operations_historic", dayOperationRows);
+  console.log(`[Process] Inserted transaction descriptions: ${insertedDayOperations}`);
 }
 
 async function inventoryOperationProcess(originDbClient: SupabaseClientType, targetDbClient: SupabaseClientType): Promise<void> {
@@ -1030,7 +1013,7 @@ async function inventoryOperationProcess(originDbClient: SupabaseClientType, tar
   });
   
   console.log("[Process] Retrieving inventory operations to migrate.");
-  const inventoryOperationsToMigrate = await getRowsToMigrate(
+  const inventoryOperationsToMigrate = await getRowsToMigrate<OldInventoryOperationsModel, NewInventoryOperationsModel>(
     originDbClient,
     targetDbClient,
     "inventory_operations",
@@ -1040,7 +1023,7 @@ async function inventoryOperationProcess(originDbClient: SupabaseClientType, tar
   );
 
   console.log("[Process] Retrieving inventory operations descriptions to migrate.");
-  const inventoryOperationDescriptionsToMigrate = await getRowsToMigrate(
+  const inventoryOperationDescriptionsToMigrate = await getRowsToMigrate<OldInventoryOperationDescriptionsModel, NewInventoryOperationDescriptionsModel>(
     originDbClient,
     targetDbClient,
     "inventory_operation_descriptions",
@@ -1152,7 +1135,6 @@ async function inventoryOperationProcess(originDbClient: SupabaseClientType, tar
   const cancelInventoryOperations: NewInventoryOperationsModel[] = [];
   const cancelInventoryOperationsDescriptions: NewInventoryOperationDescriptionsModel[] = [];
 
-  const uuidGenerator = new IntegrityNodeRepository();
   inventoryOperationsToMigrate.forEach((row) => {
     const { state, id_inventory_operation_type } = row;
     let originInventory:string = "";
@@ -1200,7 +1182,7 @@ async function inventoryOperationProcess(originDbClient: SupabaseClientType, tar
         throw new Error(`inventory`)
       }
       
-      const inventoryOperationCancelation = uuidGenerator.generateUUIDv4();
+      const inventoryOperationCancelation = crypto.randomUUID();
 
       cancelInventoryOperations.push(
         {
@@ -1223,7 +1205,7 @@ async function inventoryOperationProcess(originDbClient: SupabaseClientType, tar
         inventoryOperationDescriptionsCancelled.forEach((invOpDesc) => {
           cancelInventoryOperationsDescriptions.push(
             {
-              id_inventory_operation_description: uuidGenerator.generateUUIDv4(),
+              id_inventory_operation_description: crypto.randomUUID(),
               id_inventory_operation: row.id_inventory_operation,
               id_product: invOpDesc.id_product,
               quantity: invOpDesc.quantity,
@@ -1270,308 +1252,6 @@ async function inventoryOperationProcess(originDbClient: SupabaseClientType, tar
   console.log(`[Process] Inventory operations cancelled inserted: ${insertedInventoryOperationDescriptionsCancelled}.`);
 }
 
-// Processes
-async function substep4_1InsertBaseRecords(
-  client: SupabaseClientType,
-  origin: OldSchemaSnapshot,
-): Promise<void> {
-  const createdAt = nowIso();
-
-  const productRows = origin.products.map((row) => ({
-    id_product: row.id_product,
-    product_name: row.product_name,
-    barcode: row.barcode,
-    cost: 0,
-    product_status: row.product_status,
-    quantity_presentation: 0,
-    order_to_show: row.order_to_show,
-    id_measurement_unit: DEFAULT_MEASUREMENT_UNIT_ID,
-    created_at: createdAt,
-  }));
-
-  const locationRows = origin.stores.map((row) => ({
-    id_location: row.id_store,
-    street: row.street,
-    ext_number: row.ext_number,
-    colony: row.colony,
-    postal_code: row.postal_code,
-    address_reference: row.address_reference,
-    location_name: row.store_name,
-    latitude: row.latitude,
-    longitude: row.longitude,
-    status_location: row.status_store,
-    id_creator: row.id_creator,
-    id_client: DEFAULT_LOCATION_CLIENT_ID,
-    id_location_type: DEFAULT_LOCATION_TYPE_ID,
-    created_at: row.creation_date,
-    updated_at: row.creation_date,
-  }));
-
-  const routeRows = origin.routes.map((row) => ({
-    id_route: row.id_route,
-    route_name: row.route_name,
-    description: row.description,
-    route_status: row.route_status,
-  }));
-
-  const insertedProducts = await insertRows(client, "products", productRows);
-  const insertedLocations = await insertRows(client, "locations", locationRows);
-  const insertedRoutes = await insertRows(client, "routes", routeRows);
-
-  console.log(`[step-4.1] Inserted products: ${insertedProducts}`);
-  console.log(`[step-4.1] Inserted locations: ${insertedLocations}`);
-  console.log(`[step-4.1] Inserted routes: ${insertedRoutes}`);
-
-}
-
-async function substep4_2InsertRouteRecords(
-  client: SupabaseClientType,
-  origin: OldSchemaSnapshot,
-): Promise<void> {
-  const routeDayRows = origin.route_days.map((row) => ({
-    id_route_day: row.id_route_day,
-    id_route: row.id_route,
-    id_day: row.id_day,
-  }));
-
-  const routeDayLocationRows = origin.route_day_stores.map((row) => ({
-    position_in_route: row.position_in_route,
-    id_route_day_location: row.id_route_day_store,
-    id_location: row.id_store,
-    id_route_day: row.id_route_day,
-  }));
-
-  const routeDayProposalRows = origin.route_day_proposals
-    .filter((row) => row.id_route_day !== null)
-    .map((row) => ({
-      id_route_day_proposal: row.id_route_day_proposal,
-      proposal_name: row.proposal_name,
-      created_at: row.created_at,
-      id_route_day: row.id_route_day,
-    }));
-
-  const routeDayLocationProposalRows = origin.route_day_store_proposals.map((row) => ({
-    id_route_day_location_proposal: row.id_route_day_store,
-    position_in_route: row.position_in_route,
-    id_route_day_proposal: row.id_route_day_proposal,
-    id_location: row.id_store,
-  }));
-
-  const insertedRouteDays = await insertRows(client, "route_days", routeDayRows);
-  const insertedRouteDayLocations = await insertRows(client, "route_day_locations", routeDayLocationRows);
-  const insertedRouteDayProposals = await insertRows(client, "route_day_proposals", routeDayProposalRows);
-  const insertedRouteDayLocationProposals = await insertRows(
-    client,
-    "route_day_location_proposals",
-    routeDayLocationProposalRows,
-  );
-
-  console.log(`[step-4.2] Inserted route_days: ${insertedRouteDays}`);
-  console.log(`[step-4.2] Inserted route_day_locations: ${insertedRouteDayLocations}`);
-  console.log(`[step-4.2] Inserted route_day_proposals: ${insertedRouteDayProposals}`);
-  console.log(`[step-4.2] Inserted route_day_location_proposals: ${insertedRouteDayLocationProposals}`);
-}
-
-async function substep4_3InsertWorkDays(
-  client: SupabaseClientType,
-  origin: OldSchemaSnapshot,
-): Promise<void> {
-  const workDayRows = origin.work_days.map((row) => ({
-    id_work_day: row.id_work_day,
-    start_date: row.start_date,
-    finish_date: row.finish_date,
-    start_petty_cash: row.start_petty_cash,
-    final_petty_cash: row.final_petty_cash,
-    id_route_day: row.id_route_day,
-    id_user: row.id_vendor,
-    id_payment_stub: null,
-  }));
-
-  const insertedWorkDays = await insertRows(client, "work_days", workDayRows);
-  console.log(`[step-4.3] Inserted work_days: ${insertedWorkDays}`);
-}
-
-async function substep4_4BuildReferenceMaps(client: SupabaseClientType): Promise<Step4ReferenceMaps> {
-  const [products, locations, workDays] = await Promise.all([
-    fetchModelsFromTable(client, "products", "target-new", (row) => new NewProductsModel(
-      asString(row.id_product),
-      asString(row.product_name),
-      asNullableString(row.barcode),
-      asNumber(row.cost),
-      asNumber(row.product_status),
-      asNumber(row.quantity_presentation),
-      asNumber(row.order_to_show),
-      asString(row.id_measurement_unit),
-      asString(row.created_at),
-    )),
-    fetchModelsFromTable(client, "locations", "target-new", (row) => new NewLocationsModel(
-      asString(row.id_location),
-      asString(row.street),
-      asString(row.ext_number),
-      asString(row.colony),
-      asString(row.postal_code),
-      asNullableString(row.address_reference),
-      asString(row.location_name),
-      asString(row.latitude),
-      asString(row.longitude),
-      asNumber(row.status_location),
-      asString(row.id_creator),
-      asString(row.id_client),
-      asString(row.id_location_type),
-      asString(row.created_at),
-      asString(row.updated_at),
-    )),
-    fetchModelsFromTable(client, "work_days", "target-new", (row) => new NewWorkDaysModel(
-      asString(row.id_work_day),
-      asString(row.start_date),
-      asNullableString(row.finish_date),
-      asNumber(row.start_petty_cash),
-      asNullableNumber(row.final_petty_cash),
-      asString(row.id_route_day),
-      asString(row.id_user),
-      asNullableString(row.id_payment_stub),
-    )),
-  ]);
-
-  return {
-    productsById: new Map(products.map((row) => [row.id_product, row])),
-    locationsById: new Map(locations.map((row) => [row.id_location, row])),
-    workDaysById: new Map(workDays.map((row) => [row.id_work_day, row])),
-  };
-}
-
-async function substep4_5InsertTransactionRecords(
-  client: SupabaseClientType,
-  origin: OldSchemaSnapshot,
-  maps: Step4ReferenceMaps,
-): Promise<void> {
-  const transactionRows = origin.route_transactions.map((row) => {
-    const location = maps.locationsById.get(row.id_store);
-    const workDay = maps.workDaysById.get(row.id_work_day);
-
-    return {
-      id_transaction: row.id_route_transaction,
-      cfdi: null,
-      state: row.state,
-      received_amount: row.cash_received,
-      id_invoice_concept: null,
-      created_at: row.date,
-      id_location: row.id_store,
-      id_client: DEFAULT_LOCATION_CLIENT_ID,
-      id_work_day: row.id_work_day,
-      id_payment_method: row.id_payment_method,
-      id_payment_schema: DEFAULT_PAYMENT_SCHEMA_ID,
-      latitude: location?.latitude ?? null,
-      longitude: location?.longitude ?? null,
-      created_by: workDay?.id_user ?? null,
-    };
-  });
-
-  
-
-  const transactionDescriptionRows = origin.route_transaction_descriptions.map((row) => {
-    const product = maps.productsById.get(row.id_product);
-
-    return {
-      id_transaction_description: row.id_route_transaction_description,
-      id_transaction: row.id_route_transaction,
-      id_product: row.id_product,
-      id_transaction_operation_type: row.id_route_transaction_operation_type,
-      price_at_moment: row.price_at_moment,
-      cost_at_moment: product?.cost ?? 0,
-      quantity: row.amount,
-      created_at: row.created_at,
-    };
-  });
-
-  const insertedTransactions = await insertRows(client, "transactions", transactionRows);
-  const insertedTransactionDescriptions = await insertRows(
-    client,
-    "transaction_descriptions",
-    transactionDescriptionRows,
-  );
-
-  console.log(`[step-4.5] Inserted transactions: ${insertedTransactions}`);
-  console.log(`[step-4.5] Inserted transaction_descriptions: ${insertedTransactionDescriptions}`);
-}
-
-async function substep4_6InsertInventoryRecords(
-  client: SupabaseClientType,
-  origin: OldSchemaSnapshot,
-  maps: Step4ReferenceMaps,
-): Promise<void> {
-  const defaultInventoryOriginId = getRequiredEnv("MIGRATION_DEFAULT_INVENTORY_ORIGIN_ID");
-  const defaultInventoryTargetId = getRequiredEnv("MIGRATION_DEFAULT_INVENTORY_TARGET_ID");
-  const defaultInventoryMovementType = Number(
-    process.env.MIGRATION_DEFAULT_INVENTORY_MOVEMENT_TYPE ?? "0",
-  );
-
-  const inventoryOperationRows = origin.inventory_operations.map((row) => {
-    const workDay = maps.workDaysById.get(row.id_work_day);
-
-    if (!workDay) {
-      throw new Error(
-        `Cannot map inventory operation '${row.id_inventory_operation}' because work_day '${row.id_work_day}' is missing in target database.`,
-      );
-    }
-
-    return {
-      id_inventory_operation: row.id_inventory_operation,
-      document_reference: null,
-      movement_type: defaultInventoryMovementType,
-      latitude: null,
-      longitude: null,
-      inventory_operation_reference: null,
-      created_by: workDay.id_user,
-      id_inventory_origin: defaultInventoryOriginId,
-      id_inventory_target: defaultInventoryTargetId,
-      created_at: row.date,
-    };
-  });
-
-  const inventoryOperationDescriptionRows = origin.inventory_operation_descriptions.map((row) => {
-    const product = maps.productsById.get(row.id_product);
-
-    return {
-      id_inventory_operation_description: row.id_inventory_operation_description,
-      id_inventory_operation: row.id_inventory_operation,
-      id_product: row.id_product,
-      quantity: row.amount,
-      price_at_moment: row.price_at_moment,
-      cost_at_moment: product?.cost ?? 0,
-      created_at: row.created_at,
-    };
-  });
-
-  const insertedInventoryOperations = await insertRows(
-    client,
-    "inventory_operations",
-    inventoryOperationRows,
-  );
-  const insertedInventoryOperationDescriptions = await insertRows(
-    client,
-    "inventory_operation_descriptions",
-    inventoryOperationDescriptionRows,
-  );
-
-  console.log(`[step-4.6] Inserted inventory_operations: ${insertedInventoryOperations}`);
-  console.log(`[step-4.6] Inserted inventory_operation_descriptions: ${insertedInventoryOperationDescriptions}`);
-}
-
-async function executeStep4(
-  targetClient: SupabaseClientType,
-  originRecordsToMigrate: OldSchemaSnapshot,
-): Promise<void> {
-  await substep4_1InsertBaseRecords(targetClient, originRecordsToMigrate);
-  await substep4_2InsertRouteRecords(targetClient, originRecordsToMigrate);
-  await substep4_3InsertWorkDays(targetClient, originRecordsToMigrate);
-
-  const referenceMaps = await substep4_4BuildReferenceMaps(targetClient);
-
-  await substep4_5InsertTransactionRecords(targetClient, originRecordsToMigrate, referenceMaps);
-  await substep4_6InsertInventoryRecords(targetClient, originRecordsToMigrate, referenceMaps);
-}
-
 // Supabase client
 export class SupabaseDataSource {
   private client: SupabaseClientType;
@@ -1603,10 +1283,15 @@ async function migrateScript() {
     process.env.PUBLIC_TARGET_SUPABASE_ANON_KEY
   );
   
-
-  await routeRecordsProcess(supabaseOriginDataSource.getClient(), supabaseTargetDataSource.getClient());
-  await workDayProcess(supabaseOriginDataSource.getClient(), supabaseTargetDataSource.getClient());
-  await transactionProcess(supabaseOriginDataSource.getClient(), supabaseTargetDataSource.getClient());
+  // await productProcess(supabaseOriginDataSource.getClient(), supabaseTargetDataSource.getClient());
+  // await locationProcess(supabaseOriginDataSource.getClient(), supabaseTargetDataSource.getClient());
+  // await routeRecordsProcess(supabaseOriginDataSource.getClient(), supabaseTargetDataSource.getClient());
+  // await workDayProcess(supabaseOriginDataSource.getClient(), supabaseTargetDataSource.getClient());
+  // await transactionProcess(supabaseOriginDataSource.getClient(), supabaseTargetDataSource.getClient());
+  
+  // Special process
+  await createVisitForTransactions(supabaseOriginDataSource.getClient(), supabaseTargetDataSource.getClient());
+  
   await inventoryOperationProcess(supabaseOriginDataSource.getClient(), supabaseTargetDataSource.getClient());
 
 

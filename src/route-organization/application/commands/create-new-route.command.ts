@@ -33,7 +33,7 @@ export class CreateNewRouteCommand {
     const routeEntity: RouteEntity = routeAggregate.createRoute(
       this.integrityRepository.generateUUIDv4(),
       route_name,
-      description,
+      description === undefined ? null : description,
     );
 
     /*
