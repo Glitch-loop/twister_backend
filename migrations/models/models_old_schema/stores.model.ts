@@ -1,0 +1,19 @@
+export class StoresModel {
+  constructor(
+    public readonly street: string,
+    public readonly ext_number: string,
+    public readonly colony: string,
+    public readonly postal_code: string,
+    public readonly address_reference: string | null,
+    public readonly store_name: string,
+    public readonly owner_name: string | null,
+    public readonly cellphone: string | null,
+    public readonly latitude: string,
+    public readonly longitude: string,
+    public readonly creation_date: string,
+    public readonly creation_context: string,
+    public readonly status_store: number,
+    public readonly id_creator: string,
+    public readonly id_store: string,
+  ) {}
+}
